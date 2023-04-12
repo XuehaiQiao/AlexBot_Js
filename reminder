@@ -1,0 +1,175 @@
+W22S15
+W27S18
+
+// claimer spawn
+Game.spawns['Spawn1_W18S15'].spawnCreep([MOVE, CLAIM], 'Claimer' + Game.time, {memory: {role: 'claimer', status: 1, targetRoom: 'W17S13', claim: true}});
+
+//builder
+Game.spawns['Spawn1_W18S15'].spawnCreep([WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE], 'Builder' + Game.time, {memory: {role: 'builder', status: 1, targetRoom: 'W17S13'}});
+
+// carrier spawn
+Game.spawns['Spawn1_W13S21'].spawnCreep([...new Array(40).fill(CARRY), ...new Array(10).fill(MOVE)], 'Carrier' + Game.time, {memory: {role: 'carrier', building: 1}});
+
+// defender
+Game.spawns['Spawn2_W13S21'].spawnCreep([MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, RANGED_ATTACK, MOVE], 'defender' + Game.time, {memory: {role: 'defender', targetRoom: 'W12S21'}});
+
+
+Game.spawns['Spawn1_W18S15'].spawnCreep([WORK, WORK, MOVE], 'Harvester2' + Game.time, {memory: {role: 'harvester2', status: 1, target: 0}});
+[WORK, WORK, MOVE]
+
+_.forEach(_.filter(Game.rooms['W18S15'].find(FIND_STRUCTURES), structure => structure.structureType == STRUCTURE_TOWER), function(object) {
+    object.destroy();
+});
+
+// if no tasks
+if (roomInfo[creep.room.name]) {
+    creep.moveTo(roomInfo[creep.room.name].restPos);
+    return;
+}
+
+// wrecker spawn
+Game.spawns['Spawn1'].spawnCreep([WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE], 'wrecker' + Game.time, {memory: {role: 'wrecker', targetRoom: 'W21S15', target: '63dbf3057bc7d9c61fb347ce'}});
+// scout spawn
+Game.spawns['Spawn1_W21S19'].spawnCreep([MOVE], 'scout' + Game.time, {memory: {role: 'scout', targetRoom: 'W22S18'}});
+
+
+outSourceRooms = {
+    W17S15: {
+        base: 'W18S15',
+        sourceNum: 1,
+    },
+    W17S14: {
+        base: 'W18S15',
+        sourceNum: 2,
+    }
+
+}
+
+
+// outSource logic: if in range 3 find hostile creep, move back home
+// 20:MOVE, 20: ATTACK
+// 10:HEAL, 10: MOVE
+
+// destroy structures
+_.forEach(
+    _.filter(Game.rooms['roomName'].find(FIND_STRUCTURES), struct => struct.structureType == STRUCTURE_EXTENSION), 
+    function(wall){
+        console.log(wall);
+        wall.destroy();
+    }
+);
+
+
+JSON.stringify(obj)
+
+Game.rooms['W13S21'].terminal.send(RESOURCE_ENERGY, 45000, 'W12S21', 'Energy Support 45000');
+
+Game.market.deal('64366b090e083d66a8f6f54b', 20000, "W18S15");
+
+Game.market.createOrder({
+    type: ORDER_SELL,
+    resourceType: RESOURCE_ENERGY,
+    price: 13,
+    totalAmount: 50000,
+    roomName: "W18S15"   
+});
+
+
+/*
+Todo list:
+
+Best safe mode open time
+
+Mineral mining
+- miner creep
+- mineral carrier creep
+
+Lab logic
+
+Remote sourcing
+- harvester
+- carrier
+- knight (pertect & heal others)
+
+Queues
+1. creepGenerationQueue
+- eventCreepQueue
+- otherCreepGenerationQueue
+
+Optimizing code
+- minimizing room maintain cost
+- maximizing out source resources
+- optimizing defending algos
+
+Scouting
+- scout
+- how to pertect it self
+- keep memory of dangerous zone
+- keep memory the killed scouts (where, creep, owner)
+
+2. repairQueue(for tower)
+3. 
+
+*/
+
+// {
+//     "path":[
+//         {"x":36,"y":17,"roomName":"W18S15"},
+//         {"x":37,"y":17,"roomName":"W18S15"},
+//         {"x":38,"y":16,"roomName":"W18S15"},
+//         {"x":39,"y":15,"roomName":"W18S15"},
+//         {"x":40,"y":14,"roomName":"W18S15"},
+//         {"x":41,"y":13,"roomName":"W18S15"},
+//         {"x":42,"y":13,"roomName":"W18S15"},
+//         {"x":43,"y":12,"roomName":"W18S15"},
+//         {"x":44,"y":11,"roomName":"W18S15"},
+//         {"x":45,"y":11,"roomName":"W18S15"},
+//         {"x":46,"y":11,"roomName":"W18S15"},
+//         {"x":47,"y":11,"roomName":"W18S15"},
+//         {"x":48,"y":12,"roomName":"W18S15"},
+//         {"x":49,"y":13,"roomName":"W18S15"},
+//         {"x":0,"y":13,"roomName":"W17S15"},
+//         {"x":1,"y":14,"roomName":"W17S15"},
+//         {"x":1,"y":15,"roomName":"W17S15"},
+//         {"x":1,"y":16,"roomName":"W17S15"},
+//         {"x":1,"y":17,"roomName":"W17S15"},
+//         {"x":1,"y":18,"roomName":"W17S15"},
+//         {"x":2,"y":19,"roomName":"W17S15"},
+//         {"x":3,"y":20,"roomName":"W17S15"},
+//         {"x":4,"y":21,"roomName":"W17S15"},
+//         {"x":5,"y":21,"roomName":"W17S15"},
+//         {"x":6,"y":20,"roomName":"W17S15"},
+//         {"x":7,"y":19,"roomName":"W17S15"},
+//         {"x":8,"y":18,"roomName":"W17S15"},
+//         {"x":9,"y":17,"roomName":"W17S15"},
+//         {"x":10,"y":16,"roomName":"W17S15"},
+//         {"x":11,"y":15,"roomName":"W17S15"},
+//         {"x":12,"y":15,"roomName":"W17S15"},
+//         {"x":13,"y":15,"roomName":"W17S15"},
+//         {"x":14,"y":15,"roomName":"W17S15"},
+//         {"x":15,"y":15,"roomName":"W17S15"},
+//         {"x":16,"y":15,"roomName":"W17S15"},
+//         {"x":17,"y":15,"roomName":"W17S15"},
+//         {"x":18,"y":15,"roomName":"W17S15"},
+//         {"x":19,"y":15,"roomName":"W17S15"},
+//         {"x":20,"y":15,"roomName":"W17S15"},
+//         {"x":21,"y":15,"roomName":"W17S15"},
+//         {"x":22,"y":15,"roomName":"W17S15"},
+//         {"x":23,"y":15,"roomName":"W17S15"},
+//         {"x":24,"y":15,"roomName":"W17S15"},
+//         {"x":25,"y":15,"roomName":"W17S15"},
+//         {"x":26,"y":15,"roomName":"W17S15"},
+//         {"x":27,"y":16,"roomName":"W17S15"},
+//         {"x":28,"y":17,"roomName":"W17S15"},
+//         {"x":29,"y":18,"roomName":"W17S15"},
+//         {"x":30,"y":19,"roomName":"W17S15"},
+//         {"x":31,"y":20,"roomName":"W17S15"},
+//         {"x":32,"y":19,"roomName":"W17S15"},
+//         {"x":33,"y":18,"roomName":"W17S15"},
+//         {"x":33,"y":17,"roomName":"W17S15"},
+//         {"x":32,"y":16,"roomName":"W17S15"}
+//     ],
+//     "ops":1388,
+//     "cost":118,
+//     "incomplete":false，
+// }
