@@ -1,8 +1,8 @@
 /*
     manager: manage link, storage, terminal...
     logic:
-        if link is full, withdraw from link, send it to storage
-        task queues
+        for status == 0: find withdraw target, withdraw and set transfer target.
+        for status == 1: transfer whatever resource to target.
 */
 var manager = {
     properties: {
@@ -19,125 +19,139 @@ var manager = {
             }
         }
 
-        // set up memory
-        this.updateMemory(creep);
+        // update memory every 100 sec
+        if(creep.memory.updated == undefined || Game.time % 100 == 67) {
+            this.updateMemory(creep);
+        }
 
         // set status
-        // currently only energy
-        creep.workerSetStatus();        
+        creep.workerSetStatus();
 
-        // from storage to managerLink
-        if(creep.memory.controllerLink && 
-            Game.getObjectById(creep.memory.controllerLink) && 
-            Game.getObjectById(creep.memory.controllerLink).store[RESOURCE_ENERGY] == 0 &&
-            Game.getObjectById(creep.memory.controllerLink).cooldown <= 1) {
+        // status:1 transfer
+        if(creep.memory.status) {
+            // In theory, manager only carry 1 resource at a time.
+            let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
+            let target = Game.getObjectById(creep.memory.target);
+            let result = -1;
+            if(target) {
+                result = creep.transfer(target, resourceType);
+            }
+            else if(creep.room.storage) { 
+                result = creep.transfer(creep.room.storage, resourceType);
+            }
             
-            creep.say('S2L');
-            this.storageToLink(creep);
+            // if cannot find place to put the resource, drop it
+            if(result != OK) {
+                creep.drop(resourceType);
+            }
         }
-        else if(creep.memory[STRUCTURE_LINK] && Game.getObjectById(creep.memory[STRUCTURE_LINK]) && Game.getObjectById(creep.memory[STRUCTURE_LINK]).store[RESOURCE_ENERGY] > 0) {
-            creep.say('L2S');
-            this.linkToStorage(creep);
-        }
-        // terminal
-        else if(creep.room.terminal && creep.room.terminal.store[RESOURCE_ENERGY] < 50000) {
-            creep.say('S2T');
-            this.storageToTerminal(creep, RESOURCE_ENERGY);
-        }
-        else if(creep.room.terminal && creep.room.terminal.store[RESOURCE_ENERGY] > 60000) {
-            creep.say('T2S');
-            this.terminalToStorage(creep, RESOURCE_ENERGY);
-        }
-        // other tasks
+        // status:0 withdraw
         else {
-            // todo
-            // empty self first
-            if(creep.memory.status) {
-                let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
-                // to storage:
-                if(creep.room.storage) {
-                    let storage = creep.room.storage;
-                    creep.transfer(storage, resourceType);
+            // from storage to managerLink
+            if(creep.memory.controllerLink && 
+                Game.getObjectById(creep.memory.controllerLink) && 
+                Game.getObjectById(creep.memory.controllerLink).store[RESOURCE_ENERGY] == 0 &&
+                Game.getObjectById(creep.memory.controllerLink).cooldown <= 1) {
+                
+                creep.say('S2L');
+                this.storageToLink(creep);
+            }
+            else if(creep.memory[STRUCTURE_LINK] && Game.getObjectById(creep.memory[STRUCTURE_LINK]) && Game.getObjectById(creep.memory[STRUCTURE_LINK]).store[RESOURCE_ENERGY] > 0) {
+                creep.say('L2S');
+                this.linkToStorage(creep);
+            }
+            // terminal energy balance
+            else if(creep.room.terminal && creep.room.terminal.store[RESOURCE_ENERGY] < 50000) {
+                creep.say('S2T');
+                this.storageToTerminal(creep, RESOURCE_ENERGY);
+            }
+            else if(creep.room.terminal && creep.room.terminal.store[RESOURCE_ENERGY] > 60000) {
+                creep.say('T2S');
+                this.terminalToStorage(creep, RESOURCE_ENERGY);
+            }
+            // storage resource balance
+            else if(creep.room.needStorage2Terminal()) {
+                creep.say('S2T_R');
+                this.storageToTerminal(creep, creep.room.needStorage2Terminal());
+            }
+            // other tasks
+            else {
+                if(creep.room.memory.managerTasks && creep.room.memory.managerTasks.length > 0) {
+                    this.doTask(creep);
                 }
             }
         }
     },
 
-    linkToStorage: function(creep) {
-        // transfer
-        if(creep.memory.status) {
-            let storage = creep.room.storage;
-            if(storage) { 
-                creep.transfer(storage, RESOURCE_ENERGY);
-            }
+    doTask: function(creep) {
+        let task = creep.room.memory.managerTasks[creep.room.memory.managerTasks.length - 1];
+
+        // console.log(JSON.stringify(task), "dgffgdidgfrgfrognollkfmoirngoigigoqgqozhcklzbgfoginotnlgf");
+
+        // delete task if withdraw meets requirements
+        let transferVolume;
+        if(task.volume <= creep.store.getFreeCapacity()) {
+            transferVolume = task.volume;
+            creep.room.memory.managerTasks.pop();
         }
-        // withdraw
         else {
-            let link = Game.getObjectById(creep.memory[STRUCTURE_LINK]);
-            if(link && link.store[RESOURCE_ENERGY] > 0) {
-                creep.withdraw(link, RESOURCE_ENERGY);
-                creep.memory.status = 1;
-            }
+            transferVolume = creep.store.getFreeCapacity();
+            creep.room.memory.managerTasks[creep.room.memory.managerTasks.length - 1].volume -= transferVolume;
         }
+
+        // withdraw
+        let target = Game.getObjectById(creep.memory[task.from]);
+        if(target && creep.withdraw(target, task.resourceType, transferVolume) == OK) {
+            creep.memory.status = 1;
+        }
+
+        // set transfer target
+        creep.memory.target = creep.memory[task.to];
+    },
+
+    linkToStorage: function(creep) {
+        let link = Game.getObjectById(creep.memory[STRUCTURE_LINK]);
+        if(link && link.store[RESOURCE_ENERGY] > 0) {
+            creep.withdraw(link, RESOURCE_ENERGY);
+            creep.memory.status = 1;
+        }
+        // set transfer target
+        creep.memory.target = creep.memory[STRUCTURE_STORAGE];
     },
 
     storageToLink: function(creep) {
-        // transfer
-        if(creep.memory.status) {
-            let link = Game.getObjectById(creep.memory[STRUCTURE_LINK]);
-            if(link) {
-                creep.transfer(link, RESOURCE_ENERGY);
-            }
+        let storage = creep.room.storage;
+        if(storage && storage.store[RESOURCE_ENERGY] > 0) {
+            creep.withdraw(creep.room.storage, RESOURCE_ENERGY);
+            creep.memory.status = 1;
         }
-        // withdraw
-        else {
-            let storage = creep.room.storage;
-            if(storage && storage.store[RESOURCE_ENERGY] > 0) {
-                creep.withdraw(creep.room.storage, RESOURCE_ENERGY);
-                creep.memory.status = 1;
-            }
-        }
+        // set transfer target
+        creep.memory.target = creep.memory[STRUCTURE_LINK];
     },
 
     storageToTerminal: function(creep, resourceType) {
-        // transfer
-        if(creep.memory.status) {
-            let terminal = Game.getObjectById(creep.memory[STRUCTURE_TERMINAL]);
-            if(terminal) {
-                creep.transfer(terminal, resourceType);
-            }
-        }
         // withdraw
-        else {
-            let storage = creep.room.storage;
-            if(storage && storage.store[resourceType] > 0) {
-                creep.withdraw(creep.room.storage, resourceType);
-                creep.memory.status = 1;
-            }
+        let storage = creep.room.storage;
+        if(storage && storage.store[resourceType] > 0) {
+            creep.withdraw(creep.room.storage, resourceType);
+            creep.memory.status = 1;
         }
+        // set transfer target
+        creep.memory.target = creep.memory[STRUCTURE_TERMINAL];
     },
 
     terminalToStorage: function(creep, resourceType) {
-        // transfer
-        if(creep.memory.status) {
-            let storage = creep.room.storage;
-            if(storage) { 
-                creep.transfer(storage, resourceType);
-            }
-        }
         // withdraw
-        else {
-            let terminal = Game.getObjectById(creep.memory[STRUCTURE_TERMINAL]);
-            if(terminal && terminal.store[resourceType] > 0) {
-                creep.withdraw(terminal, resourceType);
-                creep.memory.status = 1;
-            }
+        let terminal = Game.getObjectById(creep.memory[STRUCTURE_TERMINAL]);
+        if(terminal && terminal.store[resourceType] > 0) {
+            creep.withdraw(terminal, resourceType);
+            creep.memory.status = 1;
         }
+        // set transfer target
+        creep.memory.target = creep.memory[STRUCTURE_STORAGE];
     },
 
     updateMemory: function(creep) {
-        if(creep.memory.updated && Game.time % 100 != 67) return;
-
         // controllerLink id
         let controllerLink = _.find(creep.room.find(FIND_MY_STRUCTURES), struct => (
             struct.structureType == STRUCTURE_LINK &&

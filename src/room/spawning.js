@@ -29,6 +29,10 @@ function spawnCreeps(room) {
         types = ['carrier2', 'harvester2', 'manager', 'upgrader2', 'builder2'];
     }
 
+    if(room.find(FIND_MINERALS)[0].mineralType == RESOURCE_HYDROGEN) {
+        types.push('miner')
+    }
+
     // find a creep type that returns true for the .spawn() function
     let creepTypeNeeded = _.find(types, function(type) {
         return creepLogic[type].spawn(room);

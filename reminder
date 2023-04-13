@@ -64,14 +64,16 @@ JSON.stringify(obj)
 
 Game.rooms['W13S21'].terminal.send(RESOURCE_ENERGY, 45000, 'W12S21', 'Energy Support 45000');
 
-Game.market.deal('64366b090e083d66a8f6f54b', 20000, "W18S15");
+Game.market.deal('6436a0730e083d59bd0816fd', 3200, "W21S19");
+
+Game.rooms['W19S17'].memory.managerTasks = [{from: STRUCTURE_STORAGE, to: STRUCTURE_TERMINAL, resourceType: RESOURCE_FRAME, volume: 1}]
 
 Game.market.createOrder({
     type: ORDER_SELL,
-    resourceType: RESOURCE_ENERGY,
-    price: 13,
-    totalAmount: 50000,
-    roomName: "W18S15"   
+    resourceType: RESOURCE_BATTERY,
+    price: 66,
+    totalAmount: 20000,
+    roomName: "W13S21"   
 });
 
 

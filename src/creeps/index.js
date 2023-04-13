@@ -3,6 +3,7 @@ let creepLogic = {
     carrier:        require('./carrier'),
     upgrader:       require('./upgrader'),
     builder:        require('./builder'),
+    miner:          require('./miner'),
     
     harvester2:     require('./harvester2'),
     carrier2:       require('./carrier2'),
