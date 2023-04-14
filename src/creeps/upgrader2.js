@@ -11,6 +11,7 @@ var upgrader2 = {
             5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(8).fill(WORK), ...new Array(8).fill(CARRY), ...new Array(8).fill(MOVE)], mBodyParts: [...new Array(10).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(5).fill(MOVE)], number: 1},
             6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], mBodyParts: [...new Array(12).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
             7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(16).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(8).fill(MOVE)], number: 0},
+            8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(36).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(9).fill(MOVE)], number: 1},
         },
     },
 
@@ -80,10 +81,12 @@ var upgrader2 = {
 
         let storage = room.storage;
         let num = this.properties.stages[this.getStage(room)].number;
-        
+
         // for level 8 room
         if(room.controller.level == 8){
-            if(room.controller.ticksToDowngrade < 50000 && creepCount < 1) return true;
+            if (storage && storage.store[RESOURCE_ENERGY] > 400000 && creepCount < 1) {
+                return true
+            }
             else return false;
         }
 

@@ -25,6 +25,18 @@ module.exports.loop = function () {
         roomLogic.defending(r);
         roomLogic.healing(r);
         roomLogic.linkTransfer(r);
+
+        if(r.controller.level == 8) {
+            let pSpawns = r.find(FIND_MY_STRUCTURES, {filter: struct => (
+                struct.structureType == STRUCTURE_POWER_SPAWN && 
+                struct.store[RESOURCE_ENERGY] >= 50 &&
+                struct.store[RESOURCE_POWER] > 0
+            )});
+
+            if(pSpawns.length > 0) {
+                pSpawns[0].processPower();
+            }
+        }
     });
     
     // run each creep role see /creeps/index.js
@@ -51,7 +63,7 @@ module.exports.loop = function () {
     
     if(!Memory.statistics) Memory.statistics = {};
     if(!Memory.statistics.cpu) Memory.statistics.cpu = 20;
-    Memory.statistics.cpu = Memory.statistics.cpu + Game.cpu.getUsed() / 1000 - Memory.statistics.cpu / 1000;
+    Memory.statistics.cpu = Memory.statistics.cpu + Game.cpu.getUsed() / 1500 - Memory.statistics.cpu / 1500;
     console.log('CPU bucket: ', Game.cpu.bucket);
     console.log('Average CPU usage: ', Math.round(Memory.statistics.cpu * 1000) / 1000);
     console.log("---------- End Tick, No Errors ----------");

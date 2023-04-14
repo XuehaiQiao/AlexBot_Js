@@ -71,6 +71,18 @@ module.exports.loop = function () {
         roomLogic.defending(r);
         roomLogic.healing(r);
         roomLogic.linkTransfer(r);
+
+        if(r.controller.level == 8) {
+            let pSpawns = r.find(FIND_MY_STRUCTURES, {filter: struct => (
+                struct.structureType == STRUCTURE_POWER_SPAWN && 
+                struct.store[RESOURCE_ENERGY] >= 50 &&
+                struct.store[RESOURCE_POWER] > 0
+            )});
+
+            if(pSpawns.length > 0) {
+                pSpawns[0].processPower();
+            }
+        }
     });
     for(var name in Game.creeps) {
         var creep = Game.creeps[name];
@@ -93,7 +105,7 @@ module.exports.loop = function () {
     
     if(!Memory.statistics) Memory.statistics = {};
     if(!Memory.statistics.cpu) Memory.statistics.cpu = 20;
-    Memory.statistics.cpu = Memory.statistics.cpu + Game.cpu.getUsed() / 1000 - Memory.statistics.cpu / 1000;
+    Memory.statistics.cpu = Memory.statistics.cpu + Game.cpu.getUsed() / 1500 - Memory.statistics.cpu / 1500;
     console.log('CPU bucket: ', Game.cpu.bucket);
     console.log('Average CPU usage: ', Math.round(Memory.statistics.cpu * 1000) / 1000);
     console.log("---------- End Tick, No Errors ----------");
@@ -729,6 +741,8 @@ var carrier2 = {
             4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(16).fill(CARRY), ...new Array(8).fill(MOVE)], number: 2},
             5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(20).fill(CARRY), ...new Array(10).fill(MOVE)], number: 2},
             6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(20).fill(CARRY), ...new Array(10).fill(MOVE)], number: 2},
+            7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(20).fill(CARRY), ...new Array(10).fill(MOVE)], number: 2},
+            8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(32).fill(CARRY), ...new Array(16).fill(MOVE)], number: 2},
         },
     },
 
@@ -865,6 +879,7 @@ var upgrader2 = {
             5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(8).fill(WORK), ...new Array(8).fill(CARRY), ...new Array(8).fill(MOVE)], mBodyParts: [...new Array(10).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(5).fill(MOVE)], number: 1},
             6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], mBodyParts: [...new Array(12).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
             7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(16).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(8).fill(MOVE)], number: 0},
+            8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(36).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(9).fill(MOVE)], number: 1},
         },
     },
 
@@ -920,7 +935,9 @@ var upgrader2 = {
         let storage = room.storage;
         let num = this.properties.stages[this.getStage(room)].number;
         if(room.controller.level == 8){
-            if(room.controller.ticksToDowngrade < 50000 && creepCount < 1) return true;
+            if (storage && storage.store[RESOURCE_ENERGY] > 400000 && creepCount < 1) {
+                return true
+            }
             else return false;
         }
         if (storage && storage.store[RESOURCE_ENERGY] > 300000) {
@@ -974,6 +991,7 @@ var builder2 = {
             5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(9).fill(WORK), ...new Array(9).fill(CARRY), ...new Array(9).fill(MOVE)], number: 1},
             6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], number: 1},
             7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], number: 1},
+            8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], number: 2},
         }
     },
 
@@ -1115,18 +1133,25 @@ var manager = {
         if(creep.memory.status) {
             let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
             let target = Game.getObjectById(creep.memory.target);
-            let result = -1;
-            if(target) {
-                result = creep.transfer(target, resourceType);
+
+            if(target && creep.transfer(target, resourceType) == OK) {
+                return;
             }
-            else if(creep.room.storage) { 
-                result = creep.transfer(creep.room.storage, resourceType);
+            else if(creep.room.storage && creep.transfer(creep.room.storage, resourceType) == OK) { 
+                return;
             }
-            if(result != OK) {
+            else {
                 creep.drop(resourceType);
+                return;
             }
+            
         }
         else {
+            let link = Game.getObjectById(creep.memory[STRUCTURE_LINK]);
+            let powerSpawn = Game.getObjectById(creep.memory[STRUCTURE_POWER_SPAWN]);
+            let terminal = Game.getObjectById(creep.memory[STRUCTURE_TERMINAL]);
+            let storage = Game.getObjectById(creep.memory[STRUCTURE_STORAGE]);
+            let nuker = Game.getObjectById(creep.memory[STRUCTURE_NUKER]);
             if(creep.memory.controllerLink && 
                 Game.getObjectById(creep.memory.controllerLink) && 
                 Game.getObjectById(creep.memory.controllerLink).store[RESOURCE_ENERGY] == 0 &&
@@ -1135,21 +1160,25 @@ var manager = {
                 creep.say('S2L');
                 this.storageToLink(creep);
             }
-            else if(creep.memory[STRUCTURE_LINK] && Game.getObjectById(creep.memory[STRUCTURE_LINK]) && Game.getObjectById(creep.memory[STRUCTURE_LINK]).store[RESOURCE_ENERGY] > 0) {
+            else if(link && link.store[RESOURCE_ENERGY] > 0) {
                 creep.say('L2S');
-                this.linkToStorage(creep);
+                this.fromA2B(creep, link, storage, RESOURCE_ENERGY);
             }
-            else if(creep.room.terminal && creep.room.terminal.store[RESOURCE_ENERGY] < 50000) {
+            else if(terminal && terminal.store[RESOURCE_ENERGY] < 50000) {
                 creep.say('S2T');
-                this.storageToTerminal(creep, RESOURCE_ENERGY);
+                this.fromA2B(creep, storage, terminal, RESOURCE_ENERGY);
             }
-            else if(creep.room.terminal && creep.room.terminal.store[RESOURCE_ENERGY] > 60000) {
+            else if(powerSpawn && storage && powerSpawn.store.getFreeCapacity(RESOURCE_ENERGY) > creep.store.getCapacity()) {
+                creep.say('2PS');
+                this.fromA2B(creep, storage, powerSpawn, RESOURCE_ENERGY);
+            }
+            else if(powerSpawn && storage && powerSpawn.store[RESOURCE_POWER] == 0 && storage.store[RESOURCE_POWER] > 0) {
+                creep.say('2PS');
+                this.fromA2B(creep, storage, powerSpawn, RESOURCE_POWER, 100);
+            }
+            else if(terminal && terminal.store[RESOURCE_ENERGY] > 60000) {
                 creep.say('T2S');
-                this.terminalToStorage(creep, RESOURCE_ENERGY);
-            }
-            else if(creep.room.needStorage2Terminal()) {
-                creep.say('S2T_R');
-                this.storageToTerminal(creep, creep.room.needStorage2Terminal());
+                this.fromA2B(creep, terminal, storage, RESOURCE_ENERGY);
             }
             else {
                 if(creep.room.memory.managerTasks && creep.room.memory.managerTasks.length > 0) {
@@ -1157,6 +1186,22 @@ var manager = {
                 }
             }
         }
+    },
+
+    fromA2B: function(creep, fromStruct, toStruct, resourceType, amount=null) {
+        if(!fromStruct || !toStruct) {
+            console.log("some struct is missing");
+            return;
+        }
+
+        
+        if(fromStruct.store[resourceType] > 0) {
+            if(amount == null) creep.withdraw(fromStruct, resourceType);
+            else creep.withdraw(fromStruct, resourceType, amount);
+
+            creep.memory.status = 1;
+        }
+        creep.memory.target = toStruct.id;
     },
 
     doTask: function(creep) {
@@ -1175,42 +1220,6 @@ var manager = {
             creep.memory.status = 1;
         }
         creep.memory.target = creep.memory[task.to];
-    },
-
-    linkToStorage: function(creep) {
-        let link = Game.getObjectById(creep.memory[STRUCTURE_LINK]);
-        if(link && link.store[RESOURCE_ENERGY] > 0) {
-            creep.withdraw(link, RESOURCE_ENERGY);
-            creep.memory.status = 1;
-        }
-        creep.memory.target = creep.memory[STRUCTURE_STORAGE];
-    },
-
-    storageToLink: function(creep) {
-        let storage = creep.room.storage;
-        if(storage && storage.store[RESOURCE_ENERGY] > 0) {
-            creep.withdraw(creep.room.storage, RESOURCE_ENERGY);
-            creep.memory.status = 1;
-        }
-        creep.memory.target = creep.memory[STRUCTURE_LINK];
-    },
-
-    storageToTerminal: function(creep, resourceType) {
-        let storage = creep.room.storage;
-        if(storage && storage.store[resourceType] > 0) {
-            creep.withdraw(creep.room.storage, resourceType);
-            creep.memory.status = 1;
-        }
-        creep.memory.target = creep.memory[STRUCTURE_TERMINAL];
-    },
-
-    terminalToStorage: function(creep, resourceType) {
-        let terminal = Game.getObjectById(creep.memory[STRUCTURE_TERMINAL]);
-        if(terminal && terminal.store[resourceType] > 0) {
-            creep.withdraw(terminal, resourceType);
-            creep.memory.status = 1;
-        }
-        creep.memory.target = creep.memory[STRUCTURE_STORAGE];
     },
 
     updateMemory: function(creep) {
