@@ -63,19 +63,21 @@ _.forEach(
 JSON.stringify(obj)
 
 // create task
-Game.rooms['W18S15'].memory.managerTasks = [{from: STRUCTURE_STORAGE, to: STRUCTURE_POWER_SPAWN, resourceType: RESOURCE_POWER, volume: 100}];
+Game.rooms['W18S15'].memory.managerTasks = [{from: STRUCTURE_TERMINAL, to: STRUCTURE_STORAGE, resourceType: RESOURCE_POWER, volume: 1000}];
 Game.rooms['W21S19'].memory.managerTasks = [{from: STRUCTURE_STORAGE, to: STRUCTURE_TERMINAL, resourceType: RESOURCE_GHODIUM, volume: 400}];
 // orders
 Game.rooms['W15S13'].terminal.send(RESOURCE_ENERGY, 30000, 'W18S15', 'energy 30000');
 
-Game.market.deal('6438c1bd8611948e5737bc56', 3000, "W18S15");
+Game.market.deal('6438c1bd8611948e5737bc56', 1000, "W18S15");
+
+Game.market.cancelOrder('643751b00e083d8cf1442440');
 
 Game.market.createOrder({
-    type: ORDER_SELL,
-    resourceType: RESOURCE_HYDROGEN,
-    price: 60,
-    totalAmount: 20000,
-    roomName: "W16S17"   
+    type: ORDER_BUY,
+    resourceType: RESOURCE_POWER,
+    price: 260,
+    totalAmount: 1000,
+    roomName: "W18S15"   
 });
 
 

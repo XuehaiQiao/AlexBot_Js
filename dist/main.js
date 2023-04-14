@@ -660,19 +660,43 @@ var harvester2 = {
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 1},
             3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
             4: {maxEnergyCapacity: 1300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
+            5: {maxEnergyCapacity: 1800, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
+            6: {maxEnergyCapacity: 2300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
+            7: {maxEnergyCapacity: 5600, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], number: 1},
         },
     },
 
     /** @param {Creep} creep **/
     run: function(creep) {
+        if(creep.memory.rest) {
+            creep.memory.rest -= 1;
+            return;
+        }
         if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
             creep.moveToRoom(creep.memory.targetRoom);
             return;
         }
-        creep.harvestEnergy();
+        let source = creep.room.find(FIND_SOURCES)[creep.memory.target];
+        let result = creep.harvest(source);
+        if(result == ERR_NOT_IN_RANGE) {
+            creep.moveTo(source, {reusePath: 10});
+        }
+        else {
+            let link = creep.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_LINK && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0});
+            let container = creep.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_CONTAINER && struct.store.getFreeCapacity() > 0});
+            if (link.length > 0) {
+                creep.transfer(link[0], RESOURCE_ENERGY);
+            }
+            else if (container.length > 0) {
+                creep.transfer(container[0], RESOURCE_ENERGY);
+            }
+
+            if(result == ERR_NOT_ENOUGH_RESOURCES) {
+                creep.memory.rest = source.ticksToRegeneration;
+            }
+        }
     },
     spawn: function(room) {
-        
         var sourceCount = Math.min(2, room.find(FIND_SOURCES).length);
 
         let creepCount;
@@ -1152,13 +1176,10 @@ var manager = {
             let terminal = Game.getObjectById(creep.memory[STRUCTURE_TERMINAL]);
             let storage = Game.getObjectById(creep.memory[STRUCTURE_STORAGE]);
             let nuker = Game.getObjectById(creep.memory[STRUCTURE_NUKER]);
-            if(creep.memory.controllerLink && 
-                Game.getObjectById(creep.memory.controllerLink) && 
-                Game.getObjectById(creep.memory.controllerLink).store[RESOURCE_ENERGY] == 0 &&
-                Game.getObjectById(creep.memory.controllerLink).cooldown <= 1) {
-                
+            let controllerLink = Game.getObjectById(creep.memory.controllerLink);
+            if(controllerLink && controllerLink.store[RESOURCE_ENERGY] == 0 && controllerLink.cooldown <= 1) {
                 creep.say('S2L');
-                this.storageToLink(creep);
+                this.fromA2B(creep, storage, link, RESOURCE_ENERGY);
             }
             else if(link && link.store[RESOURCE_ENERGY] > 0) {
                 creep.say('L2S');
@@ -1687,7 +1708,7 @@ var defender = {
     },
     spawnData: function(room, targetRoomName, targetId = null) {
         let name = this.properties.role + Game.time;
-        let body = [MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, RANGED_ATTACK, MOVE];
+        let body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE];
         let memory = {role: this.properties.role, status: 0, targetRoom: targetRoomName, target: targetId, base: room.name};
 
         return {name, body, memory};

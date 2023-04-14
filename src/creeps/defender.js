@@ -52,7 +52,7 @@ var defender = {
     // returns an object with the data to spawn a new creep
     spawnData: function(room, targetRoomName, targetId = null) {
         let name = this.properties.role + Game.time;
-        let body = [MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, RANGED_ATTACK, MOVE];
+        let body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE];
         let memory = {role: this.properties.role, status: 0, targetRoom: targetRoomName, target: targetId, base: room.name};
 
         return {name, body, memory};

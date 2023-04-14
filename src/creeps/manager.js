@@ -52,15 +52,12 @@ var manager = {
             let terminal = Game.getObjectById(creep.memory[STRUCTURE_TERMINAL]);
             let storage = Game.getObjectById(creep.memory[STRUCTURE_STORAGE]);
             let nuker = Game.getObjectById(creep.memory[STRUCTURE_NUKER]);
+            let controllerLink = Game.getObjectById(creep.memory.controllerLink);
 
             // from storage to managerLink
-            if(creep.memory.controllerLink && 
-                Game.getObjectById(creep.memory.controllerLink) && 
-                Game.getObjectById(creep.memory.controllerLink).store[RESOURCE_ENERGY] == 0 &&
-                Game.getObjectById(creep.memory.controllerLink).cooldown <= 1) {
-                
+            if(controllerLink && controllerLink.store[RESOURCE_ENERGY] == 0 && controllerLink.cooldown <= 1) {
                 creep.say('S2L');
-                this.storageToLink(creep);
+                this.fromA2B(creep, storage, link, RESOURCE_ENERGY);
             }
             else if(link && link.store[RESOURCE_ENERGY] > 0) {
                 creep.say('L2S');

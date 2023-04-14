@@ -6,11 +6,19 @@ var harvester2 = {
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 1},
             3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
             4: {maxEnergyCapacity: 1300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
+            5: {maxEnergyCapacity: 1800, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
+            6: {maxEnergyCapacity: 2300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
+            7: {maxEnergyCapacity: 5600, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], number: 1},
         },
     },
 
     /** @param {Creep} creep **/
     run: function(creep) {
+        if(creep.memory.rest) {
+            creep.memory.rest -= 1;
+            return;
+        }
+
         // move to its target room if not in
         if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
             creep.moveToRoom(creep.memory.targetRoom);
@@ -18,14 +26,29 @@ var harvester2 = {
         }
 
         // harvest
-        creep.harvestEnergy();
+        let source = creep.room.find(FIND_SOURCES)[creep.memory.target];
+        let result = creep.harvest(source);
+        if(result == ERR_NOT_IN_RANGE) {
+            creep.moveTo(source, {reusePath: 10});
+        }
+        else {
+            let link = creep.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_LINK && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0});
+            let container = creep.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_CONTAINER && struct.store.getFreeCapacity() > 0});
+            if (link.length > 0) {
+                creep.transfer(link[0], RESOURCE_ENERGY);
+            }
+            else if (container.length > 0) {
+                creep.transfer(container[0], RESOURCE_ENERGY);
+            }
+
+            if(result == ERR_NOT_ENOUGH_RESOURCES) {
+                creep.memory.rest = source.ticksToRegeneration;
+            }
+        }
     },
 
     // checks if the room needs to spawn a creep
     spawn: function(room) {
-        // var thisTypeCreeps = _.filter(room.find(FIND_MY_CREEPS), (creep) => creep.memory.role == this.properties.role && creep.room.name == room.name);
-        // console.log(this.properties.role + ': ' + thisTypeCreeps.length, room.name);
-        
         var sourceCount = Math.min(2, room.find(FIND_SOURCES).length);
 
         let creepCount;
