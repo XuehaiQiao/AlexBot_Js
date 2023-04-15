@@ -29,7 +29,7 @@ function spawnCreeps(room) {
         types = ['carrier2', 'harvester2', 'manager', 'upgrader2', 'builder2'];
     }
 
-    if(room.find(FIND_MINERALS)[0].mineralType == RESOURCE_HYDROGEN) {
+    if(_.find(room.find(FIND_MY_STRUCTURES), struct => struct.structureType == STRUCTURE_EXTRACTOR)) {
         types.push('miner')
     }
 
@@ -52,6 +52,10 @@ function spawnCreeps(room) {
         return;
     }
     
+    // if still have basic spawn needs. stop producing out sourcing creeps
+    if(creepTypeNeeded) {
+
+    }
 
     // stop sending outSourcer if base room found enemy
     var hostileParts = [WORK, ATTACK, RANGED_ATTACK, HEAL, CLAIM];
@@ -91,16 +95,18 @@ function spawnCreeps(room) {
         }
 
         // remote harvest
-        let outSourceTypes = ['claimer', 'remoteHarvester', 'remoteHauler'];
+        let outSourceTypes;
         // level 6 to use remoteHarvester/remoteHauler
-        if(room.energyCapacityAvailable < 2300) {
-            if(room.energyCapacityAvailable >= 1800) {
-                outSourceTypes = ['claimer', 'outSourcer'];
-            }
-            else {
-                outSourceTypes = ['outSourcer'];
-            }
+        if(room.energyCapacityAvailable < 800) {
+            outSourceTypes = []
         }
+        else if(room.energyCapacityAvailable < 1300) {
+            outSourceTypes = ['remoteHarvester', 'remoteHauler'];
+        }
+        else {
+            outSourceTypes = ['claimer', 'remoteHarvester', 'remoteHauler'];
+        }
+
         // create outsource creeps / claim creeps (copy of about spawn logic)
         for(let index in outSourceTypes) {
             let cType = outSourceTypes[index];

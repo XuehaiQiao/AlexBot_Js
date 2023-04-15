@@ -27,6 +27,10 @@ var roomObject = {
         restPos: new RoomPosition(11, 21, "W12S21"),
         managerPos: new RoomPosition(6, 19, "W12S21"),
     },
+    W22S15: {
+        restPos: new RoomPosition(16, 10, "W22S15"),
+        // managerPos: new RoomPosition(6, 19, "W22S15"),
+    },
     sim: {
         restPos: new RoomPosition(19, 21, "sim"),
         managerPos: new RoomPosition(18, 27, "sim"),

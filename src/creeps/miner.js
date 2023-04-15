@@ -5,6 +5,10 @@ var miner = {
     },
     /** @param {Creep} creep **/
     run: function(creep) {
+        if(creep.memory.rest) {
+            creep.memory.rest -= 1;
+        }
+
         creep.workerSetStatus();
 
         if(creep.memory.status) {
@@ -15,8 +19,12 @@ var miner = {
         }
         else {
             let mine = creep.room.find(FIND_MINERALS)[0];
+            let result = creep.harvest(mine)
             if(creep.harvest(mine) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(mine);
+            }
+            else {
+                creep.memory.rest = 5;
             }
         }
     },
@@ -24,10 +32,13 @@ var miner = {
     // checks if the room needs to spawn a creep
     spawn: function(room) {
         // check mineralAmount & if have extractor
-        let mine = room.find(FIND_MINERALS)[0];
-        if(mine.mineralAmount == 0) return false;
-        var extractor = _.find(room.find(FIND_MY_STRUCTURES), struct => struct.structureType == STRUCTURE_EXTRACTOR)
+        let mineral = room.find(FIND_MINERALS)[0];
+        let extractor = _.find(room.find(FIND_MY_STRUCTURES), struct => struct.structureType == STRUCTURE_EXTRACTOR);
+        
+        // mineral has resources, room have extractor, storage have less than 100000 this mineral type
+        if(mineral.mineralAmount == 0) return false;
         if(!extractor) return false;
+        if(room.storage && room.storage.store[mineral.mineralType] > 100000) return false;
         
         let creepCount;
         if(global.roomCensus[room.name][this.properties.role]) creepCount = global.roomCensus[room.name][this.properties.role]

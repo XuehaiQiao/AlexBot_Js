@@ -49,7 +49,7 @@ Creep.prototype.workerSetStatus = function() {
     }
 }
 
-// same as takeEnergy but no storage
+// same as takeEnergy but no storage (only used in carrier)
 Creep.prototype.collectEnergy = function collectEnergy(changeStatus=false) {
     // first find droped resource
     var dropedResource = this.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount > this.store.getCapacity() / 2});
@@ -69,8 +69,13 @@ Creep.prototype.collectEnergy = function collectEnergy(changeStatus=false) {
         return false;
     }
 
-    // find containers
-    var container = this.pos.findClosestByPath(FIND_STRUCTURES, {filter: structure => structure.structureType == STRUCTURE_CONTAINER && structure.store.getUsedCapacity(RESOURCE_ENERGY) > this.store.getCapacity() / 2});
+    // find containers (exclude near controller containers)
+    var container = this.pos.findClosestByPath(FIND_STRUCTURES, {filter: structure => (
+        structure.structureType == STRUCTURE_CONTAINER && 
+        !structure.pos.inRangeTo(this.room.controller.pos, 3) &&
+        structure.store.getUsedCapacity(RESOURCE_ENERGY) > this.store.getCapacity() / 2
+        )});
+
     if (container) {
         // var resourceType = _.find(Object.keys(container.store), resource => container.store[resource] > 0);
         let resourceType = RESOURCE_ENERGY;

@@ -26,12 +26,16 @@ var harvester2 = {
         }
 
         // harvest
+        if(!creep.memory.target == undefined) {
+            creep.memory.target = 0;
+            return;
+        }
         let source = creep.room.find(FIND_SOURCES)[creep.memory.target];
-        let result = creep.harvest(source);
-        if(result == ERR_NOT_IN_RANGE) {
+        if(!creep.pos.inRangeTo(source.pos, 1)) {
             creep.moveTo(source, {reusePath: 10});
         }
         else {
+            let result = creep.harvest(source);
             let link = creep.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_LINK && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0});
             let container = creep.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_CONTAINER && struct.store.getFreeCapacity() > 0});
             if (link.length > 0) {

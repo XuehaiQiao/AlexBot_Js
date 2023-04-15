@@ -5,7 +5,7 @@ var upgrader2 = {
         type: 'upgrader2',
         stages: {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, CARRY, MOVE], number: 1},
-            2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, CARRY, CARRY, MOVE, MOVE], number: 6},
+            2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, CARRY, CARRY, MOVE, MOVE], number: 3},
             3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, CARRY, CARRY, MOVE, MOVE, WORK, WORK, CARRY, CARRY, MOVE, MOVE], number: 3},
             4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(6).fill(WORK), ...new Array(6).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
             5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(8).fill(WORK), ...new Array(8).fill(CARRY), ...new Array(8).fill(MOVE)], mBodyParts: [...new Array(10).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(5).fill(MOVE)], number: 1},
@@ -34,7 +34,7 @@ var upgrader2 = {
 
     managerLogic: function(creep) {
         // set status: 0. harvest  1. upgrade 
-        if(creep.memory.status == 0 && creep.store.getFreeCapacity() == 0) {
+        if(creep.memory.status && creep.store.getFreeCapacity() == 0) {
             creep.memory.status = 1;
         }
         else if (creep.memory.status != 0 && creep.store[RESOURCE_ENERGY] < 50) {
@@ -60,14 +60,14 @@ var upgrader2 = {
         creep.workerSetStatus();
 
         // harvest
-        if(creep.memory.status == 0) {
-            creep.takeEnergyFromClosest();
-        }
-        // upgrade
-        else {
+        if(creep.memory.status) {
             if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(creep.room.controller, {reusePath: 10});
             }
+        }
+        // upgrade
+        else {
+            creep.takeEnergyFromClosest();
         }
     },
 

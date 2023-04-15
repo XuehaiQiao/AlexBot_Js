@@ -62,7 +62,13 @@ module.exports.loop = function () {
         console.log('CPU bucket is low, skip this tick..');
         return;
     }
-    console.log("---------- Start Tick: " + Game.time + " ----------")
+    console.log("---------- Start Tick: " + Game.time + " ----------");
+    for(var name in Memory.creeps) {
+        if(!Game.creeps[name]) {
+            delete Memory.creeps[name];
+            console.log('Clearing non-existing creep memory:', name);
+        }
+    }
     Game.myRooms = _.filter(Game.rooms, r => r.controller && r.controller.level > 0 && r.controller.my);
     roomLogic.roomCensus();
     _.forEach(Game.myRooms, r => {
@@ -90,12 +96,6 @@ module.exports.loop = function () {
         let role = creep.memory.role;
         if (creepLogic[role]) {
             creepLogic[role].run(creep);
-        }
-    }
-    for(var name in Memory.creeps) {
-        if(!Game.creeps[name]) {
-            delete Memory.creeps[name];
-            console.log('Clearing non-existing creep memory:', name);
         }
     }
 
@@ -608,6 +608,10 @@ var miner = {
     },
     /** @param {Creep} creep **/
     run: function(creep) {
+        if(creep.memory.rest) {
+            creep.memory.rest -= 1;
+        }
+
         creep.workerSetStatus();
 
         if(creep.memory.status) {
@@ -618,16 +622,21 @@ var miner = {
         }
         else {
             let mine = creep.room.find(FIND_MINERALS)[0];
+            let result = creep.harvest(mine)
             if(creep.harvest(mine) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(mine);
+            }
+            else {
+                creep.memory.rest = 5;
             }
         }
     },
     spawn: function(room) {
-        let mine = room.find(FIND_MINERALS)[0];
-        if(mine.mineralAmount == 0) return false;
-        var extractor = _.find(room.find(FIND_MY_STRUCTURES), struct => struct.structureType == STRUCTURE_EXTRACTOR)
+        let mineral = room.find(FIND_MINERALS)[0];
+        let extractor = _.find(room.find(FIND_MY_STRUCTURES), struct => struct.structureType == STRUCTURE_EXTRACTOR);
+        if(mineral.mineralAmount == 0) return false;
         if(!extractor) return false;
+        if(room.storage && room.storage.store[mineral.mineralType] > 100000) return false;
         
         let creepCount;
         if(global.roomCensus[room.name][this.properties.role]) creepCount = global.roomCensus[room.name][this.properties.role]
@@ -676,12 +685,16 @@ var harvester2 = {
             creep.moveToRoom(creep.memory.targetRoom);
             return;
         }
+        if(!creep.memory.target == undefined) {
+            creep.memory.target = 0;
+            return;
+        }
         let source = creep.room.find(FIND_SOURCES)[creep.memory.target];
-        let result = creep.harvest(source);
-        if(result == ERR_NOT_IN_RANGE) {
+        if(!creep.pos.inRangeTo(source.pos, 1)) {
             creep.moveTo(source, {reusePath: 10});
         }
         else {
+            let result = creep.harvest(source);
             let link = creep.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_LINK && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0});
             let container = creep.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_CONTAINER && struct.store.getFreeCapacity() > 0});
             if (link.length > 0) {
@@ -780,15 +793,7 @@ var carrier2 = {
             creep.memory.restTime -= 1;
             return;
         }
-        if(!creep.memory.status && creep.store.getFreeCapacity() == 0) {
-            creep.memory.status = 1;
-            creep.say('🚩 transfer');
-        }
-        else if (creep.memory.status && creep.store.getUsedCapacity() == 0) {
-            creep.memory.status = 0;
-            creep.memory.target = Math.floor(Math.random() * creep.room.find(FIND_SOURCES_ACTIVE).length);
-            creep.say('🔄 harvest');
-        }
+        creep.workerSetStatus();
         var needFeedStructure = _.find(creep.room.find(FIND_MY_STRUCTURES), (structure) => (
             ((structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN) && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0) ||
             (structure.structureType == STRUCTURE_TOWER && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 300)
@@ -802,6 +807,16 @@ var carrier2 = {
     },
     toStorage: function(creep) {
         var storage = creep.room.storage;
+        if(!storage) {
+            let containers = creep.room.find(FIND_STRUCTURES, {filter: struct => (
+                struct.structureType == STRUCTURE_CONTAINER &&
+                struct.pos.inRangeTo(creep.room.controller.pos, 3) &&
+                struct.store.getFreeCapacity() > 0
+            )});
+            if(containers.length) {
+                storage = containers[0];
+            }
+        }
 
         if (!storage || storage.store.getFreeCapacity() == 0) {
             creep.toResPos(10);
@@ -897,7 +912,7 @@ var upgrader2 = {
         type: 'upgrader2',
         stages: {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, CARRY, MOVE], number: 1},
-            2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, CARRY, CARRY, MOVE, MOVE], number: 6},
+            2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, CARRY, CARRY, MOVE, MOVE], number: 3},
             3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, CARRY, CARRY, MOVE, MOVE, WORK, WORK, CARRY, CARRY, MOVE, MOVE], number: 3},
             4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(6).fill(WORK), ...new Array(6).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
             5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(8).fill(WORK), ...new Array(8).fill(CARRY), ...new Array(8).fill(MOVE)], mBodyParts: [...new Array(10).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(5).fill(MOVE)], number: 1},
@@ -922,7 +937,7 @@ var upgrader2 = {
     },
 
     managerLogic: function(creep) {
-        if(creep.memory.status == 0 && creep.store.getFreeCapacity() == 0) {
+        if(creep.memory.status && creep.store.getFreeCapacity() == 0) {
             creep.memory.status = 1;
         }
         else if (creep.memory.status != 0 && creep.store[RESOURCE_ENERGY] < 50) {
@@ -942,13 +957,13 @@ var upgrader2 = {
 
     noManagerLogic: function(creep) {
         creep.workerSetStatus();
-        if(creep.memory.status == 0) {
-            creep.takeEnergyFromClosest();
-        }
-        else {
+        if(creep.memory.status) {
             if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(creep.room.controller, {reusePath: 10});
             }
+        }
+        else {
+            creep.takeEnergyFromClosest();
         }
     },
     spawn: function(room) {
@@ -1010,12 +1025,12 @@ var builder2 = {
         stages: {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, CARRY, MOVE], number: 3},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, CARRY, MOVE, WORK, CARRY, MOVE], number: 3},
-            3: {maxEnergyCapacity: 800, bodyParts:[WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE], number: 2},
+            3: {maxEnergyCapacity: 800, bodyParts:[WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE], number: 1},
             4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(6).fill(WORK), ...new Array(6).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
             5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(9).fill(WORK), ...new Array(9).fill(CARRY), ...new Array(9).fill(MOVE)], number: 1},
             6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], number: 1},
             7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], number: 1},
-            8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], number: 2},
+            8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], number: 1},
         }
     },
 
@@ -1402,20 +1417,27 @@ var outSourcer = {
                 return;
             }
 
-            var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter: struct => (
+            let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter: struct => (
                 (struct.structureType == STRUCTURE_STORAGE || struct.structureType == STRUCTURE_CONTAINER) && struct.store.getFreeCapacity() > 0
             )});
-    
-            if (!target) {
-                if (roomInfo[creep.room.name]) {
-                    creep.moveTo(roomInfo[creep.room.name].restPos);
-                    return;
-                };
+            if (target) {
+                if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target);
+                }
+                return;
             }
 
-            if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
+            let constructSites = creep.room.find(FIND_CONSTRUCTION_SITES);
+            if(constructSites.length > 0) {
+                if(creep.build(constructSites[0]) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(constructSites[0]);
+                }
+                return;
             }
+            if (roomInfo[creep.room.name]) {
+                creep.moveTo(roomInfo[creep.room.name].restPos);
+                return;
+            };
         }
     },
     spawn: function(room, roomName) {
@@ -1459,6 +1481,12 @@ __modules[17] = function(module, exports) {
 var remoteHarvester = {
     properties: {
         role: "remoteHarvester",
+        stages: {
+            1: {maxEnergyCapacity: 300, bodyParts:[WORK, WORK, CARRY, MOVE], number: 2},
+            2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 1},
+            3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 1},
+            4: {maxEnergyCapacity: 1300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
+        },
     },
     /** @param {Creep} creep **/
     run: function(creep) {
@@ -1470,7 +1498,7 @@ var remoteHarvester = {
             creep.say('no e')
             if(creep.memory.containerId == undefined) {
                 let containerList = creep.room.find(FIND_SOURCES)[creep.memory.target].pos.findInRange(FIND_STRUCTURES, 2, {filter: struct => struct.structureType == STRUCTURE_CONTAINER});
-                if(containerList) creep.memory.containerId = containerList[0].id;
+                if(containerList.length) creep.memory.containerId = containerList[0].id;
                 
             }
             let container = Game.getObjectById(creep.memory.containerId);
@@ -1492,7 +1520,7 @@ var remoteHarvester = {
         }
         else creepCount = 0;
 
-        if (creepCount < Memory.outSourceRooms[roomName].sourceNum) {
+        if (creepCount < Memory.outSourceRooms[roomName].sourceNum * this.properties.stages[this.getStage(room)].number) {
             return true;
         }
     },
@@ -1500,7 +1528,7 @@ var remoteHarvester = {
 
 
         let name = this.properties.role + Game.time;
-        let body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE] // cost: 600 + 150 + 50 = 800
+        let body = this.properties.stages[this.getStage(room)].bodyParts;
 
         const existingThisTypeCreeps = _.filter(Game.creeps, (creep) => creep.memory.role == this.properties.role && creep.memory.targetRoom == outSourceRoomName);
         var existingTargets = _.map(existingThisTypeCreeps, creep => creep.memory.target)
@@ -1518,6 +1546,17 @@ var remoteHarvester = {
 
         return {name, body, memory};
     },
+
+    getStage: function(room) {
+        var stage = 1;
+        let capacity = room.energyCapacityAvailable;
+        for(var level in this.properties.stages) {
+            if(capacity >= this.properties.stages[level].maxEnergyCapacity) {
+                stage = level;
+            }
+        }
+        return stage;
+    }
 }
 
 module.exports = remoteHarvester;
@@ -1539,11 +1578,11 @@ var remoteHauler = {
     properties: {
         role: 'remoteHauler',
         stages: {
-            1: {maxEnergyCapacity: 300, bodyParts:[CARRY, MOVE, CARRY, MOVE], number: 2},
-            2: {maxEnergyCapacity: 550, bodyParts:[CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2},
-            3: {maxEnergyCapacity: 800, bodyParts:[CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2},
-            4: {maxEnergyCapacity: 1300, bodyParts:[CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], number: 2},
-            5: {maxEnergyCapacity: 1800, bodyParts:[CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], number: 2},
+            1: {maxEnergyCapacity: 300, bodyParts:[CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2},
+            2: {maxEnergyCapacity: 550, bodyParts:[CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2},
+            3: {maxEnergyCapacity: 800, bodyParts:[WORK, ...new Array(9).fill(CARRY), ...new Array(5).fill(MOVE)], number: 1},
+            4: {maxEnergyCapacity: 1300, bodyParts:[WORK, ...new Array(13).fill(CARRY), ...new Array(7).fill(MOVE)], number: 2},
+            5: {maxEnergyCapacity: 1800, bodyParts:[WORK, ...new Array(15).fill(CARRY), ...new Array(8).fill(MOVE)], number: 2},
             6: {maxEnergyCapacity: 2300, bodyParts:[WORK, ...new Array(27).fill(CARRY), ...new Array(14).fill(MOVE)], number: 1}, // 100 + 1350 + 700 = 2150
             7: {maxEnergyCapacity: 5600, bodyParts:[WORK, WORK, ...new Array(31).fill(CARRY), ...new Array(17).fill(MOVE)], number: 1}, // 200 + 1650 + 850 = 2700
         },
@@ -1604,8 +1643,7 @@ var remoteHauler = {
             }
             const myConstuct = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 1);
             if(myConstuct.length > 0) {
-                creep.build(myConstuct[0]);
-                return;
+                if(creep.build(myConstuct[0]) == OK) return;
             }
             if (creep.memory.base && creep.memory.base != creep.room.name) {
                 creep.moveToRoom(creep.memory.base);
@@ -1652,7 +1690,6 @@ var remoteHauler = {
                 stage = level;
             }
         }
-
         return stage;
     }
 };
@@ -1665,7 +1702,13 @@ return module.exports;
 __modules[19] = function(module, exports) {
 var defender = {
     properties: {
-        role: "defender"
+        role: "defender",
+        stages: {
+            3: {maxEnergyCapacity: 800, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
+            4: {maxEnergyCapacity: 1300, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
+            5: {maxEnergyCapacity: 1800, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
+            6: {maxEnergyCapacity: 2300, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
+        },
     },
     /** @param {Creep} creep **/
     run: function(creep) {
@@ -1875,7 +1918,7 @@ function spawnCreeps(room) {
         types = ['carrier2', 'harvester2', 'manager', 'upgrader2', 'builder2'];
     }
 
-    if(room.find(FIND_MINERALS)[0].mineralType == RESOURCE_HYDROGEN) {
+    if(_.find(room.find(FIND_MY_STRUCTURES), struct => struct.structureType == STRUCTURE_EXTRACTOR)) {
         types.push('miner')
     }
     let creepTypeNeeded = _.find(types, function(type) {
@@ -1890,6 +1933,9 @@ function spawnCreeps(room) {
         spawn.spawnCreep([WORK, CARRY, CARRY, MOVE], 'Servivor001-' + Game.time, {memory: {role: 'harvester', status: 1}});
         console.log("Spawning backup tiny Servivor001");
         return;
+    }
+    if(creepTypeNeeded) {
+
     }
     var hostileParts = [WORK, ATTACK, RANGED_ATTACK, HEAL, CLAIM];
     var enemy = _.find(room.find(FIND_HOSTILE_CREEPS), creep =>
@@ -1923,14 +1969,15 @@ function spawnCreeps(room) {
                 }
             }
         }
-        let outSourceTypes = ['claimer', 'remoteHarvester', 'remoteHauler'];
-        if(room.energyCapacityAvailable < 2300) {
-            if(room.energyCapacityAvailable >= 1800) {
-                outSourceTypes = ['claimer', 'outSourcer'];
-            }
-            else {
-                outSourceTypes = ['outSourcer'];
-            }
+        let outSourceTypes;
+        if(room.energyCapacityAvailable < 800) {
+            outSourceTypes = []
+        }
+        else if(room.energyCapacityAvailable < 1300) {
+            outSourceTypes = ['remoteHarvester', 'remoteHauler'];
+        }
+        else {
+            outSourceTypes = ['claimer', 'remoteHarvester', 'remoteHauler'];
         }
         for(let index in outSourceTypes) {
             let cType = outSourceTypes[index];
@@ -2272,7 +2319,12 @@ Creep.prototype.collectEnergy = function collectEnergy(changeStatus=false) {
     if(this.room.memory.linkCompleteness == true) {
         return false;
     }
-    var container = this.pos.findClosestByPath(FIND_STRUCTURES, {filter: structure => structure.structureType == STRUCTURE_CONTAINER && structure.store.getUsedCapacity(RESOURCE_ENERGY) > this.store.getCapacity() / 2});
+    var container = this.pos.findClosestByPath(FIND_STRUCTURES, {filter: structure => (
+        structure.structureType == STRUCTURE_CONTAINER && 
+        !structure.pos.inRangeTo(this.room.controller.pos, 3) &&
+        structure.store.getUsedCapacity(RESOURCE_ENERGY) > this.store.getCapacity() / 2
+        )});
+
     if (container) {
         let resourceType = RESOURCE_ENERGY;
         let result = this.withdraw(container, resourceType);
@@ -2429,6 +2481,9 @@ var roomObject = {
     W12S21: {
         restPos: new RoomPosition(11, 21, "W12S21"),
         managerPos: new RoomPosition(6, 19, "W12S21"),
+    },
+    W22S15: {
+        restPos: new RoomPosition(16, 10, "W22S15"),
     },
     sim: {
         restPos: new RoomPosition(19, 21, "sim"),

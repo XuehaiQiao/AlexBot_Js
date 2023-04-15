@@ -11,11 +11,11 @@ var remoteHauler = {
     properties: {
         role: 'remoteHauler',
         stages: {
-            1: {maxEnergyCapacity: 300, bodyParts:[CARRY, MOVE, CARRY, MOVE], number: 2},
-            2: {maxEnergyCapacity: 550, bodyParts:[CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2},
-            3: {maxEnergyCapacity: 800, bodyParts:[CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2},
-            4: {maxEnergyCapacity: 1300, bodyParts:[CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], number: 2},
-            5: {maxEnergyCapacity: 1800, bodyParts:[CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], number: 2},
+            1: {maxEnergyCapacity: 300, bodyParts:[CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2},
+            2: {maxEnergyCapacity: 550, bodyParts:[CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2},
+            3: {maxEnergyCapacity: 800, bodyParts:[WORK, ...new Array(9).fill(CARRY), ...new Array(5).fill(MOVE)], number: 1},
+            4: {maxEnergyCapacity: 1300, bodyParts:[WORK, ...new Array(13).fill(CARRY), ...new Array(7).fill(MOVE)], number: 2},
+            5: {maxEnergyCapacity: 1800, bodyParts:[WORK, ...new Array(15).fill(CARRY), ...new Array(8).fill(MOVE)], number: 2},
             6: {maxEnergyCapacity: 2300, bodyParts:[WORK, ...new Array(27).fill(CARRY), ...new Array(14).fill(MOVE)], number: 1}, // 100 + 1350 + 700 = 2150
             7: {maxEnergyCapacity: 5600, bodyParts:[WORK, WORK, ...new Array(31).fill(CARRY), ...new Array(17).fill(MOVE)], number: 1}, // 200 + 1650 + 850 = 2700
         },
@@ -93,8 +93,7 @@ var remoteHauler = {
             // build near road and container
             const myConstuct = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 1);
             if(myConstuct.length > 0) {
-                creep.build(myConstuct[0]);
-                return;
+                if(creep.build(myConstuct[0]) == OK) return;
             }
 
             // move to base room if not in
@@ -151,7 +150,6 @@ var remoteHauler = {
                 stage = level;
             }
         }
-
         return stage;
     }
 };

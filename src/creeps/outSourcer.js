@@ -63,21 +63,29 @@ var outSourcer = {
                 return;
             }
 
-            var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter: struct => (
+            let target = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter: struct => (
                 (struct.structureType == STRUCTURE_STORAGE || struct.structureType == STRUCTURE_CONTAINER) && struct.store.getFreeCapacity() > 0
             )});
-    
-            if (!target) {
-                // go rest
-                if (roomInfo[creep.room.name]) {
-                    creep.moveTo(roomInfo[creep.room.name].restPos);
-                    return;
-                };
+            if (target) {
+                if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target);
+                }
+                return;
             }
 
-            if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
+            let constructSites = creep.room.find(FIND_CONSTRUCTION_SITES);
+            if(constructSites.length > 0) {
+                if(creep.build(constructSites[0]) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(constructSites[0]);
+                }
+                return;
             }
+
+            // go rest
+            if (roomInfo[creep.room.name]) {
+                creep.moveTo(roomInfo[creep.room.name].restPos);
+                return;
+            };
         }
     },
 

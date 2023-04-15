@@ -1,5 +1,5 @@
-class managerTask {
-    constructor(from, to, resourceType, volume, priority=0) {
+var taskModels = {
+    ManagerTask: function(from, to, resourceType, volume, priority=0) {
         this.from = from;
         this.to = to;
         this.resourceType = resourceType;
@@ -7,3 +7,5 @@ class managerTask {
         this.priority = priority;
     }
 }
+
+module.exports = taskModels;

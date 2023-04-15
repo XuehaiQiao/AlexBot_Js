@@ -1,6 +1,12 @@
 var remoteHarvester = {
     properties: {
         role: "remoteHarvester",
+        stages: {
+            1: {maxEnergyCapacity: 300, bodyParts:[WORK, WORK, CARRY, MOVE], number: 2},
+            2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 1},
+            3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 1},
+            4: {maxEnergyCapacity: 1300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
+        },
     },
     /** @param {Creep} creep **/
     run: function(creep) {
@@ -15,7 +21,7 @@ var remoteHarvester = {
             creep.say('no e')
             if(creep.memory.containerId == undefined) {
                 let containerList = creep.room.find(FIND_SOURCES)[creep.memory.target].pos.findInRange(FIND_STRUCTURES, 2, {filter: struct => struct.structureType == STRUCTURE_CONTAINER});
-                if(containerList) creep.memory.containerId = containerList[0].id;
+                if(containerList.length) creep.memory.containerId = containerList[0].id;
                 
             }
             let container = Game.getObjectById(creep.memory.containerId);
@@ -45,7 +51,7 @@ var remoteHarvester = {
         }
         else creepCount = 0;
 
-        if (creepCount < Memory.outSourceRooms[roomName].sourceNum) {
+        if (creepCount < Memory.outSourceRooms[roomName].sourceNum * this.properties.stages[this.getStage(room)].number) {
             return true;
         }
     },
@@ -55,7 +61,7 @@ var remoteHarvester = {
 
 
         let name = this.properties.role + Game.time;
-        let body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE] // cost: 600 + 150 + 50 = 800
+        let body = this.properties.stages[this.getStage(room)].bodyParts;
 
         const existingThisTypeCreeps = _.filter(Game.creeps, (creep) => creep.memory.role == this.properties.role && creep.memory.targetRoom == outSourceRoomName);
         var existingTargets = _.map(existingThisTypeCreeps, creep => creep.memory.target)
@@ -73,6 +79,17 @@ var remoteHarvester = {
 
         return {name, body, memory};
     },
+
+    getStage: function(room) {
+        var stage = 1;
+        let capacity = room.energyCapacityAvailable;
+        for(var level in this.properties.stages) {
+            if(capacity >= this.properties.stages[level].maxEnergyCapacity) {
+                stage = level;
+            }
+        }
+        return stage;
+    }
 }
 
 module.exports = remoteHarvester;

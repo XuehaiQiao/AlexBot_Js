@@ -2,16 +2,19 @@ W22S15
 W27S18
 
 // claimer spawn
-Game.spawns['Spawn1_W18S15'].spawnCreep([MOVE, CLAIM], 'Claimer' + Game.time, {memory: {role: 'claimer', status: 1, targetRoom: 'W17S13', claim: true}});
+Game.spawns['Spawn1_W18S15'].spawnCreep([MOVE, CLAIM], 'Claimer' + Game.time, {memory: {role: 'claimer', status: 1, targetRoom: 'W22S15', claim: true}});
 
 //builder
-Game.spawns['Spawn1_W18S15'].spawnCreep([WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE], 'Builder' + Game.time, {memory: {role: 'builder', status: 1, targetRoom: 'W17S13'}});
+Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], 'builder' + Game.time, {memory: {role: 'builder', status: 1, targetRoom: 'W22S15'}});
+
+// upgrader
+Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], 'upgrader2' + Game.time, {memory: {role: 'upgrader2', status: 1, targetRoom: 'W22S15', base: 'W22S15'}});
 
 // carrier spawn
 Game.spawns['Spawn2_W18S15'].spawnCreep([...new Array(4).fill(CARRY), ...new Array(2).fill(MOVE)], 'Carrier' + Game.time, {memory: {role: 'carrier', building: 1}});
 
 // defender
-Game.spawns['Spawn2_W13S21'].spawnCreep([MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, RANGED_ATTACK, MOVE], 'defender' + Game.time, {memory: {role: 'defender', targetRoom: 'W12S21'}});
+Game.spawns['Spawn2_W13S21'].spawnCreep([MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, RANGED_ATTACK, MOVE], 'defender' + Game.time, {memory: {role: 'defender', targetRoom: 'W22S15'}});
 
 
 Game.spawns['Spawn1_W18S15'].spawnCreep([WORK, WORK, MOVE], 'Harvester2' + Game.time, {memory: {role: 'harvester2', status: 1, target: 0}});
@@ -25,6 +28,12 @@ _.forEach(_.filter(Game.rooms['W18S15'].find(FIND_STRUCTURES), structure => stru
 if (roomInfo[creep.room.name]) {
     creep.moveTo(roomInfo[creep.room.name].restPos);
     return;
+}
+
+// destroy all the walls
+let wallList = Game.rooms.W22S15.find(FIND_STRUCTURES, {filter: struct => struct.structureType == STRUCTURE_WALL});
+for(let i in wallList) {
+    wallList[i].destroy();
 }
 
 // wrecker spawn

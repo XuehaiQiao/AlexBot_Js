@@ -30,15 +30,7 @@ var carrier2 = {
         }
 
         // set status: 0. harvest  1. transfer 
-        if(!creep.memory.status && creep.store.getFreeCapacity() == 0) {
-            creep.memory.status = 1;
-            creep.say('🚩 transfer');
-        }
-        else if (creep.memory.status && creep.store.getUsedCapacity() == 0) {
-            creep.memory.status = 0;
-            creep.memory.target = Math.floor(Math.random() * creep.room.find(FIND_SOURCES_ACTIVE).length);
-            creep.say('🔄 harvest');
-        }
+        creep.workerSetStatus();
 
         // extension, spawn, tower
         var needFeedStructure = _.find(creep.room.find(FIND_MY_STRUCTURES), (structure) => (
@@ -59,6 +51,18 @@ var carrier2 = {
     toStorage: function(creep) {
         // console.log("in toStorage", creep.id)
         var storage = creep.room.storage;
+        
+        // if no storage, change target to containers that near controller
+        if(!storage) {
+            let containers = creep.room.find(FIND_STRUCTURES, {filter: struct => (
+                struct.structureType == STRUCTURE_CONTAINER &&
+                struct.pos.inRangeTo(creep.room.controller.pos, 3) &&
+                struct.store.getFreeCapacity() > 0
+            )});
+            if(containers.length) {
+                storage = containers[0];
+            }
+        }
 
         if (!storage || storage.store.getFreeCapacity() == 0) {
             // go rest

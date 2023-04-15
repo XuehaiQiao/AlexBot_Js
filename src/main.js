@@ -10,7 +10,16 @@ module.exports.loop = function () {
         console.log('CPU bucket is low, skip this tick..');
         return;
     }
-    console.log("---------- Start Tick: " + Game.time + " ----------")
+    console.log("---------- Start Tick: " + Game.time + " ----------");
+
+    // free up memory if creep no longer exists
+    for(var name in Memory.creeps) {
+        if(!Game.creeps[name]) {
+            delete Memory.creeps[name];
+            console.log('Clearing non-existing creep memory:', name);
+        }
+    }
+
     // make a list of all of our rooms
     Game.myRooms = _.filter(Game.rooms, r => r.controller && r.controller.level > 0 && r.controller.my);
 
@@ -46,14 +55,6 @@ module.exports.loop = function () {
         let role = creep.memory.role;
         if (creepLogic[role]) {
             creepLogic[role].run(creep);
-        }
-    }
-
-    // free up memory if creep no longer exists
-    for(var name in Memory.creeps) {
-        if(!Game.creeps[name]) {
-            delete Memory.creeps[name];
-            console.log('Clearing non-existing creep memory:', name);
         }
     }
 
