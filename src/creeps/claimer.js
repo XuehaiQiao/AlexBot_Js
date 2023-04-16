@@ -46,7 +46,7 @@ var claimer = {
             if(!Game.rooms[roomName].controller) return false; // sourceKeeper rooms
 
             let controller = Game.rooms[roomName].controller;
-            if(controller.reservation && controller.reservation.username == room.controller.owner && controller.reservation.ticksToEnd > 2000) {
+            if(controller.reservation && controller.reservation.username == room.controller.owner.username && controller.reservation.ticksToEnd > 2000) {
                 return false
             }
         }
