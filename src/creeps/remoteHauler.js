@@ -52,11 +52,11 @@ var remoteHauler = {
             }
 
             // if no avilable source, move to nearest source
-            var dropedResources = creep.room.find(FIND_DROPPED_RESOURCES, {filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount > creep.store.getCapacity()});
-            if (dropedResources.length > 0) {
-                let result = creep.pickup(dropedResources[0]);
+            let dropedResource = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount > creep.store.getCapacity()});
+            if (dropedResource) {
+                let result = creep.pickup(dropedResource);
                 if(result == ERR_NOT_IN_RANGE) {
-                    creep.moveToNoCreep(dropedResources[0]);
+                    creep.moveToNoCreep(dropedResource);
                 }
                 return;
             }

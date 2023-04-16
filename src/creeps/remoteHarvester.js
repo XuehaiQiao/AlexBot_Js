@@ -4,40 +4,51 @@ var remoteHarvester = {
         stages: {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, WORK, CARRY, MOVE], number: 2},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 1},
-            3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 1},
             4: {maxEnergyCapacity: 1300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
+            7: {maxEnergyCapacity: 5600, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], number: 1},
         },
     },
     /** @param {Creep} creep **/
     run: function(creep) {
+        if(creep.memory.rest) {
+            creep.memory.rest -= 1;
+            return;
+        }
+
         // move to its target room if not in
         if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
             creep.moveToRoomAdv(creep.memory.targetRoom);
             return;
         }
 
+        // harvest
+        let result = creep.harvestEnergy();
+
         // repair container when finished harvest source no energy
-        if(creep.memory.target != undefined && creep.room.find(FIND_SOURCES)[creep.memory.target].energy == 0) {
+        if(creep.memory.target != undefined && result == ERR_NOT_ENOUGH_RESOURCES) {
+            let source = creep.room.find(FIND_SOURCES)[creep.memory.target];
             creep.say('no e')
             if(creep.memory.containerId == undefined) {
-                let containerList = creep.room.find(FIND_SOURCES)[creep.memory.target].pos.findInRange(FIND_STRUCTURES, 2, {filter: struct => struct.structureType == STRUCTURE_CONTAINER});
+                let containerList = source.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_CONTAINER});
                 if(containerList.length) creep.memory.containerId = containerList[0].id;
-                
             }
+            
             let container = Game.getObjectById(creep.memory.containerId);
-            //creep.say('no energy')
-            // let container = creep.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_CONTAINER && struct.hits < struct.hitsMax});
-            if (container && container.hits < container.hitsMax) {
-                if(creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(container);
-                };
+            if (container && container.hits < container.hitsMax && container.store[RESOURCE_ENERGY] > 0) {
+                if(creep.store[RESOURCE_ENERGY] == 0) {
+                    if(creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(container);
+                    }
+                }
                 creep.repair(container);
-                
+            }
+            else {
+                creep.memory.rest = source.ticksToRegeneration;
             }
             return;
         }
-        // harvest
-        creep.harvestEnergy();
+        
+        
     },
 
     // checks if the room needs to spawn a creep (logic differ from others)

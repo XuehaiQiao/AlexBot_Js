@@ -120,14 +120,13 @@ Creep.prototype.collectEnergy = function collectEnergy(changeStatus=false) {
     //     return;
     // }
 
-    // if no resources
-    // this.toResPos();
-
     return false;
 }
 
-Creep.prototype.harvestEnergy = function harvestEnergy(remote=false) {
-    var source;
+Creep.prototype.harvestEnergy = function harvestEnergy() {
+    // todo:
+    // add targetRoom option, to create harvest path before enter the target room.
+    let source;
     if (this.memory.target != undefined) {
         source = this.room.find(FIND_SOURCES)[this.memory.target];
     }
@@ -135,21 +134,32 @@ Creep.prototype.harvestEnergy = function harvestEnergy(remote=false) {
         source = this.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
     }
 
-    if(this.harvest(source) == ERR_NOT_IN_RANGE) {
+    if(!this.pos.inRangeTo(source.pos, 1)) {
         this.moveTo(source, {reusePath: 10});
+        return ERR_NOT_IN_RANGE;
     }
     else {
-        let link = this.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_LINK && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0});
-        if (link.length > 0) {
-            this.transfer(link[0], RESOURCE_ENERGY);
-            return;
+        let result = this.harvest(source);
+        let links = this.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_LINK && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0});
+        if(links.length > 0 && (this.store.getFreeCapacity() < 20 || this.ticksToLive < 2 || result == ERR_NOT_ENOUGH_RESOURCES)) {
+            this.transfer(links[0], RESOURCE_ENERGY);
         }
-        let container = this.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_CONTAINER && struct.store.getFreeCapacity() > 0});
-        if (container.length > 0) {
-            this.transfer(container[0], RESOURCE_ENERGY);
-            return;
+
+        // if not near link, move to containers
+        if(links.length == 0) {
+            let contianer = this.pos.findClosestByPath(FIND_STRUCTURES, {filter: struct => (
+                struct.structureType == STRUCTURE_CONTAINER &&
+                struct.pos.inRangeTo(source.pos, 1)
+            )});
+            if(contianer && !contianer.pos.isEqualTo(this.pos)) {
+                this.moveTo(contianer);
+            }
         }
+
+        return result;
     }
+
+    
 }
 
 Creep.prototype.takeEnergyFromStorage = function takeEnergyFromStorage() {
@@ -229,7 +239,7 @@ Creep.prototype.isStuck = function() {
         this.memory.lastPos = {x: this.pos.x, y: this.pos.y, t: 0};
     }
     else {
-        if(this.memory.lastPos.t > 0) { // stuck for 1 tick
+        if(this.memory.lastPos.t > 1) { // stuck for 1 tick
             stuck = true;   
         }
         this.memory.lastPos.t += 1;

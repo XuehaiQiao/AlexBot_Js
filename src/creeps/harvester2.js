@@ -5,10 +5,8 @@ var harvester2 = {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, WORK, CARRY, MOVE], number: 1},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 1},
             3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
-            4: {maxEnergyCapacity: 1300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
-            5: {maxEnergyCapacity: 1800, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
-            6: {maxEnergyCapacity: 2300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
-            7: {maxEnergyCapacity: 5600, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], number: 1},
+            4: {maxEnergyCapacity: 1300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE], number: 1},
+            7: {maxEnergyCapacity: 5600, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], number: 1},
         },
     },
 
@@ -26,28 +24,11 @@ var harvester2 = {
         }
 
         // harvest
-        if(!creep.memory.target == undefined) {
-            creep.memory.target = 0;
-            return;
-        }
-        let source = creep.room.find(FIND_SOURCES)[creep.memory.target];
-        if(!creep.pos.inRangeTo(source.pos, 1)) {
-            creep.moveTo(source, {reusePath: 10});
-        }
-        else {
-            let result = creep.harvest(source);
-            let link = creep.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_LINK && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0});
-            let container = creep.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_CONTAINER && struct.store.getFreeCapacity() > 0});
-            if (link.length > 0) {
-                creep.transfer(link[0], RESOURCE_ENERGY);
-            }
-            else if (container.length > 0) {
-                creep.transfer(container[0], RESOURCE_ENERGY);
-            }
+        let result = creep.harvestEnergy();
 
-            if(result == ERR_NOT_ENOUGH_RESOURCES) {
-                creep.memory.rest = source.ticksToRegeneration;
-            }
+        if(result == ERR_NOT_ENOUGH_RESOURCES) {
+            let source = creep.room.find(FIND_SOURCES)[creep.memory.target];
+            if(source) creep.memory.rest = source.ticksToRegeneration;
         }
     },
 

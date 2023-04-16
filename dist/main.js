@@ -62,6 +62,7 @@ module.exports.loop = function () {
         console.log('CPU bucket is low, skip this tick..');
         return;
     }
+    
     console.log("---------- Start Tick: " + Game.time + " ----------");
     for(var name in Memory.creeps) {
         if(!Game.creeps[name]) {
@@ -94,9 +95,7 @@ module.exports.loop = function () {
         var creep = Game.creeps[name];
 
         let role = creep.memory.role;
-        if (creepLogic[role]) {
-            creepLogic[role].run(creep);
-        }
+        if (creepLogic[role]) creepLogic[role].run(creep);
     }
 
     if (Game.cpu.bucket == 10000) {
@@ -104,12 +103,6 @@ module.exports.loop = function () {
     }
 
     roomLogic.exportStats();
-    
-    if(!Memory.statistics) Memory.statistics = {};
-    if(!Memory.statistics.cpu) Memory.statistics.cpu = 20;
-    Memory.statistics.cpu = Memory.statistics.cpu + Game.cpu.getUsed() / 1500 - Memory.statistics.cpu / 1500;
-    console.log('CPU bucket: ', Game.cpu.bucket);
-    console.log('Average CPU usage: ', Math.round(Memory.statistics.cpu * 1000) / 1000);
     console.log("---------- End Tick, No Errors ----------");
 }
 return module.exports;
@@ -671,10 +664,8 @@ var harvester2 = {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, WORK, CARRY, MOVE], number: 1},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 1},
             3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
-            4: {maxEnergyCapacity: 1300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
-            5: {maxEnergyCapacity: 1800, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
-            6: {maxEnergyCapacity: 2300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
-            7: {maxEnergyCapacity: 5600, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], number: 1},
+            4: {maxEnergyCapacity: 1300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE], number: 1},
+            7: {maxEnergyCapacity: 5600, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], number: 1},
         },
     },
 
@@ -688,28 +679,11 @@ var harvester2 = {
             creep.moveToRoom(creep.memory.targetRoom);
             return;
         }
-        if(!creep.memory.target == undefined) {
-            creep.memory.target = 0;
-            return;
-        }
-        let source = creep.room.find(FIND_SOURCES)[creep.memory.target];
-        if(!creep.pos.inRangeTo(source.pos, 1)) {
-            creep.moveTo(source, {reusePath: 10});
-        }
-        else {
-            let result = creep.harvest(source);
-            let link = creep.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_LINK && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0});
-            let container = creep.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_CONTAINER && struct.store.getFreeCapacity() > 0});
-            if (link.length > 0) {
-                creep.transfer(link[0], RESOURCE_ENERGY);
-            }
-            else if (container.length > 0) {
-                creep.transfer(container[0], RESOURCE_ENERGY);
-            }
+        let result = creep.harvestEnergy();
 
-            if(result == ERR_NOT_ENOUGH_RESOURCES) {
-                creep.memory.rest = source.ticksToRegeneration;
-            }
+        if(result == ERR_NOT_ENOUGH_RESOURCES) {
+            let source = creep.room.find(FIND_SOURCES)[creep.memory.target];
+            if(source) creep.memory.rest = source.ticksToRegeneration;
         }
     },
     spawn: function(room) {
@@ -1347,26 +1321,23 @@ var claimer = {
         
     },
     spawn: function(room, roomName) {
-
-
         if(Game.rooms[roomName]) {
             if(!Game.rooms[roomName].controller) return false; // sourceKeeper rooms
 
             let controller = Game.rooms[roomName].controller;
-            if(controller.reservation.username === room.controller.owner && controller.reservation.ticksToEnd > 2000) {
+            if(controller.reservation && controller.reservation.username == room.controller.owner && controller.reservation.ticksToEnd > 2000) {
                 return false
             }
         }
-        else {
-            let creepCount = 0;
-            if(global.roomCensus[roomName] && global.roomCensus[roomName][this.properties.role]) {
-                creepCount = global.roomCensus[roomName][this.properties.role];
-            }
 
-            if (creepCount < this.properties.stages[this.getStage(room)].number) {
-                return true;
-            }
+        let creepCount = 0;
+        if(global.roomCensus[roomName] && global.roomCensus[roomName][this.properties.role]) {
+            creepCount = global.roomCensus[roomName][this.properties.role];
         }
+
+        if (creepCount < this.properties.stages[this.getStage(room)].number) return true;
+
+        return false;
 
     },
     spawnData: function(room, targetRoomName) {
@@ -1518,34 +1489,45 @@ var remoteHarvester = {
         stages: {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, WORK, CARRY, MOVE], number: 2},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 1},
-            3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 1},
             4: {maxEnergyCapacity: 1300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
+            7: {maxEnergyCapacity: 5600, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], number: 1},
         },
     },
     /** @param {Creep} creep **/
     run: function(creep) {
+        if(creep.memory.rest) {
+            creep.memory.rest -= 1;
+            return;
+        }
         if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
             creep.moveToRoomAdv(creep.memory.targetRoom);
             return;
         }
-        if(creep.memory.target != undefined && creep.room.find(FIND_SOURCES)[creep.memory.target].energy == 0) {
+        let result = creep.harvestEnergy();
+        if(creep.memory.target != undefined && result == ERR_NOT_ENOUGH_RESOURCES) {
+            let source = creep.room.find(FIND_SOURCES)[creep.memory.target];
             creep.say('no e')
             if(creep.memory.containerId == undefined) {
-                let containerList = creep.room.find(FIND_SOURCES)[creep.memory.target].pos.findInRange(FIND_STRUCTURES, 2, {filter: struct => struct.structureType == STRUCTURE_CONTAINER});
+                let containerList = source.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_CONTAINER});
                 if(containerList.length) creep.memory.containerId = containerList[0].id;
-                
             }
+            
             let container = Game.getObjectById(creep.memory.containerId);
-            if (container && container.hits < container.hitsMax) {
-                if(creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(container);
-                };
+            if (container && container.hits < container.hitsMax && container.store[RESOURCE_ENERGY] > 0) {
+                if(creep.store[RESOURCE_ENERGY] == 0) {
+                    if(creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(container);
+                    }
+                }
                 creep.repair(container);
-                
+            }
+            else {
+                creep.memory.rest = source.ticksToRegeneration;
             }
             return;
         }
-        creep.harvestEnergy();
+        
+        
     },
     spawn: function(room, roomName) {
         let creepCount;
@@ -1642,11 +1624,11 @@ var remoteHauler = {
             if (creep.moveToRoomAdv(creep.memory.targetRoom)) {
                 return;
             }
-            var dropedResources = creep.room.find(FIND_DROPPED_RESOURCES, {filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount > creep.store.getCapacity()});
-            if (dropedResources.length > 0) {
-                let result = creep.pickup(dropedResources[0]);
+            let dropedResource = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount > creep.store.getCapacity()});
+            if (dropedResource) {
+                let result = creep.pickup(dropedResource);
                 if(result == ERR_NOT_IN_RANGE) {
-                    creep.moveToNoCreep(dropedResources[0]);
+                    creep.moveToNoCreep(dropedResource);
                 }
                 return;
             }
@@ -2430,8 +2412,8 @@ Creep.prototype.collectEnergy = function collectEnergy(changeStatus=false) {
     return false;
 }
 
-Creep.prototype.harvestEnergy = function harvestEnergy(remote=false) {
-    var source;
+Creep.prototype.harvestEnergy = function harvestEnergy() {
+    let source;
     if (this.memory.target != undefined) {
         source = this.room.find(FIND_SOURCES)[this.memory.target];
     }
@@ -2439,21 +2421,30 @@ Creep.prototype.harvestEnergy = function harvestEnergy(remote=false) {
         source = this.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
     }
 
-    if(this.harvest(source) == ERR_NOT_IN_RANGE) {
+    if(!this.pos.inRangeTo(source.pos, 1)) {
         this.moveTo(source, {reusePath: 10});
+        return ERR_NOT_IN_RANGE;
     }
     else {
-        let link = this.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_LINK && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0});
-        if (link.length > 0) {
-            this.transfer(link[0], RESOURCE_ENERGY);
-            return;
+        let result = this.harvest(source);
+        let links = this.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_LINK && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0});
+        if(links.length > 0 && (this.store.getFreeCapacity() < 20 || this.ticksToLive < 2 || result == ERR_NOT_ENOUGH_RESOURCES)) {
+            this.transfer(links[0], RESOURCE_ENERGY);
         }
-        let container = this.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_CONTAINER && struct.store.getFreeCapacity() > 0});
-        if (container.length > 0) {
-            this.transfer(container[0], RESOURCE_ENERGY);
-            return;
+        if(links.length == 0) {
+            let contianer = this.pos.findClosestByPath(FIND_STRUCTURES, {filter: struct => (
+                struct.structureType == STRUCTURE_CONTAINER &&
+                struct.pos.inRangeTo(source.pos, 1)
+            )});
+            if(contianer && !contianer.pos.isEqualTo(this.pos)) {
+                this.moveTo(contianer);
+            }
         }
+
+        return result;
     }
+
+    
 }
 
 Creep.prototype.takeEnergyFromStorage = function takeEnergyFromStorage() {
@@ -2524,7 +2515,7 @@ Creep.prototype.isStuck = function() {
         this.memory.lastPos = {x: this.pos.x, y: this.pos.y, t: 0};
     }
     else {
-        if(this.memory.lastPos.t > 0) { // stuck for 1 tick
+        if(this.memory.lastPos.t > 1) { // stuck for 1 tick
             stuck = true;   
         }
         this.memory.lastPos.t += 1;

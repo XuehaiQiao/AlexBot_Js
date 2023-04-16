@@ -42,29 +42,23 @@ var claimer = {
 
     // checks if the room needs to spawn a creep
     spawn: function(room, roomName) {
-        // var thisTypeCreeps = _.filter(Game.creeps, (creep) => creep.memory.role == this.properties.role && creep.memory.targetRoom == roomName);
-    
-        // check if need spawn
-
-
         if(Game.rooms[roomName]) {
             if(!Game.rooms[roomName].controller) return false; // sourceKeeper rooms
 
             let controller = Game.rooms[roomName].controller;
-            if(controller.reservation.username === room.controller.owner && controller.reservation.ticksToEnd > 2000) {
+            if(controller.reservation && controller.reservation.username == room.controller.owner && controller.reservation.ticksToEnd > 2000) {
                 return false
             }
         }
-        else {
-            let creepCount = 0;
-            if(global.roomCensus[roomName] && global.roomCensus[roomName][this.properties.role]) {
-                creepCount = global.roomCensus[roomName][this.properties.role];
-            }
 
-            if (creepCount < this.properties.stages[this.getStage(room)].number) {
-                return true;
-            }
+        let creepCount = 0;
+        if(global.roomCensus[roomName] && global.roomCensus[roomName][this.properties.role]) {
+            creepCount = global.roomCensus[roomName][this.properties.role];
         }
+
+        if (creepCount < this.properties.stages[this.getStage(room)].number) return true;
+
+        return false;
 
     },
 
