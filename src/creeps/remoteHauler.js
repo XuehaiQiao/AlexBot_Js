@@ -43,6 +43,7 @@ var remoteHauler = {
             const nearTomstone = creep.pos.findInRange(FIND_TOMBSTONES, 1, {filter: ts => ts.store[RESOURCE_ENERGY] > 0});
             if(nearTomstone.length > 0) {
                 creep.withdraw(nearTomstone[0], RESOURCE_ENERGY);
+                return;
             }
 
             // move to its target room if not in
@@ -51,28 +52,28 @@ var remoteHauler = {
             }
 
             // if no avilable source, move to nearest source
-            var dropedResources = creep.room.find(FIND_DROPPED_RESOURCES, {filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount > creep.store.getCapacity() / 2});
+            var dropedResources = creep.room.find(FIND_DROPPED_RESOURCES, {filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount > creep.store.getCapacity()});
             if (dropedResources.length > 0) {
                 let result = creep.pickup(dropedResources[0]);
                 if(result == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(dropedResources[0]);
+                    creep.moveToNoCreep(dropedResources[0]);
                 }
                 return;
             }
         
-            // find containers
-            var containers = creep.room.find(FIND_STRUCTURES, {filter: structure => structure.structureType == STRUCTURE_CONTAINER && structure.store.getUsedCapacity(RESOURCE_ENERGY) > creep.store.getFreeCapacity()});
-            if (containers.length > 0) {
-                let result = creep.withdraw(containers[0], RESOURCE_ENERGY);
+            // find container
+            let container = creep.pos.findClosestByRange(FIND_STRUCTURES, {filter: structure => structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] > creep.store.getFreeCapacity()});
+            if (container) {
+                let result = creep.withdraw(container, RESOURCE_ENERGY);
                 if(result == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(containers[0]);
+                    creep.moveToNoCreep(container);
                 }
                 return;
             }
 
             let source = creep.room.find(FIND_SOURCES)[0];
             if(!creep.pos.inRangeTo(source.pos, 3)) {
-                creep.moveTo(source, {reusePath: 20})
+                creep.moveToNoCreep(source)
             }
             else {
                 creep.memory.rest = 10;
@@ -109,12 +110,12 @@ var remoteHauler = {
             if (!target) {
                 // go rest
                 if (roomInfo[creep.room.name]) {
-                    creep.moveTo(roomInfo[creep.room.name].restPos);
+                    creep.moveToNoCreep(roomInfo[creep.room.name].restPos);
                     return;
                 };
             }
             if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
+                creep.moveToNoCreep(target);
             }
         }
     },

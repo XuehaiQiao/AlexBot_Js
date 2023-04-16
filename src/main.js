@@ -61,6 +61,8 @@ module.exports.loop = function () {
     if (Game.cpu.bucket == 10000) {
         Game.cpu.generatePixel();
     }
+
+    roomLogic.exportStats();
     
     if(!Memory.statistics) Memory.statistics = {};
     if(!Memory.statistics.cpu) Memory.statistics.cpu = 20;

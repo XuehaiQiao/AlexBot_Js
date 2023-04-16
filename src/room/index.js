@@ -6,6 +6,7 @@ let roomLogic = {
     healing:      require('./healing'),
     linkTransfer: require('./linkTransfer'),
     roomCensus:   require('./roomCensus'),
+    exportStats:  require('./exportStats'),
 }
 
 module.exports = roomLogic;

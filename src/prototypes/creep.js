@@ -6,14 +6,21 @@ Creep.prototype.damaged = function() {
     return this.hits < this.hitsMax;
 }
 
+Creep.prototype.moveToNoCreep = function(target) {
+    if(this.isStuck()) {
+        this.moveTo(target);
+    }
+    this.moveTo(target, {reusePath: 50, ignoreCreeps: true});
+}
+
 Creep.prototype.moveToRoom = function(roomName) {
-    return this.moveTo(new RoomPosition(25, 25, roomName), {reusePath: 20});
+    return this.moveToNoCreep(new RoomPosition(25, 25, roomName));
 }
 
 Creep.prototype.moveToRoomAdv = function(roomName) {
     // return true if its moving to the target room
     if (roomName && roomName != this.room.name) {
-        this.moveTo(new RoomPosition(25, 25, roomName), {reusePath: 20});
+        this.moveToNoCreep(new RoomPosition(25, 25, roomName));
         return true;
     }
     // move 1 more step to leave the room edge
@@ -210,8 +217,27 @@ Creep.prototype.toResPos = function toResPos(restTime=5) {
         }
         else {
             this.moveTo(roomInfo[this.room.name].restPos);
-        }
-        
+        }   
     }
-    
+}
+
+// call every time
+Creep.prototype.isStuck = function() {
+    let stuck = false;
+
+    if(this.memory.lastPos === undefined || this.memory.lastPos.x != this.pos.x && this.memory.lastPos.x != this.pos.x) {
+        this.memory.lastPos = {x: this.pos.x, y: this.pos.y, t: 0};
+    }
+    else {
+        if(this.memory.lastPos.t > 0) { // stuck for 1 tick
+            stuck = true;   
+        }
+        this.memory.lastPos.t += 1;
+    }
+    return stuck;
+}
+
+Creep.prototype.isAtEdge = function() {
+    let pos = this.pos;
+	return pos.x == 0 || pos.y == 0 || pos.x == 49 || pos.y == 49;
 }
