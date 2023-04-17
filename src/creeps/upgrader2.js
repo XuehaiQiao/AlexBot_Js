@@ -11,7 +11,7 @@ var upgrader2 = {
             5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(8).fill(WORK), ...new Array(8).fill(CARRY), ...new Array(8).fill(MOVE)], mBodyParts: [...new Array(10).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(5).fill(MOVE)], number: 1},
             6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], mBodyParts: [...new Array(12).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
             7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(16).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(8).fill(MOVE)], number: 0},
-            8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(36).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(9).fill(MOVE)], number: 1},
+            8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(36).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(9).fill(MOVE)], number: 1},
         },
     },
 
@@ -34,24 +34,19 @@ var upgrader2 = {
 
     managerLogic: function(creep) {
         // set status: 0. harvest  1. upgrade 
-        if(creep.memory.status && creep.store.getFreeCapacity() == 0) {
-            creep.memory.status = 1;
-        }
-        else if (creep.memory.status != 0 && creep.store[RESOURCE_ENERGY] < 50) {
-            creep.memory.status = 0;
-            creep.memory.target = Math.floor(Math.random() * creep.room.find(FIND_SOURCES_ACTIVE).length);
-        }
+        creep.workerSetStatus();
 
-        // harvest
-        if(creep.memory.status == 0) {
+        // harvest: status 0
+        if(!creep.memory.status) {
             creep.takeEnergyFromControllerLink();
-            creep.upgradeController(creep.room.controller)
+            creep.upgradeController(creep.room.controller);
         }
-        // upgrade
+        // upgrade: status 1
         else {
             if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(creep.room.controller, {reusePath: 10});
             }
+            if(creep.store[RESOURCE_ENERGY] <= 20) creep.memory.status = 0;
         }
     },
 
@@ -59,13 +54,13 @@ var upgrader2 = {
         // set status: 0. harvest  1. work 
         creep.workerSetStatus();
 
-        // harvest
+        // upgrade
         if(creep.memory.status) {
             if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(creep.room.controller, {reusePath: 10});
             }
         }
-        // upgrade
+        // harvest
         else {
             creep.takeEnergyFromClosest();
         }

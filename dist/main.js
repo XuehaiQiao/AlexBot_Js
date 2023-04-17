@@ -62,7 +62,7 @@ module.exports.loop = function () {
         console.log('CPU bucket is low, skip this tick..');
         return;
     }
-    
+
     console.log("---------- Start Tick: " + Game.time + " ----------");
     for(var name in Memory.creeps) {
         if(!Game.creeps[name]) {
@@ -103,6 +103,7 @@ module.exports.loop = function () {
     }
 
     roomLogic.exportStats();
+    console.log('CPU bucket: ', Game.cpu.bucket);
     console.log("---------- End Tick, No Errors ----------");
 }
 return module.exports;
@@ -895,7 +896,7 @@ var upgrader2 = {
             5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(8).fill(WORK), ...new Array(8).fill(CARRY), ...new Array(8).fill(MOVE)], mBodyParts: [...new Array(10).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(5).fill(MOVE)], number: 1},
             6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], mBodyParts: [...new Array(12).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
             7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(16).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(8).fill(MOVE)], number: 0},
-            8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(36).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(9).fill(MOVE)], number: 1},
+            8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(36).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(9).fill(MOVE)], number: 1},
         },
     },
 
@@ -914,21 +915,16 @@ var upgrader2 = {
     },
 
     managerLogic: function(creep) {
-        if(creep.memory.status && creep.store.getFreeCapacity() == 0) {
-            creep.memory.status = 1;
-        }
-        else if (creep.memory.status != 0 && creep.store[RESOURCE_ENERGY] < 50) {
-            creep.memory.status = 0;
-            creep.memory.target = Math.floor(Math.random() * creep.room.find(FIND_SOURCES_ACTIVE).length);
-        }
-        if(creep.memory.status == 0) {
+        creep.workerSetStatus();
+        if(!creep.memory.status) {
             creep.takeEnergyFromControllerLink();
-            creep.upgradeController(creep.room.controller)
+            creep.upgradeController(creep.room.controller);
         }
         else {
             if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(creep.room.controller, {reusePath: 10});
             }
+            if(creep.store[RESOURCE_ENERGY] <= 20) creep.memory.status = 0;
         }
     },
 
@@ -1305,17 +1301,17 @@ var claimer = {
         }
         else if (creep.memory.claim) {
             if(creep.claimController(controller) == ERR_NOT_IN_RANGE) {
-                creep.moveToNoCreep(controller);
+                creep.moveToNoCreepInRoom(controller);
             }
         }
         else if ((controller.reservation && controller.reservation.username != 'LeTsCrEEp') || (controller.owner && !controller.my)) {
             if(creep.attackController(controller) == ERR_NOT_IN_RANGE) {
-                creep.moveToNoCreep(controller);
+                creep.moveToNoCreepInRoom(controller);
             }
         }
         else {
             if(creep.reserveController(controller) == ERR_NOT_IN_RANGE) {
-                creep.moveToNoCreep(controller);
+                creep.moveToNoCreepInRoom(controller);
             }
         }
         
@@ -1535,8 +1531,15 @@ var remoteHarvester = {
             creepCount = global.roomCensus[roomName][this.properties.role]
         }
         else creepCount = 0;
-
-        if (creepCount < Memory.outSourceRooms[roomName].sourceNum * this.properties.stages[this.getStage(room)].number) {
+        
+        let sourceNum = 1;
+        if(Memory.outSourceRooms[roomName] && Memory.outSourceRooms[roomName].sourceNum) {
+            sourceNum = Memory.outSourceRooms[roomName].sourceNum;
+        }
+        else if(Game.rooms[roomName]) {
+            Memory.outSourceRooms[roomName] = {sourceNum: Game.rooms[roomName].find(FIND_SOURCES).length};
+        }
+        if (creepCount < sourceNum * this.properties.stages[this.getStage(room)].number) {
             return true;
         }
     },
@@ -1641,7 +1644,7 @@ var remoteHauler = {
                 return;
             }
 
-            let source = creep.room.find(FIND_SOURCES)[0];
+            let source = creep.pos.findClosestByRange(FIND_SOURCES);
             if(!creep.pos.inRangeTo(source.pos, 3)) {
                 creep.moveToNoCreep(source)
             }
@@ -1658,7 +1661,7 @@ var remoteHauler = {
             if(needRepair.length > 0) {
                 creep.repair(needRepair[0]);
             }
-            const myConstuct = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 1);
+            const myConstuct = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 2);
             if(myConstuct.length > 0) {
                 if(creep.build(myConstuct[0]) == OK) return;
             }
@@ -1687,7 +1690,15 @@ var remoteHauler = {
         }
         else creepCount = 0;
 
-        if (creepCount < Memory.outSourceRooms[roomName].sourceNum * this.properties.stages[this.getStage(room)].number) {
+        let sourceNum = 1;
+        if(Memory.outSourceRooms[roomName] && Memory.outSourceRooms[roomName].sourceNum) {
+            sourceNum = Memory.outSourceRooms[roomName].sourceNum;
+        }
+        else if(Game.rooms[roomName]) {
+            Memory.outSourceRooms[roomName] = {sourceNum: Game.rooms[roomName].find(FIND_SOURCES).length};
+        }
+
+        if (creepCount < sourceNum * this.properties.stages[this.getStage(room)].number) {
             return true;
         }
     },
@@ -1721,7 +1732,6 @@ var defender = {
     properties: {
         role: "defender",
         stages: {
-            3: {maxEnergyCapacity: 800, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
             4: {maxEnergyCapacity: 1300, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
             5: {maxEnergyCapacity: 1800, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
             6: {maxEnergyCapacity: 2300, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
@@ -1745,12 +1755,12 @@ var defender = {
             hostile = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {filter: struct => (struct.structureType != STRUCTURE_KEEPER_LAIR &&struct.structureType != STRUCTURE_CONTROLLER)});
         }
 
-        
-
         if (hostile) {
+            console.log(hostile, "test log");
             creep.rangedAttack(hostile);
             if(creep.attack(hostile) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(hostile, {visualizePathStyle: {stroke: '#ff0000'}});
+                let moveResult = creep.moveTo(hostile, {visualizePathStyle: {stroke: '#ff0000'}, maxRooms: 1});
+                creep.say(moveResult);
             }
             return;
         }
@@ -2328,6 +2338,13 @@ Creep.prototype.moveToNoCreep = function(target) {
     this.moveTo(target, {reusePath: 50, ignoreCreeps: true});
 }
 
+Creep.prototype.moveToNoCreepInRoom = function(target) {
+    if(this.isStuck()) {
+        this.moveTo(target, {maxRooms: 1});
+    }
+    this.moveTo(target, {reusePath: 50, ignoreCreeps: true, maxRooms: 1});
+}
+
 Creep.prototype.moveToRoom = function(roomName) {
     return this.moveToNoCreep(new RoomPosition(25, 25, roomName));
 }
@@ -2480,12 +2497,13 @@ Creep.prototype.takeEnergyFromClosest = function takeEnergyFromClosest() {
     this.toResPos();
 }
 
-Creep.prototype.takeEnergyFromControllerLink = function takeEnergyFromControllerLink() {
+Creep.prototype.takeEnergyFromControllerLink = function() {
     if(this.memory.ControllerLinkId) {
         let target = Game.getObjectById(this.memory.ControllerLinkId);
-        if(this.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-            this.moveTo(target);
-        }
+        let result = this.withdraw(target, RESOURCE_ENERGY);
+        
+        if(result == ERR_NOT_IN_RANGE) this.moveTo(target);
+        else if(result == OK) this.memory.status = 1;
     }
     else {
         let controllerLinkArray = this.room.find(FIND_MY_STRUCTURES, {filter: struct => struct.structureType == STRUCTURE_LINK && struct.pos.inRangeTo(this.room.controller.pos, 2)});
@@ -2518,7 +2536,10 @@ Creep.prototype.isStuck = function() {
         if(this.memory.lastPos.t > 1) { // stuck for 1 tick
             stuck = true;   
         }
-        this.memory.lastPos.t += 1;
+        if(this.fatigue == 0) {
+            this.memory.lastPos.t += 1;
+        }
+
     }
     return stuck;
 }

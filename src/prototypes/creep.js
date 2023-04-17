@@ -13,6 +13,13 @@ Creep.prototype.moveToNoCreep = function(target) {
     this.moveTo(target, {reusePath: 50, ignoreCreeps: true});
 }
 
+Creep.prototype.moveToNoCreepInRoom = function(target) {
+    if(this.isStuck()) {
+        this.moveTo(target, {maxRooms: 1});
+    }
+    this.moveTo(target, {reusePath: 50, ignoreCreeps: true, maxRooms: 1});
+}
+
 Creep.prototype.moveToRoom = function(roomName) {
     return this.moveToNoCreep(new RoomPosition(25, 25, roomName));
 }
@@ -202,12 +209,13 @@ Creep.prototype.takeEnergyFromClosest = function takeEnergyFromClosest() {
     this.toResPos();
 }
 
-Creep.prototype.takeEnergyFromControllerLink = function takeEnergyFromControllerLink() {
+Creep.prototype.takeEnergyFromControllerLink = function() {
     if(this.memory.ControllerLinkId) {
         let target = Game.getObjectById(this.memory.ControllerLinkId);
-        if(this.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-            this.moveTo(target);
-        }
+        let result = this.withdraw(target, RESOURCE_ENERGY);
+        
+        if(result == ERR_NOT_IN_RANGE) this.moveTo(target);
+        else if(result == OK) this.memory.status = 1;
     }
     else {
         let controllerLinkArray = this.room.find(FIND_MY_STRUCTURES, {filter: struct => struct.structureType == STRUCTURE_LINK && struct.pos.inRangeTo(this.room.controller.pos, 2)});
@@ -242,7 +250,10 @@ Creep.prototype.isStuck = function() {
         if(this.memory.lastPos.t > 1) { // stuck for 1 tick
             stuck = true;   
         }
-        this.memory.lastPos.t += 1;
+        if(this.fatigue == 0) {
+            this.memory.lastPos.t += 1;
+        }
+
     }
     return stuck;
 }

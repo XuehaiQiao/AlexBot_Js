@@ -24,17 +24,17 @@ var claimer = {
         }
         else if (creep.memory.claim) {
             if(creep.claimController(controller) == ERR_NOT_IN_RANGE) {
-                creep.moveToNoCreep(controller);
+                creep.moveToNoCreepInRoom(controller);
             }
         }
         else if ((controller.reservation && controller.reservation.username != 'LeTsCrEEp') || (controller.owner && !controller.my)) {
             if(creep.attackController(controller) == ERR_NOT_IN_RANGE) {
-                creep.moveToNoCreep(controller);
+                creep.moveToNoCreepInRoom(controller);
             }
         }
         else {
             if(creep.reserveController(controller) == ERR_NOT_IN_RANGE) {
-                creep.moveToNoCreep(controller);
+                creep.moveToNoCreepInRoom(controller);
             }
         }
         

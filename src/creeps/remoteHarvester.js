@@ -61,8 +61,15 @@ var remoteHarvester = {
             creepCount = global.roomCensus[roomName][this.properties.role]
         }
         else creepCount = 0;
-
-        if (creepCount < Memory.outSourceRooms[roomName].sourceNum * this.properties.stages[this.getStage(room)].number) {
+        
+        let sourceNum = 1;
+        if(Memory.outSourceRooms[roomName] && Memory.outSourceRooms[roomName].sourceNum) {
+            sourceNum = Memory.outSourceRooms[roomName].sourceNum;
+        }
+        else if(Game.rooms[roomName]) {
+            Memory.outSourceRooms[roomName] = {sourceNum: Game.rooms[roomName].find(FIND_SOURCES).length};
+        }
+        if (creepCount < sourceNum * this.properties.stages[this.getStage(room)].number) {
             return true;
         }
     },

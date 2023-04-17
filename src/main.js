@@ -10,7 +10,7 @@ module.exports.loop = function () {
         console.log('CPU bucket is low, skip this tick..');
         return;
     }
-    
+
     console.log("---------- Start Tick: " + Game.time + " ----------");
 
     // free up memory if creep no longer exists
@@ -80,7 +80,7 @@ module.exports.loop = function () {
     // if(!Memory.statistics) Memory.statistics = {};
     // if(!Memory.statistics.cpu) Memory.statistics.cpu = 20;
     // Memory.statistics.cpu = Memory.statistics.cpu + Game.cpu.getUsed() / 1500 - Memory.statistics.cpu / 1500;
-    // console.log('CPU bucket: ', Game.cpu.bucket);
+    console.log('CPU bucket: ', Game.cpu.bucket);
     // console.log('Average CPU usage: ', Math.round(Memory.statistics.cpu * 1000) / 1000);
     console.log("---------- End Tick, No Errors ----------");
 }

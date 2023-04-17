@@ -5,10 +5,10 @@ W27S18
 Game.spawns['Spawn1_W18S15'].spawnCreep([MOVE, CLAIM], 'Claimer' + Game.time, {memory: {role: 'claimer', status: 1, targetRoom: 'W22S15', claim: true}});
 
 //builder
-Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], 'builder' + Game.time, {memory: {role: 'builder', status: 1, targetRoom: 'W22S15'}});
+Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], 'builder2' + Game.time, {memory: {role: 'builder2', status: 1, targetRoom: 'W22S15'}});
 
 // upgrader2
-Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(15).fill(WORK), ...new Array(15).fill(CARRY), ...new Array(15).fill(MOVE)], 'upgrader2' + Game.time, {memory: {role: 'upgrader2', status: 1, targetRoom: 'W22S15', base: 'W22S15'}});
+Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], 'upgrader2' + Game.time, {memory: {role: 'upgrader2', status: 1, targetRoom: 'W22S15', base: 'W22S15'}});
 
 // carrier spawn
 Game.spawns['Spawn2_W18S15'].spawnCreep([...new Array(4).fill(CARRY), ...new Array(2).fill(MOVE)], 'Carrier' + Game.time, {memory: {role: 'carrier', building: 1}});

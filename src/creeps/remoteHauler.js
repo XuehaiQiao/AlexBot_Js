@@ -51,7 +51,7 @@ var remoteHauler = {
                 return;
             }
 
-            // if no avilable source, move to nearest source
+            // find dropedResource
             let dropedResource = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount > creep.store.getCapacity()});
             if (dropedResource) {
                 let result = creep.pickup(dropedResource);
@@ -71,7 +71,7 @@ var remoteHauler = {
                 return;
             }
 
-            let source = creep.room.find(FIND_SOURCES)[0];
+            let source = creep.pos.findClosestByRange(FIND_SOURCES);
             if(!creep.pos.inRangeTo(source.pos, 3)) {
                 creep.moveToNoCreep(source)
             }
@@ -92,7 +92,7 @@ var remoteHauler = {
             }
 
             // build near road and container
-            const myConstuct = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 1);
+            const myConstuct = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 2);
             if(myConstuct.length > 0) {
                 if(creep.build(myConstuct[0]) == OK) return;
             }
@@ -129,7 +129,15 @@ var remoteHauler = {
         }
         else creepCount = 0;
 
-        if (creepCount < Memory.outSourceRooms[roomName].sourceNum * this.properties.stages[this.getStage(room)].number) {
+        let sourceNum = 1;
+        if(Memory.outSourceRooms[roomName] && Memory.outSourceRooms[roomName].sourceNum) {
+            sourceNum = Memory.outSourceRooms[roomName].sourceNum;
+        }
+        else if(Game.rooms[roomName]) {
+            Memory.outSourceRooms[roomName] = {sourceNum: Game.rooms[roomName].find(FIND_SOURCES).length};
+        }
+
+        if (creepCount < sourceNum * this.properties.stages[this.getStage(room)].number) {
             return true;
         }
     },
