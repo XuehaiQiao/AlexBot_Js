@@ -610,7 +610,6 @@ var miner = {
         }
 
         creep.workerSetStatus();
-
         if(creep.memory.status) {
             let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
             if(creep.transfer(creep.room.storage, resourceType) == ERR_NOT_IN_RANGE) {
@@ -620,8 +619,10 @@ var miner = {
         else {
             let mine = creep.room.find(FIND_MINERALS)[0];
             let result = creep.harvest(mine)
-            if(creep.harvest(mine) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(mine);
+            if(result == ERR_NOT_IN_RANGE) {
+                creep.moveToNoCreepInRoom(mine);
+                let dropedResources = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1);
+                if(dropedResources.length) creep.pickup(dropedResources[0]);
             }
             else {
                 creep.memory.rest = 5;
@@ -703,20 +704,14 @@ var harvester2 = {
         let name = this.properties.role + Game.time; 
         let body = this.properties.stages[stage].bodyParts;
 
-
-        var existingThisTypeCreeps = _.filter(Game.creeps, (creep) => creep.memory.role == this.properties.role && creep.room.name == room.name);
-        var existingTargets = []
-        _.forEach(existingThisTypeCreeps, function(creep){existingTargets.push(creep.memory.target)});
-
-        var sourceTarget = 0;
-
-        var sourceCount = Math.min(2, room.find(FIND_SOURCES).length);
-
-        for(var i = 0; i < sourceCount; i++) {
-            if (!existingTargets.includes(i)) {
-                sourceTarget = i;
-                break;
-            }
+        let sourceTarget = room.memory.nextHarvesterIndex;
+        let sourceCount = Math.min(2, room.find(FIND_SOURCES).length);
+        if(sourceTarget === undefined) {
+            room.memory.nextHarvesterIndex = 1 % sourceCount;
+            sourceTarget = 0;
+        }
+        else {
+            room.memory.nextHarvesterIndex = (room.memory.nextHarvesterIndex + 1) % sourceCount;
         }
 
         let memory = {role: this.properties.role, status: 0, target: sourceTarget, base: room.name};
@@ -894,9 +889,9 @@ var upgrader2 = {
             3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, CARRY, CARRY, MOVE, MOVE, WORK, WORK, CARRY, CARRY, MOVE, MOVE], number: 3},
             4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(6).fill(WORK), ...new Array(6).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
             5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(8).fill(WORK), ...new Array(8).fill(CARRY), ...new Array(8).fill(MOVE)], mBodyParts: [...new Array(10).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(5).fill(MOVE)], number: 1},
-            6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], mBodyParts: [...new Array(12).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
-            7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(16).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(8).fill(MOVE)], number: 0},
-            8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(36).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(9).fill(MOVE)], number: 1},
+            6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], mBodyParts: [...new Array(12).fill(WORK), ...new Array(3).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
+            7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(16).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(8).fill(MOVE)], number: 0},
+            8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(15).fill(WORK), ...new Array(15).fill(CARRY), ...new Array(15).fill(MOVE)], mBodyParts: [...new Array(15).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(8).fill(MOVE)], number: 1},
         },
     },
 
@@ -1549,7 +1544,11 @@ var remoteHarvester = {
         let name = this.properties.role + Game.time;
         let body = this.properties.stages[this.getStage(room)].bodyParts;
 
-        const existingThisTypeCreeps = _.filter(Game.creeps, (creep) => creep.memory.role == this.properties.role && creep.memory.targetRoom == outSourceRoomName);
+        const existingThisTypeCreeps = _.filter(Game.creeps, creep => (
+            creep.memory.role == this.properties.role && 
+            creep.memory.targetRoom == outSourceRoomName &&
+            creep.ticksToLive >= creep.body.length * 3
+        ));
         var existingTargets = _.map(existingThisTypeCreeps, creep => creep.memory.target)
 
         const sourceCount = Memory.outSourceRooms[outSourceRoomName].sourceNum;
@@ -1627,26 +1626,46 @@ var remoteHauler = {
             if (creep.moveToRoomAdv(creep.memory.targetRoom)) {
                 return;
             }
-            let dropedResource = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount > creep.store.getCapacity()});
-            if (dropedResource) {
-                let result = creep.pickup(dropedResource);
+            let targetSource = creep.memory.targetSource;
+            if(targetSource == undefined || targetSource == null) {
+                targetSource = Memory.outSourceRooms[creep.room.name].targetSource;
+                if(targetSource === undefined) {
+                    Memory.outSourceRooms[creep.room.name].targetSource = 1 % Memory.outSourceRooms[creep.room.name].sourceNum;
+                    targetSource = 0;
+                }
+                else {
+                    Memory.outSourceRooms[creep.room.name].targetSource = (targetSource + 1) % Memory.outSourceRooms[creep.room.name].sourceNum;
+                }
+                
+                creep.memory.targetSource = targetSource;
+            }
+            
+
+            let source = creep.room.find(FIND_SOURCES)[targetSource];
+            let dropedResources = source.pos.findInRange(FIND_DROPPED_RESOURCES, 3, {filter: resource => (
+                resource.amount > Math.min(creep.store.getFreeCapacity(), creep.store.getCapacity() / 3)
+            )});
+            if (dropedResources.length) {
+                let result = creep.pickup(dropedResources[0]);
                 if(result == ERR_NOT_IN_RANGE) {
-                    creep.moveToNoCreep(dropedResource);
+                    creep.moveToNoCreepInRoom(dropedResources[0]);
                 }
                 return;
             }
-            let container = creep.pos.findClosestByRange(FIND_STRUCTURES, {filter: structure => structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] > creep.store.getFreeCapacity()});
-            if (container) {
-                let result = creep.withdraw(container, RESOURCE_ENERGY);
+            let containers = source.pos.findInRange(FIND_STRUCTURES, 3, {filter: structure => (
+                structure.structureType == STRUCTURE_CONTAINER && 
+                structure.store[RESOURCE_ENERGY] > Math.min(creep.store.getFreeCapacity(), creep.store.getCapacity() / 3)
+            )});
+            if (containers.length) {
+                let result = creep.withdraw(containers[0], RESOURCE_ENERGY);
                 if(result == ERR_NOT_IN_RANGE) {
-                    creep.moveToNoCreep(container);
+                    creep.moveToNoCreepInRoom(containers[0]);
                 }
                 return;
             }
 
-            let source = creep.pos.findClosestByRange(FIND_SOURCES);
-            if(!creep.pos.inRangeTo(source.pos, 3)) {
-                creep.moveToNoCreep(source)
+            if(!creep.pos.inRangeTo(source.pos, 2)) {
+                creep.moveToNoCreepInRoom(source);
             }
             else {
                 creep.memory.rest = 10;
@@ -1654,6 +1673,9 @@ var remoteHauler = {
             return;
         }
         else {
+            if(creep.memory.targetSource != null) {
+                creep.memory.targetSource = null;
+            }
             const needRepair = creep.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => (
                 (struct.structureType == STRUCTURE_ROAD || struct.structureType == STRUCTURE_CONTAINER) &&
                 struct.hits < struct.hitsMax
@@ -1756,7 +1778,6 @@ var defender = {
         }
 
         if (hostile) {
-            console.log(hostile, "test log");
             creep.rangedAttack(hostile);
             if(creep.attack(hostile) == ERR_NOT_IN_RANGE) {
                 let moveResult = creep.moveTo(hostile, {visualizePathStyle: {stroke: '#ff0000'}, maxRooms: 1});
@@ -2251,6 +2272,7 @@ function roomCensus() {
     global.roomCensus = {}
     let targetRoomRoles = new Set(['outSourcer', 'claimer', 'defender']);
     _.forEach(Game.creeps, creep => {
+        if(creep.body.length * 3 > creep.ticksToLive) return;
         if(creep.memory.targetRoom) {
             if(global.roomCensus[creep.memory.targetRoom] == undefined) {
                 global.roomCensus[creep.memory.targetRoom] = {}
@@ -2272,7 +2294,6 @@ function roomCensus() {
             else {
                 global.roomCensus[creep.memory.base][creep.memory.role] += 1;
             }
-
         }
     })
     _.forEach(_.keys(global.roomCensus), roomName => {
@@ -2435,7 +2456,13 @@ Creep.prototype.harvestEnergy = function harvestEnergy() {
         source = this.room.find(FIND_SOURCES)[this.memory.target];
     }
     else {
+        this.say('!target')
         source = this.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+    }
+
+    if(!source) {
+        console.log(this.name)
+        return ERR_NOT_FOUND;
     }
 
     if(!this.pos.inRangeTo(source.pos, 1)) {
@@ -2593,6 +2620,7 @@ var roomObject = {
     },
     W22S15: {
         restPos: new RoomPosition(16, 10, "W22S15"),
+        managerPos: new RoomPosition(15, 16, "W22S15"),
     },
     sim: {
         restPos: new RoomPosition(19, 21, "sim"),

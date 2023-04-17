@@ -11,17 +11,23 @@ var miner = {
 
         creep.workerSetStatus();
 
+        // transfer
         if(creep.memory.status) {
             let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
             if(creep.transfer(creep.room.storage, resourceType) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(creep.room.storage);
             }
         }
+        // harvest
         else {
             let mine = creep.room.find(FIND_MINERALS)[0];
             let result = creep.harvest(mine)
-            if(creep.harvest(mine) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(mine);
+            if(result == ERR_NOT_IN_RANGE) {
+                creep.moveToNoCreepInRoom(mine);
+                
+                //look for adjacent droped resources
+                let dropedResources = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1);
+                if(dropedResources.length) creep.pickup(dropedResources[0]);
             }
             else {
                 creep.memory.rest = 5;

@@ -81,7 +81,11 @@ var remoteHarvester = {
         let name = this.properties.role + Game.time;
         let body = this.properties.stages[this.getStage(room)].bodyParts;
 
-        const existingThisTypeCreeps = _.filter(Game.creeps, (creep) => creep.memory.role == this.properties.role && creep.memory.targetRoom == outSourceRoomName);
+        const existingThisTypeCreeps = _.filter(Game.creeps, creep => (
+            creep.memory.role == this.properties.role && 
+            creep.memory.targetRoom == outSourceRoomName &&
+            creep.ticksToLive >= creep.body.length * 3
+        ));
         var existingTargets = _.map(existingThisTypeCreeps, creep => creep.memory.target)
 
         const sourceCount = Memory.outSourceRooms[outSourceRoomName].sourceNum;

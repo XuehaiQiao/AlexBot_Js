@@ -138,7 +138,13 @@ Creep.prototype.harvestEnergy = function harvestEnergy() {
         source = this.room.find(FIND_SOURCES)[this.memory.target];
     }
     else {
+        this.say('!target')
         source = this.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+    }
+
+    if(!source) {
+        console.log(this.name)
+        return ERR_NOT_FOUND;
     }
 
     if(!this.pos.inRangeTo(source.pos, 1)) {

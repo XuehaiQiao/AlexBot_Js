@@ -51,20 +51,14 @@ var harvester2 = {
         let name = this.properties.role + Game.time; 
         let body = this.properties.stages[stage].bodyParts;
 
-
-        var existingThisTypeCreeps = _.filter(Game.creeps, (creep) => creep.memory.role == this.properties.role && creep.room.name == room.name);
-        var existingTargets = []
-        _.forEach(existingThisTypeCreeps, function(creep){existingTargets.push(creep.memory.target)});
-
-        var sourceTarget = 0;
-
-        var sourceCount = Math.min(2, room.find(FIND_SOURCES).length);
-
-        for(var i = 0; i < sourceCount; i++) {
-            if (!existingTargets.includes(i)) {
-                sourceTarget = i;
-                break;
-            }
+        let sourceTarget = room.memory.nextHarvesterIndex;
+        let sourceCount = Math.min(2, room.find(FIND_SOURCES).length);
+        if(sourceTarget === undefined) {
+            room.memory.nextHarvesterIndex = 1 % sourceCount;
+            sourceTarget = 0;
+        }
+        else {
+            room.memory.nextHarvesterIndex = (room.memory.nextHarvesterIndex + 1) % sourceCount;
         }
 
         let memory = {role: this.properties.role, status: 0, target: sourceTarget, base: room.name};

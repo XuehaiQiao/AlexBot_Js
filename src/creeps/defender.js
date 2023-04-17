@@ -30,7 +30,6 @@ var defender = {
         }
 
         if (hostile) {
-            console.log(hostile, "test log");
             creep.rangedAttack(hostile);
             if(creep.attack(hostile) == ERR_NOT_IN_RANGE) {
                 let moveResult = creep.moveTo(hostile, {visualizePathStyle: {stroke: '#ff0000'}, maxRooms: 1});
