@@ -80,7 +80,7 @@ Game.rooms['W21S19'].memory.managerTasks = [{from: STRUCTURE_STORAGE, to: STRUCT
 // orders
 Game.rooms['W13S21'].terminal.send(RESOURCE_ENERGY, 40000, 'W12S21', 'energy');
 
-Game.market.deal('643f333d7085b8ed6cb800d8', 10000, "W21S19");
+Game.market.deal('643f676a99d6216870a7dee8', 10000, "W21S19");
 
 Game.market.cancelOrder('643751b00e083d8cf1442440');
 

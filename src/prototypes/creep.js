@@ -66,6 +66,20 @@ Creep.prototype.workerSetStatus = function() {
     }
 }
 
+Creep.prototype.workerSetStatusWithAction = function(onHarvest=null, onWork=null) {
+    // set status: 0. harvest  1. work 
+    if(this.memory.status && this.store.getUsedCapacity() == 0) {
+        this.memory.status = 0;
+        if(onHarvest) onHarvest();
+        // this.say('🔄 harvest');
+    }
+    if(!this.memory.status && this.store.getFreeCapacity() == 0) {
+        this.memory.status = 1;
+        if(onWork) onWork();
+        // this.say('home');
+    }
+}
+
 // same as takeEnergy but no storage (only used in carrier)
 Creep.prototype.collectEnergy = function collectEnergy(changeStatus=false) {
     // first find droped resource

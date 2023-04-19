@@ -1014,16 +1014,11 @@ var builder2 = {
             return;
         }
 
-        if(creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
-            creep.memory.building = 0;
-            creep.say('🔄 harvest');
-        }
-        if(!creep.memory.building && creep.store.getFreeCapacity() == 0) {
-            creep.memory.building = 1;
-            creep.memory.target = Math.floor(Math.random() * creep.room.find(FIND_SOURCES_ACTIVE).length);
-            creep.say('🚧 build');
-        }
-        if(creep.memory.building == 1) {
+        creep.workerSetStatusWithAction(null, () => {
+            creep.memory.targetId = null;
+            this.assignTarget(creep);
+        })
+        if(creep.memory.status) {
             var target = this.assignTarget(creep);
             if (!target) {
                 if (roomInfo[creep.room.name]) {
@@ -1087,7 +1082,7 @@ var builder2 = {
 
     assignTarget: function(creep) {
         if (!creep.memory.targetId || !Game.getObjectById(creep.memory.targetId)) {
-            var targets = creep.room.find(FIND_CONSTRUCTION_SITES);
+            let targets = creep.room.find(FIND_CONSTRUCTION_SITES);
             if(targets.length) {
                 creep.memory.targetId = targets[0].id;
                 return Game.getObjectById(targets[0].id);
@@ -1097,18 +1092,22 @@ var builder2 = {
                 (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART) && structure.hits < structureLogic.wall.getTargetHits(creep.room)
             ))
             if(targets.length) {
-                creep.memory.targetId = targets[0].id;
-                return Game.getObjectById(targets[0].id);
+                let target = targets.reduce((a,b) => {
+                    if (a.hits < b.hits) return a;
+                    else return b;
+                });
+                creep.memory.targetId = target.id;
+                return Game.getObjectById(target.id);
             }
         }
         else {
-            var target = Game.getObjectById(creep.memory.targetId);
-            if(target.hits && target.hits >= structureLogic.wall.getTargetHits(creep.room)) {
+            let target = Game.getObjectById(creep.memory.targetId);
+            if(target && target.hits && target.hits >= structureLogic.wall.getTargetHits(creep.room)) {
                 creep.memory.targetId = null;
                 return null;
             }
 
-            return Game.getObjectById(creep.memory.targetId);
+            return target;
         }
     }
 };
@@ -2548,6 +2547,17 @@ Creep.prototype.workerSetStatus = function() {
     }
     if(!this.memory.status && this.store.getFreeCapacity() == 0) {
         this.memory.status = 1;
+    }
+}
+
+Creep.prototype.workerSetStatusWithAction = function(onHarvest=null, onWork=null) {
+    if(this.memory.status && this.store.getUsedCapacity() == 0) {
+        this.memory.status = 0;
+        if(onHarvest) onHarvest();
+    }
+    if(!this.memory.status && this.store.getFreeCapacity() == 0) {
+        this.memory.status = 1;
+        if(onWork) onWork();
     }
 }
 Creep.prototype.collectEnergy = function collectEnergy(changeStatus=false) {
