@@ -37,20 +37,20 @@ function linkTransfer(room) {
     // check link existence
     if(sourceLinks.length > 0 && controllerLink && managerLink) {
         // 1. source to controller
-        if(controllerLink.store.getUsedCapacity(RESOURCE_ENERGY) < 100) {
+        if(controllerLink.store.getUsedCapacity(RESOURCE_ENERGY) <= 200) {
             for(let i in sourceLinks) {
                 let link = sourceLinks[i];
-                if(link.store.getUsedCapacity(RESOURCE_ENERGY) > 700) {
+                if(link.store.getUsedCapacity(RESOURCE_ENERGY) >= 600) {
                     link.transferEnergy(controllerLink);
                     break;
                 }
             }
         }
         // 2. source to manager
-        else if(managerLink.store.getUsedCapacity(RESOURCE_ENERGY) == 0) {
+        else if(managerLink.store.getUsedCapacity(RESOURCE_ENERGY) <= 100) {
             for(let i in sourceLinks) {
                 let link = sourceLinks[i];
-                if(link.store.getUsedCapacity(RESOURCE_ENERGY) > 750) {
+                if(link.store.getUsedCapacity(RESOURCE_ENERGY) >= 700) {
                     link.transferEnergy(managerLink);
                     break;
                 }
@@ -58,9 +58,9 @@ function linkTransfer(room) {
         }
 
         // 3. manager to controller
-        if(controllerLink.store.getUsedCapacity(RESOURCE_ENERGY) == 0) {
+        if(controllerLink.store.getUsedCapacity(RESOURCE_ENERGY) <= 100) {
             let link = managerLink;
-            if(link.store.getUsedCapacity(RESOURCE_ENERGY) > 700) {
+            if(link.store.getUsedCapacity(RESOURCE_ENERGY) >= 700) {
                 link.transferEnergy(controllerLink);
             }
         }

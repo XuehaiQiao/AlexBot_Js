@@ -953,7 +953,7 @@ var upgrader2 = {
             else return false;
         }
         if (storage && storage.store[RESOURCE_ENERGY] > 300000) {
-            num += Math.min(Math.floor((storage.store[RESOURCE_ENERGY] + 300000) / storage.store.getFreeCapacity()), 5);
+            num += Math.min(Math.floor((storage.store[RESOURCE_ENERGY] + 300000) / (1 + storage.store.getFreeCapacity())), 4);
         }
         return creepCount < num ? true : false;
     },
@@ -1102,7 +1102,7 @@ var builder2 = {
         }
         else {
             let target = Game.getObjectById(creep.memory.targetId);
-            if(target && target.hits && target.hits >= structureLogic.wall.getTargetHits(creep.room)) {
+            if(target.hits && target.hits >= structureLogic.wall.getTargetHits(creep.room)) {
                 creep.memory.targetId = null;
                 return null;
             }
@@ -1164,9 +1164,9 @@ var manager = {
             let storage = Game.getObjectById(creep.memory[STRUCTURE_STORAGE]);
             let nuker = Game.getObjectById(creep.memory[STRUCTURE_NUKER]);
             let controllerLink = Game.getObjectById(creep.memory.controllerLink);
-            if(controllerLink && controllerLink.store[RESOURCE_ENERGY] == 0 && controllerLink.cooldown <= 1) {
+            if(controllerLink && controllerLink.store[RESOURCE_ENERGY] < 100 && link.store[RESOURCE_ENERGY] < 700) {
                 creep.say('S2L');
-                this.fromA2B(creep, storage, link, RESOURCE_ENERGY);
+                this.fromA2B(creep, storage, link, RESOURCE_ENERGY, link.store.getCapacity() - link.store[RESOURCE_ENERGY]);
             }
             else if(link && link.store[RESOURCE_ENERGY] > 0) {
                 creep.say('L2S');
@@ -1283,8 +1283,8 @@ var claimer = {
             4: {maxEnergyCapacity: 1300, bodyParts:[CLAIM, MOVE, CLAIM, MOVE], number: 1},
             5: {maxEnergyCapacity: 1800, bodyParts:[CLAIM, MOVE, CLAIM, MOVE], number: 1},
             6: {maxEnergyCapacity: 2300, bodyParts:[CLAIM, MOVE, CLAIM, MOVE, CLAIM, MOVE], number: 1},
-            6: {maxEnergyCapacity: 5600, bodyParts:[CLAIM, MOVE, CLAIM, MOVE, CLAIM, MOVE, CLAIM, MOVE, CLAIM, MOVE], number: 1},
-            7: {maxEnergyCapacity: 10000, bodyParts:[CLAIM, MOVE, CLAIM, MOVE, CLAIM, MOVE, CLAIM, MOVE, CLAIM, MOVE, CLAIM, MOVE], number: 1},
+            7: {maxEnergyCapacity: 5600, bodyParts:[CLAIM, MOVE, CLAIM, MOVE, CLAIM, MOVE, CLAIM, MOVE, CLAIM, MOVE], number: 1},
+            8: {maxEnergyCapacity: 10000, bodyParts:[CLAIM, MOVE, CLAIM, MOVE, CLAIM, MOVE, CLAIM, MOVE, CLAIM, MOVE, CLAIM, MOVE], number: 1},
         },
     },
 
@@ -2333,27 +2333,27 @@ function linkTransfer(room) {
     });
     room.memory.linkCompleteness = (sourceLinks.length == room.find(FIND_SOURCES).length && managerLink) ? true : false;
     if(sourceLinks.length > 0 && controllerLink && managerLink) {
-        if(controllerLink.store.getUsedCapacity(RESOURCE_ENERGY) < 100) {
+        if(controllerLink.store.getUsedCapacity(RESOURCE_ENERGY) <= 200) {
             for(let i in sourceLinks) {
                 let link = sourceLinks[i];
-                if(link.store.getUsedCapacity(RESOURCE_ENERGY) > 700) {
+                if(link.store.getUsedCapacity(RESOURCE_ENERGY) >= 600) {
                     link.transferEnergy(controllerLink);
                     break;
                 }
             }
         }
-        else if(managerLink.store.getUsedCapacity(RESOURCE_ENERGY) == 0) {
+        else if(managerLink.store.getUsedCapacity(RESOURCE_ENERGY) <= 100) {
             for(let i in sourceLinks) {
                 let link = sourceLinks[i];
-                if(link.store.getUsedCapacity(RESOURCE_ENERGY) > 750) {
+                if(link.store.getUsedCapacity(RESOURCE_ENERGY) >= 700) {
                     link.transferEnergy(managerLink);
                     break;
                 }
             }
         }
-        if(controllerLink.store.getUsedCapacity(RESOURCE_ENERGY) == 0) {
+        if(controllerLink.store.getUsedCapacity(RESOURCE_ENERGY) <= 100) {
             let link = managerLink;
-            if(link.store.getUsedCapacity(RESOURCE_ENERGY) > 700) {
+            if(link.store.getUsedCapacity(RESOURCE_ENERGY) >= 700) {
                 link.transferEnergy(controllerLink);
             }
         }

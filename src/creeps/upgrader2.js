@@ -87,7 +87,7 @@ var upgrader2 = {
 
         // create more upgrader2 for more energy in storage
         if (storage && storage.store[RESOURCE_ENERGY] > 300000) {
-            num += Math.min(Math.floor((storage.store[RESOURCE_ENERGY] + 300000) / storage.store.getFreeCapacity()), 5);
+            num += Math.min(Math.floor((storage.store[RESOURCE_ENERGY] + 300000) / (1 + storage.store.getFreeCapacity())), 4);
         }
 
         // return upgraders.length < num ? true : false;

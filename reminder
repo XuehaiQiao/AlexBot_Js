@@ -86,10 +86,10 @@ Game.market.cancelOrder('643751b00e083d8cf1442440');
 
 Game.market.createOrder({
     type: ORDER_BUY,
-    resourceType: RESOURCE_POWER,
-    price: 260,
-    totalAmount: 1000,
-    roomName: "W18S15"   
+    resourceType: RESOURCE_ENERGY,
+    price: 10,
+    totalAmount: 1000000,
+    roomName: "W22S15"   
 });
 
 

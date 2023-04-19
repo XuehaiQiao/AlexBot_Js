@@ -55,9 +55,9 @@ var manager = {
             let controllerLink = Game.getObjectById(creep.memory.controllerLink);
 
             // from storage to managerLink
-            if(controllerLink && controllerLink.store[RESOURCE_ENERGY] == 0 && controllerLink.cooldown <= 1) {
+            if(controllerLink && controllerLink.store[RESOURCE_ENERGY] < 100 && link.store[RESOURCE_ENERGY] < 700) {
                 creep.say('S2L');
-                this.fromA2B(creep, storage, link, RESOURCE_ENERGY);
+                this.fromA2B(creep, storage, link, RESOURCE_ENERGY, link.store.getCapacity() - link.store[RESOURCE_ENERGY]);
             }
             else if(link && link.store[RESOURCE_ENERGY] > 0) {
                 creep.say('L2S');
