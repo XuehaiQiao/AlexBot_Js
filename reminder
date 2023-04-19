@@ -5,13 +5,16 @@ W27S18
 Game.spawns['Spawn1_W18S15'].spawnCreep([MOVE, CLAIM], 'Claimer' + Game.time, {memory: {role: 'claimer', status: 1, targetRoom: 'W22S15', claim: true}});
 
 //builder
-Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], 'builder2' + Game.time, {memory: {role: 'builder2', status: 1, targetRoom: 'W22S15'}});
+Game.spawns['Spawn1_W15S13'].spawnCreep([...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], 'builder2' + Game.time, {memory: {role: 'builder2', status: 1, targetRoom: 'W15S13'}});
 
 // upgrader2
 Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], 'upgrader2' + Game.time, {memory: {role: 'upgrader2', status: 1, targetRoom: 'W22S15', base: 'W22S15'}});
 
 // carrier spawn
-Game.spawns['Spawn2_W18S15'].spawnCreep([...new Array(4).fill(CARRY), ...new Array(2).fill(MOVE)], 'Carrier' + Game.time, {memory: {role: 'carrier', building: 1}});
+Game.spawns['Spawn2_W18S15'].spawnCreep([...new Array(4).fill(CARRY), ...new Array(2).fill(MOVE)], 'Carrier' + Game.time, {memory: {role: 'carrier'}});
+
+// transporter spawn
+Game.spawns['Spawn2'].spawnCreep([...new Array(25).fill(CARRY), ...new Array(25).fill(MOVE)], 'transporter' + Game.time, {memory: {role: 'transporter', base: 'W22S15', targetRoom: 'W19S17'}});
 
 // defender
 Game.spawns['Spawn2_W13S21'].spawnCreep([MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, RANGED_ATTACK, MOVE], 'defender' + Game.time, {memory: {role: 'defender', targetRoom: 'W22S15'}});
@@ -75,9 +78,9 @@ JSON.stringify(obj)
 Game.rooms['W18S15'].memory.managerTasks = [{from: STRUCTURE_TERMINAL, to: STRUCTURE_STORAGE, resourceType: RESOURCE_POWER, volume: 1000}];
 Game.rooms['W21S19'].memory.managerTasks = [{from: STRUCTURE_STORAGE, to: STRUCTURE_TERMINAL, resourceType: RESOURCE_GHODIUM, volume: 400}];
 // orders
-Game.rooms['W15S13'].terminal.send(RESOURCE_ENERGY, 30000, 'W18S15', 'energy 30000');
+Game.rooms['W13S21'].terminal.send(RESOURCE_ENERGY, 40000, 'W12S21', 'energy');
 
-Game.market.deal('6438c1bd8611948e5737bc56', 1000, "W18S15");
+Game.market.deal('643f333d7085b8ed6cb800d8', 10000, "W21S19");
 
 Game.market.cancelOrder('643751b00e083d8cf1442440');
 

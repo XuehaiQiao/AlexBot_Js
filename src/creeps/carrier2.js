@@ -1,8 +1,5 @@
 var carrier2 = {
     properties: {
-        
-    },
-    properties: {
         type: 'carrier2',
         stages: {
             1: {maxEnergyCapacity: 300, bodyParts:[CARRY, MOVE, CARRY, MOVE], number: 2},

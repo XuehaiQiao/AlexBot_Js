@@ -21,6 +21,9 @@ Creep.prototype.moveToNoCreepInRoom = function(target) {
 }
 
 Creep.prototype.moveToRoom = function(roomName) {
+    if(this.isStuck()) {
+        this.moveTo(roomName);
+    }
     return this.moveToNoCreep(new RoomPosition(25, 25, roomName));
 }
 

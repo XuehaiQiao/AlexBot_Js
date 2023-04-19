@@ -20,6 +20,7 @@ let creepLogic = {
     wrecker:        require('./wrecker'),
     medic:          require('./medic'),
     scout:          require('./scout'),
+    transporter:    require('./transporter'),
 }
 
 module.exports = creepLogic;

@@ -83,7 +83,7 @@ var remoteHauler = {
             // find container
             let containers = source.pos.findInRange(FIND_STRUCTURES, 3, {filter: structure => (
                 structure.structureType == STRUCTURE_CONTAINER && 
-                structure.store[RESOURCE_ENERGY] > Math.min(creep.store.getFreeCapacity(), creep.store.getCapacity() / 3)
+                structure.store[RESOURCE_ENERGY] > creep.store.getFreeCapacity()
             )});
             if (containers.length) {
                 let result = creep.withdraw(containers[0], RESOURCE_ENERGY);
@@ -93,11 +93,11 @@ var remoteHauler = {
                 return;
             }
 
-            if(!creep.pos.inRangeTo(source.pos, 2)) {
+            if(!creep.pos.inRangeTo(source.pos, 3)) {
                 creep.moveToNoCreepInRoom(source);
             }
             else {
-                creep.memory.rest = 10;
+                creep.memory.rest = 20;
             }
             return;
         }

@@ -16,7 +16,14 @@ run: function(creep) {
         creep.say('🔄 harvest');
     }
 
+    // harvest
     if(creep.memory.status == 0) {
+        // move to its target room if not in
+        if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
+            creep.moveToRoom(creep.memory.targetRoom);
+            return;
+        }
+
         // first find droped recources
         var dropedRecource = _.find(creep.room.find(FIND_DROPPED_RESOURCES));
         if (dropedRecource) {
@@ -49,7 +56,14 @@ run: function(creep) {
         creep.moveTo(30, 2);
         return;
     }
+    // transfer
     else {
+        // move to its base room if not in
+        if (creep.memory.base && creep.memory.base != creep.room.name) {
+            creep.moveToRoom(creep.memory.base);
+            return;
+        }
+
         // list includes: avaliable storage
         var storage = creep.room.storage;
 
