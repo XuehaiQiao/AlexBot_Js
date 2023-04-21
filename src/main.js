@@ -1,5 +1,6 @@
 let creepLogic = require('./creeps');
 let roomLogic = require('./room');
+let tools = require('./tools');
 require('./prototypes');
 
 global.roomInfo = require('./globalObjects').roomObject;
@@ -48,6 +49,8 @@ module.exports.loop = function () {
             }
         }
     });
+
+    //tools.roomPlanner('sim', { render: true });
     
     // count creep cpu usage
     // let total = 0

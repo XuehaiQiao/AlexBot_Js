@@ -4,7 +4,7 @@ W27S18
 // claimer spawn
 Game.spawns['Spawn1_W18S15'].spawnCreep([MOVE, CLAIM], 'Claimer' + Game.time, {memory: {role: 'claimer', status: 1, targetRoom: 'W22S15', claim: true}});
 
-//builder
+//builder2
 Game.spawns['Spawn1_W15S13'].spawnCreep([...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], 'builder2' + Game.time, {memory: {role: 'builder2', status: 1, targetRoom: 'W15S13'}});
 
 // upgrader2
@@ -71,25 +71,26 @@ _.forEach(
     }
 );
 
+[].
 
 JSON.stringify(obj)
 
 // create task
-Game.rooms['W18S15'].memory.managerTasks = [{from: STRUCTURE_TERMINAL, to: STRUCTURE_STORAGE, resourceType: RESOURCE_POWER, volume: 1000}];
+Game.rooms['W19S17'].memory.managerTasks.push({from: STRUCTURE_STORAGE, to: STRUCTURE_NUKER, resourceType: RESOURCE_GHODIUM, volume: 200});
 Game.rooms['W21S19'].memory.managerTasks = [{from: STRUCTURE_STORAGE, to: STRUCTURE_TERMINAL, resourceType: RESOURCE_GHODIUM, volume: 400}];
 // orders
-Game.rooms['W13S21'].terminal.send(RESOURCE_ENERGY, 40000, 'W12S21', 'energy');
+Game.rooms['W18S15'].terminal.send(RESOURCE_ENERGY, 45000, 'W19S17', 'energy');
 
-Game.market.deal('643f676a99d6216870a7dee8', 10000, "W21S19");
+Game.market.deal('64421a8207170e614e554c84', 10000, "W21S19");
 
-Game.market.cancelOrder('643751b00e083d8cf1442440');
+Game.market.cancelOrder('644046f346d8195c5404a845');
 
 Game.market.createOrder({
     type: ORDER_BUY,
     resourceType: RESOURCE_ENERGY,
-    price: 10,
-    totalAmount: 1000000,
-    roomName: "W22S15"   
+    price: 8.75,
+    totalAmount: 600000,
+    roomName: "W19S17"   
 });
 
 

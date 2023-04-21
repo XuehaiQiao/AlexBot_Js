@@ -55,16 +55,16 @@ var manager = {
             let controllerLink = Game.getObjectById(creep.memory.controllerLink);
 
             // from storage to managerLink
-            if(controllerLink && controllerLink.store[RESOURCE_ENERGY] < 100 && link.store[RESOURCE_ENERGY] < 700) {
+            if(controllerLink && link && controllerLink.store[RESOURCE_ENERGY] < 100 && link.store[RESOURCE_ENERGY] < 700 && link.cooldown <= 3) {
                 creep.say('S2L');
-                this.fromA2B(creep, storage, link, RESOURCE_ENERGY, link.store.getCapacity() - link.store[RESOURCE_ENERGY]);
+                this.fromA2B(creep, storage, link, RESOURCE_ENERGY, Math.min(link.store.getFreeCapacity(RESOURCE_ENERGY), controllerLink.store.getFreeCapacity(RESOURCE_ENERGY)));
             }
-            else if(link && link.store[RESOURCE_ENERGY] > 0) {
+            else if(link && link.store[RESOURCE_ENERGY] > 0 && controllerLink.store[RESOURCE_ENERGY] >= 100 && storage.store.getFreeCapacity() > creep.store.getCapacity()) {
                 creep.say('L2S');
                 this.fromA2B(creep, link, storage, RESOURCE_ENERGY);
             }
             // terminal energy balance
-            else if(terminal && terminal.store[RESOURCE_ENERGY] < 50000) {
+            else if(terminal && terminal.store[RESOURCE_ENERGY] < 50000 && storage.store[RESOURCE_ENERGY] > creep.store.getCapacity()) {
                 creep.say('S2T');
                 this.fromA2B(creep, storage, terminal, RESOURCE_ENERGY);
             }
@@ -78,7 +78,7 @@ var manager = {
                 creep.say('2PS');
                 this.fromA2B(creep, storage, powerSpawn, RESOURCE_POWER, 100);
             }
-            else if(terminal && terminal.store[RESOURCE_ENERGY] > 60000) {
+            else if(terminal && terminal.store[RESOURCE_ENERGY] > 60000 && storage.store.getFreeCapacity() > creep.store.getCapacity()) {
                 creep.say('T2S');
                 this.fromA2B(creep, terminal, storage, RESOURCE_ENERGY);
             }
@@ -91,13 +91,12 @@ var manager = {
         }
     },
 
-    fromA2B: function(creep, fromStruct, toStruct, resourceType, amount=null) {
+    fromA2B: function(creep, fromStruct, toStruct, resourceType, amount = null) {
         if(!fromStruct || !toStruct) {
             console.log("some struct is missing");
             return;
         }
 
-        
         if(fromStruct.store[resourceType] > 0) {
             if(amount == null) creep.withdraw(fromStruct, resourceType);
             else creep.withdraw(fromStruct, resourceType, amount);

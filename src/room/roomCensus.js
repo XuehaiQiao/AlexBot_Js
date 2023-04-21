@@ -10,10 +10,11 @@ function roomCensus() {
     // return stat;
 
     // reset the global object
-    global.roomCensus = {}
+    global.roomCensus = {};
+    _.forEach(Game.rooms, room => {
+        global.roomCensus[room.name] = {}
+    });
     
-    // roles that needs to split based on targetRooms
-    let targetRoomRoles = new Set(['outSourcer', 'claimer', 'defender']);
     // census
     _.forEach(Game.creeps, creep => {
         // don't count dying creeps

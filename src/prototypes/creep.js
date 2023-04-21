@@ -208,10 +208,10 @@ Creep.prototype.takeEnergyFromStorage = function takeEnergyFromStorage() {
 
 Creep.prototype.takeEnergyFromClosest = function takeEnergyFromClosest() {
     // first find droped resource
-    var dropedResource = this.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount > this.store.getCapacity() / 2});
+    var dropedResource = this.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount >= this.store.getCapacity()});
     if (dropedResource) {
         if(this.pickup(dropedResource) == ERR_NOT_IN_RANGE) {
-            this.moveTo(dropedResource);
+            this.moveToNoCreepInRoom(dropedResource);
         }
         return;
     }
@@ -223,7 +223,7 @@ Creep.prototype.takeEnergyFromClosest = function takeEnergyFromClosest() {
     let target = this.pos.findClosestByPath(targets);
     if (target) {
         if(this.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-            this.moveTo(target);
+            this.moveToNoCreepInRoom(target);
         }
         return;
     }

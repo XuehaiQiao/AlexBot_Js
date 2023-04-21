@@ -1,4 +1,4 @@
-let creepLogic = require("../creeps/index");
+let creepLogic = require('../creeps');
 let creepTypes = ['harvester', 'carrier', 'upgrader', 'builder']; //_.keys(creepLogic);
 let creepTypes2 = ['carrier2', 'harvester2', 'upgrader2', 'builder2'];
 

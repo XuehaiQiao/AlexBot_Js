@@ -102,7 +102,7 @@ var carrier2 = {
             });
             if (extensionSpawn) {
                 if(creep.transfer(extensionSpawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(extensionSpawn);
+                    creep.moveToNoCreepInRoom(extensionSpawn);
                 }
                 return;
             }
@@ -115,7 +115,7 @@ var carrier2 = {
             });
             if (tower) {
                 if(creep.transfer(tower, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(tower);
+                    creep.moveToNoCreepInRoom(tower);
                 }
                 return;
             }
@@ -129,7 +129,6 @@ var carrier2 = {
     // checks if the room needs to spawn a creep
     spawn: function(room) {
         // var creeps = _.filter(Game.creeps, (creep) => creep.memory.role == this.properties.type && creep.room.name == room.name);
-        // console.log(this.properties.type + 's: ' + creeps.length, room.name);
 
         var stage = this.getStage(room);
 

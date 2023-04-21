@@ -53,9 +53,10 @@ function __getDirname(path) {
 __modules[0] = function(module, exports) {
 let creepLogic = __require(1,0);
 let roomLogic = __require(2,0);
-__require(3,0);
+let tools = __require(3,0);
+__require(4,0);
 
-global.roomInfo = __require(4,0).roomObject;
+global.roomInfo = __require(5,0).roomObject;
 
 module.exports.loop = function () {
     if (Game.cpu.bucket < 20) {
@@ -112,28 +113,28 @@ return module.exports;
 /********** Start module 1: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/index.js **********/
 __modules[1] = function(module, exports) {
 let creepLogic = {
-    harvester:      __require(5,1),
-    carrier:        __require(6,1),
-    upgrader:       __require(7,1),
-    builder:        __require(8,1),
-    miner:          __require(9,1),
+    harvester:      __require(6,1),
+    carrier:        __require(7,1),
+    upgrader:       __require(8,1),
+    builder:        __require(9,1),
+    miner:          __require(10,1),
     
-    harvester2:     __require(10,1),
-    carrier2:       __require(11,1),
-    upgrader2:      __require(12,1),
-    builder2:       __require(13,1),
-    manager:        __require(14,1),
+    harvester2:     __require(11,1),
+    carrier2:       __require(12,1),
+    upgrader2:      __require(13,1),
+    builder2:       __require(14,1),
+    manager:        __require(15,1),
 
-    claimer:        __require(15,1),
-    outSourcer:     __require(16,1),
-    remoteHarvester:__require(17,1),
-    remoteHauler:   __require(18,1),
+    claimer:        __require(16,1),
+    outSourcer:     __require(17,1),
+    remoteHarvester:__require(18,1),
+    remoteHauler:   __require(19,1),
 
-    defender:       __require(19,1),
-    wrecker:        __require(20,1),
-    medic:          __require(21,1),
-    scout:          __require(22,1),
-    transporter:    __require(23,1),
+    defender:       __require(20,1),
+    wrecker:        __require(21,1),
+    medic:          __require(22,1),
+    scout:          __require(23,1),
+    transporter:    __require(24,1),
 }
 
 module.exports = creepLogic;
@@ -143,41 +144,51 @@ return module.exports;
 /********** Start module 2: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/index.js **********/
 __modules[2] = function(module, exports) {
 let roomLogic = {
-    spawning:     __require(24,2),
-    repairing:    __require(25,2),
-    mainLogic:    __require(26,2),
-    defending:    __require(27,2),
-    healing:      __require(28,2),
-    linkTransfer: __require(29,2),
-    roomCensus:   __require(30,2),
-    exportStats:  __require(31,2),
+    spawning:     __require(25,2),
+    repairing:    __require(26,2),
+    mainLogic:    __require(27,2),
+    defending:    __require(28,2),
+    healing:      __require(29,2),
+    linkTransfer: __require(30,2),
+    roomCensus:   __require(31,2),
+    exportStats:  __require(32,2),
 }
 
 module.exports = roomLogic;
 return module.exports;
 }
 /********** End of module 2: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/index.js **********/
-/********** Start module 3: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/index.js **********/
+/********** Start module 3: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/index.js **********/
 __modules[3] = function(module, exports) {
+let tools = {
+    roomPlanner:  __require(33,3),
+}
+
+module.exports = tools;
+return module.exports;
+}
+/********** End of module 3: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/index.js **********/
+/********** Start module 4: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/index.js **********/
+__modules[4] = function(module, exports) {
 let files = {
-    creep: __require(32,3),
-    room: __require(33,3),
+    creep: __require(34,4),
+    room: __require(35,4),
 }
 return module.exports;
 }
-/********** End of module 3: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/index.js **********/
-/********** Start module 4: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/globalObjects/index.js **********/
-__modules[4] = function(module, exports) {
+/********** End of module 4: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/index.js **********/
+/********** Start module 5: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/globalObjects/index.js **********/
+__modules[5] = function(module, exports) {
 let globalObjects = {
-    roomObject:  __require(34,4),
+    roomObject:  __require(36,5),
 }
 
 module.exports = globalObjects;
 return module.exports;
 }
-/********** End of module 4: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/globalObjects/index.js **********/
-/********** Start module 5: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/harvester.js **********/
-__modules[5] = function(module, exports) {
+/********** End of module 5: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/globalObjects/index.js **********/
+/********** Start module 6: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/harvester.js **********/
+__modules[6] = function(module, exports) {
 var harvester = {
         properties: {
         stages: {
@@ -293,9 +304,9 @@ var harvester = {
 module.exports = harvester;
 return module.exports;
 }
-/********** End of module 5: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/harvester.js **********/
-/********** Start module 6: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/carrier.js **********/
-__modules[6] = function(module, exports) {
+/********** End of module 6: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/harvester.js **********/
+/********** Start module 7: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/carrier.js **********/
+__modules[7] = function(module, exports) {
 var carrier = {
     properties: {
         type: 'carrier'
@@ -383,9 +394,9 @@ spawnData: function(room) {
 module.exports = carrier;
 return module.exports;
 }
-/********** End of module 6: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/carrier.js **********/
-/********** Start module 7: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/upgrader.js **********/
-__modules[7] = function(module, exports) {
+/********** End of module 7: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/carrier.js **********/
+/********** Start module 8: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/upgrader.js **********/
+__modules[8] = function(module, exports) {
 var upgrader = {
     properties: {
         stages: {
@@ -477,10 +488,10 @@ var upgrader = {
 module.exports = upgrader;
 return module.exports;
 }
-/********** End of module 7: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/upgrader.js **********/
-/********** Start module 8: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/builder.js **********/
-__modules[8] = function(module, exports) {
-let structureLogic = __require(35,8);
+/********** End of module 8: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/upgrader.js **********/
+/********** Start module 9: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/builder.js **********/
+__modules[9] = function(module, exports) {
+let structureLogic = __require(37,9);
 
 var builder = {
     properties: {
@@ -603,9 +614,9 @@ var builder = {
 module.exports = builder;
 return module.exports;
 }
-/********** End of module 8: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/builder.js **********/
-/********** Start module 9: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/miner.js **********/
-__modules[9] = function(module, exports) {
+/********** End of module 9: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/builder.js **********/
+/********** Start module 10: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/miner.js **********/
+__modules[10] = function(module, exports) {
 
 var miner = {
     properties: {
@@ -664,9 +675,9 @@ var miner = {
 module.exports = miner;
 return module.exports;
 }
-/********** End of module 9: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/miner.js **********/
-/********** Start module 10: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/harvester2.js **********/
-__modules[10] = function(module, exports) {
+/********** End of module 10: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/miner.js **********/
+/********** Start module 11: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/harvester2.js **********/
+__modules[11] = function(module, exports) {
 var harvester2 = {
     properties: {
         role: 'harvester2',
@@ -743,9 +754,9 @@ var harvester2 = {
 module.exports = harvester2;
 return module.exports;
 }
-/********** End of module 10: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/harvester2.js **********/
-/********** Start module 11: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/carrier2.js **********/
-__modules[11] = function(module, exports) {
+/********** End of module 11: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/harvester2.js **********/
+/********** Start module 12: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/carrier2.js **********/
+__modules[12] = function(module, exports) {
 var carrier2 = {
     properties: {
         type: 'carrier2',
@@ -826,7 +837,7 @@ var carrier2 = {
             });
             if (extensionSpawn) {
                 if(creep.transfer(extensionSpawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(extensionSpawn);
+                    creep.moveToNoCreepInRoom(extensionSpawn);
                 }
                 return;
             }
@@ -837,7 +848,7 @@ var carrier2 = {
             });
             if (tower) {
                 if(creep.transfer(tower, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(tower);
+                    creep.moveToNoCreepInRoom(tower);
                 }
                 return;
             }
@@ -880,10 +891,10 @@ var carrier2 = {
 module.exports = carrier2;
 return module.exports;
 }
-/********** End of module 11: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/carrier2.js **********/
-/********** Start module 12: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/upgrader2.js **********/
-__modules[12] = function(module, exports) {
-const { min } = __require(36,12);
+/********** End of module 12: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/carrier2.js **********/
+/********** Start module 13: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/upgrader2.js **********/
+__modules[13] = function(module, exports) {
+const { min } = __require(38,13);
 
 var upgrader2 = {
     properties: {
@@ -894,8 +905,8 @@ var upgrader2 = {
             3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, CARRY, CARRY, MOVE, MOVE, WORK, WORK, CARRY, CARRY, MOVE, MOVE], number: 3},
             4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(6).fill(WORK), ...new Array(6).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
             5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(8).fill(WORK), ...new Array(8).fill(CARRY), ...new Array(8).fill(MOVE)], mBodyParts: [...new Array(10).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(5).fill(MOVE)], number: 1},
-            6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], mBodyParts: [...new Array(12).fill(WORK), ...new Array(3).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
-            7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(16).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(8).fill(MOVE)], number: 0},
+            6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], mBodyParts: [...new Array(14).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(7).fill(MOVE)], number: 1},
+            7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(30).fill(WORK), ...new Array(5).fill(CARRY), ...new Array(15).fill(MOVE)], number: 0},
             8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(15).fill(WORK), ...new Array(15).fill(CARRY), ...new Array(15).fill(MOVE)], mBodyParts: [...new Array(15).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(8).fill(MOVE)], number: 1},
         },
     },
@@ -924,7 +935,7 @@ var upgrader2 = {
             if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(creep.room.controller, {reusePath: 10});
             }
-            if(creep.store[RESOURCE_ENERGY] <= 20) creep.memory.status = 0;
+            if(creep.store[RESOURCE_ENERGY] <= 40) creep.memory.status = 0;
         }
     },
 
@@ -987,16 +998,16 @@ var upgrader2 = {
 module.exports = upgrader2;
 return module.exports;
 }
-/********** End of module 12: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/upgrader2.js **********/
-/********** Start module 13: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/builder2.js **********/
-__modules[13] = function(module, exports) {
-let structureLogic = __require(35,13);
+/********** End of module 13: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/upgrader2.js **********/
+/********** Start module 14: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/builder2.js **********/
+__modules[14] = function(module, exports) {
+let structureLogic = __require(37,14);
 
 var builder2 = {
     properties: {
         type: "builder2",
         stages: {
-            1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, CARRY, MOVE], number: 3},
+            1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, MOVE], number: 3},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, CARRY, MOVE, WORK, CARRY, MOVE], number: 3},
             3: {maxEnergyCapacity: 800, bodyParts:[WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE], number: 1},
             4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(6).fill(WORK), ...new Array(6).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
@@ -1115,9 +1126,9 @@ var builder2 = {
 module.exports = builder2;
 return module.exports;
 }
-/********** End of module 13: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/builder2.js **********/
-/********** Start module 14: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/manager.js **********/
-__modules[14] = function(module, exports) {
+/********** End of module 14: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/builder2.js **********/
+/********** Start module 15: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/manager.js **********/
+__modules[15] = function(module, exports) {
 /*
     manager: manage link, storage, terminal...
     logic:
@@ -1164,15 +1175,15 @@ var manager = {
             let storage = Game.getObjectById(creep.memory[STRUCTURE_STORAGE]);
             let nuker = Game.getObjectById(creep.memory[STRUCTURE_NUKER]);
             let controllerLink = Game.getObjectById(creep.memory.controllerLink);
-            if(controllerLink && controllerLink.store[RESOURCE_ENERGY] < 100 && link.store[RESOURCE_ENERGY] < 700) {
+            if(controllerLink && link && controllerLink.store[RESOURCE_ENERGY] < 100 && link.store[RESOURCE_ENERGY] < 700 && link.cooldown <= 3) {
                 creep.say('S2L');
-                this.fromA2B(creep, storage, link, RESOURCE_ENERGY, link.store.getCapacity() - link.store[RESOURCE_ENERGY]);
+                this.fromA2B(creep, storage, link, RESOURCE_ENERGY, Math.min(link.store.getFreeCapacity(RESOURCE_ENERGY), controllerLink.store.getFreeCapacity(RESOURCE_ENERGY)));
             }
-            else if(link && link.store[RESOURCE_ENERGY] > 0) {
+            else if(link && link.store[RESOURCE_ENERGY] > 0 && controllerLink.store[RESOURCE_ENERGY] >= 100 && storage.store.getFreeCapacity() > creep.store.getCapacity()) {
                 creep.say('L2S');
                 this.fromA2B(creep, link, storage, RESOURCE_ENERGY);
             }
-            else if(terminal && terminal.store[RESOURCE_ENERGY] < 50000) {
+            else if(terminal && terminal.store[RESOURCE_ENERGY] < 50000 && storage.store[RESOURCE_ENERGY] > creep.store.getCapacity()) {
                 creep.say('S2T');
                 this.fromA2B(creep, storage, terminal, RESOURCE_ENERGY);
             }
@@ -1184,7 +1195,7 @@ var manager = {
                 creep.say('2PS');
                 this.fromA2B(creep, storage, powerSpawn, RESOURCE_POWER, 100);
             }
-            else if(terminal && terminal.store[RESOURCE_ENERGY] > 60000) {
+            else if(terminal && terminal.store[RESOURCE_ENERGY] > 60000 && storage.store.getFreeCapacity() > creep.store.getCapacity()) {
                 creep.say('T2S');
                 this.fromA2B(creep, terminal, storage, RESOURCE_ENERGY);
             }
@@ -1196,13 +1207,12 @@ var manager = {
         }
     },
 
-    fromA2B: function(creep, fromStruct, toStruct, resourceType, amount=null) {
+    fromA2B: function(creep, fromStruct, toStruct, resourceType, amount = null) {
         if(!fromStruct || !toStruct) {
             console.log("some struct is missing");
             return;
         }
 
-        
         if(fromStruct.store[resourceType] > 0) {
             if(amount == null) creep.withdraw(fromStruct, resourceType);
             else creep.withdraw(fromStruct, resourceType, amount);
@@ -1272,9 +1282,9 @@ var manager = {
 module.exports = manager;
 return module.exports;
 }
-/********** End of module 14: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/manager.js **********/
-/********** Start module 15: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/claimer.js **********/
-__modules[15] = function(module, exports) {
+/********** End of module 15: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/manager.js **********/
+/********** Start module 16: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/claimer.js **********/
+__modules[16] = function(module, exports) {
 var claimer = {
     properties: {
         role: "claimer",
@@ -1358,9 +1368,9 @@ var claimer = {
 module.exports = claimer;
 return module.exports;
 }
-/********** End of module 15: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/claimer.js **********/
-/********** Start module 16: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/outSourcer.js **********/
-__modules[16] = function(module, exports) {
+/********** End of module 16: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/claimer.js **********/
+/********** Start module 17: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/outSourcer.js **********/
+__modules[17] = function(module, exports) {
 /*
 outSourcer1 - first generation out sourcer
 
@@ -1475,9 +1485,9 @@ var outSourcer = {
 module.exports = outSourcer;
 return module.exports;
 }
-/********** End of module 16: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/outSourcer.js **********/
-/********** Start module 17: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/remoteHarvester.js **********/
-__modules[17] = function(module, exports) {
+/********** End of module 17: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/outSourcer.js **********/
+/********** Start module 18: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/remoteHarvester.js **********/
+__modules[18] = function(module, exports) {
 var remoteHarvester = {
     properties: {
         role: "remoteHarvester",
@@ -1485,7 +1495,7 @@ var remoteHarvester = {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, WORK, CARRY, MOVE], number: 2},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 1},
             4: {maxEnergyCapacity: 1300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
-            7: {maxEnergyCapacity: 5600, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], number: 1},
+            7: {maxEnergyCapacity: 5600, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], number: 1},
         },
     },
     /** @param {Creep} creep **/
@@ -1584,9 +1594,9 @@ var remoteHarvester = {
 module.exports = remoteHarvester;
 return module.exports;
 }
-/********** End of module 17: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/remoteHarvester.js **********/
-/********** Start module 18: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/remoteHauler.js **********/
-__modules[18] = function(module, exports) {
+/********** End of module 18: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/remoteHarvester.js **********/
+/********** Start module 19: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/remoteHauler.js **********/
+__modules[19] = function(module, exports) {
 /*
     NOT FINISHED
     todo:
@@ -1751,9 +1761,9 @@ var remoteHauler = {
 module.exports = remoteHauler;
 return module.exports;
 }
-/********** End of module 18: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/remoteHauler.js **********/
-/********** Start module 19: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/defender.js **********/
-__modules[19] = function(module, exports) {
+/********** End of module 19: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/remoteHauler.js **********/
+/********** Start module 20: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/defender.js **********/
+__modules[20] = function(module, exports) {
 var defender = {
     properties: {
         role: "defender",
@@ -1813,9 +1823,9 @@ var defender = {
 module.exports = defender;
 return module.exports;
 }
-/********** End of module 19: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/defender.js **********/
-/********** Start module 20: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/wrecker.js **********/
-__modules[20] = function(module, exports) {
+/********** End of module 20: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/defender.js **********/
+/********** Start module 21: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/wrecker.js **********/
+__modules[21] = function(module, exports) {
 var wrecker = {
     properties: {
         role: "wrecker"
@@ -1864,9 +1874,9 @@ var wrecker = {
 module.exports = wrecker;
 return module.exports;
 }
-/********** End of module 20: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/wrecker.js **********/
-/********** Start module 21: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/medic.js **********/
-__modules[21] = function(module, exports) {
+/********** End of module 21: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/wrecker.js **********/
+/********** Start module 22: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/medic.js **********/
+__modules[22] = function(module, exports) {
 var medic = {
     properties: {
         role: "medic"
@@ -1912,9 +1922,9 @@ var medic = {
 module.exports = medic;
 return module.exports;
 }
-/********** End of module 21: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/medic.js **********/
-/********** Start module 22: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/scout.js **********/
-__modules[22] = function(module, exports) {
+/********** End of module 22: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/medic.js **********/
+/********** Start module 23: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/scout.js **********/
+__modules[23] = function(module, exports) {
 var creepTemplate = {
     properties: {
         role: "scout"
@@ -1942,9 +1952,9 @@ var creepTemplate = {
 module.exports = creepTemplate;
 return module.exports;
 }
-/********** End of module 22: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/scout.js **********/
-/********** Start module 23: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/transporter.js **********/
-__modules[23] = function(module, exports) {
+/********** End of module 23: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/scout.js **********/
+/********** Start module 24: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/transporter.js **********/
+__modules[24] = function(module, exports) {
 var transporter = {
     properties: {
         type: 'transporter',
@@ -2081,10 +2091,10 @@ var transporter = {
 module.exports = transporter;
 return module.exports;
 }
-/********** End of module 23: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/transporter.js **********/
-/********** Start module 24: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/spawning.js **********/
-__modules[24] = function(module, exports) {
-let creepLogic = __require(1,24);
+/********** End of module 24: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/transporter.js **********/
+/********** Start module 25: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/spawning.js **********/
+__modules[25] = function(module, exports) {
+let creepLogic = __require(1,25);
 let creepTypes = ['harvester', 'carrier', 'upgrader', 'builder']; //_.keys(creepLogic);
 let creepTypes2 = ['carrier2', 'harvester2', 'upgrader2', 'builder2'];
 
@@ -2185,10 +2195,10 @@ function spawnCreeps(room) {
 module.exports = spawnCreeps;
 return module.exports;
 }
-/********** End of module 24: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/spawning.js **********/
-/********** Start module 25: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/repairing.js **********/
-__modules[25] = function(module, exports) {
-let structureLogic = __require(35,25);
+/********** End of module 25: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/spawning.js **********/
+/********** Start module 26: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/repairing.js **********/
+__modules[26] = function(module, exports) {
+let structureLogic = __require(37,26);
 
 function repairing(room) {
     function needRepair(structure) {
@@ -2236,10 +2246,10 @@ function repairing(room) {
 module.exports = repairing;
 return module.exports;
 }
-/********** End of module 25: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/repairing.js **********/
-/********** Start module 26: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/mainLogic.js **********/
-__modules[26] = function(module, exports) {
-let structureLogic = __require(35,26);
+/********** End of module 26: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/repairing.js **********/
+/********** Start module 27: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/mainLogic.js **********/
+__modules[27] = function(module, exports) {
+let structureLogic = __require(37,27);
 
 function mainLogic(room) {
 }
@@ -2247,9 +2257,9 @@ function mainLogic(room) {
 module.exports = mainLogic;
 return module.exports;
 }
-/********** End of module 26: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/mainLogic.js **********/
-/********** Start module 27: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/defending.js **********/
-__modules[27] = function(module, exports) {
+/********** End of module 27: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/mainLogic.js **********/
+/********** Start module 28: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/defending.js **********/
+__modules[28] = function(module, exports) {
 function defending(room) {
     var hostileParts = [MOVE, WORK, ATTACK, RANGED_ATTACK, HEAL, CLAIM];
     var enemy = _.find(room.find(FIND_HOSTILE_CREEPS), creep =>
@@ -2278,9 +2288,9 @@ function defending(room) {
 module.exports = defending;
 return module.exports;
 }
-/********** End of module 27: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/defending.js **********/
-/********** Start module 28: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/healing.js **********/
-__modules[28] = function(module, exports) {
+/********** End of module 28: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/defending.js **********/
+/********** Start module 29: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/healing.js **********/
+__modules[29] = function(module, exports) {
 
 function repairing(room) {
     function needHeal(creep) {
@@ -2304,9 +2314,9 @@ function repairing(room) {
 module.exports = repairing;
 return module.exports;
 }
-/********** End of module 28: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/healing.js **********/
-/********** Start module 29: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/linkTransfer.js **********/
-__modules[29] = function(module, exports) {
+/********** End of module 29: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/healing.js **********/
+/********** Start module 30: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/linkTransfer.js **********/
+__modules[30] = function(module, exports) {
 function linkTransfer(room) {
     if (roomInfo[room.name] == undefined || roomInfo[room.name].managerPos == undefined) {
         return;
@@ -2407,13 +2417,15 @@ function updateMemory(room) {
 module.exports = linkTransfer;
 return module.exports;
 }
-/********** End of module 29: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/linkTransfer.js **********/
-/********** Start module 30: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/roomCensus.js **********/
-__modules[30] = function(module, exports) {
+/********** End of module 30: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/linkTransfer.js **********/
+/********** Start module 31: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/roomCensus.js **********/
+__modules[31] = function(module, exports) {
 
 function roomCensus() {
-    global.roomCensus = {}
-    let targetRoomRoles = new Set(['outSourcer', 'claimer', 'defender']);
+    global.roomCensus = {};
+    _.forEach(Game.rooms, room => {
+        global.roomCensus[room.name] = {}
+    });
     _.forEach(Game.creeps, creep => {
         if(creep.body.length * 3 > creep.ticksToLive) return;
         if(creep.memory.targetRoom) {
@@ -2447,9 +2459,9 @@ function roomCensus() {
 module.exports = roomCensus;
 return module.exports;
 }
-/********** End of module 30: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/roomCensus.js **********/
-/********** Start module 31: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/exportStats.js **********/
-__modules[31] = function(module, exports) {
+/********** End of module 31: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/roomCensus.js **********/
+/********** Start module 32: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/exportStats.js **********/
+__modules[32] = function(module, exports) {
 // Call this function at the end of your main loop
 function exportStats() {
     Memory.stats = {
@@ -2484,9 +2496,876 @@ function exportStats() {
 module.exports = exportStats;
 return module.exports;
 }
-/********** End of module 31: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/exportStats.js **********/
-/********** Start module 32: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/creep.js **********/
-__modules[32] = function(module, exports) {
+/********** End of module 32: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/exportStats.js **********/
+/********** Start module 33: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/roomPlanner.js **********/
+__modules[33] = function(module, exports) {
+
+function planner_loop(roomName, opts = {}) {
+    let _this = {};
+    _this.visual = new RoomVisual(roomName);
+    _this.anchor = getAnchor(roomName);
+    _this.terrain = new Room.Terrain(roomName);
+
+    if (!_this.anchor) return;
+
+    let s = 1;
+
+    /**
+     * 0 = empty
+     * 1 = road
+     * 10 = wall
+     * 20 = struct
+     * 100 = border
+     */
+    let structuresMatrix = new Uint8Array(2500);
+    structuresMatrix_updateTerrain(_this, structuresMatrix);
+
+    let minimalStructs = generateMinimalBase(_this, structuresMatrix);
+    if (!minimalStructs) return;
+/**/if (opts.render) renderStructs(_this, minimalStructs); if (opts.step < ++s) return;
+/**/if (opts.render) renderMinimal(_this);
+
+    let labs = generateLabs(_this, structuresMatrix);
+    if (!labs) return;
+/**/if (opts.render) renderStructs(_this, labs); if (opts.step < ++s) return;
+
+    let exts = generateExtensions(_this, structuresMatrix);
+    if (!exts) return;
+/**/if (opts.render) renderStructs(_this, exts); if (opts.step < ++s) return;
+};
+
+
+
+function getAnchor(roomName) {
+    let room = Game.rooms[roomName];
+    if (!room) { console.log('no room'); return null; }
+    let flags = room.find(FIND_FLAGS, { filter: { color: COLOR_RED } });
+    if (!flags.length) { console.log(`getAnchor: no (red) flag!`); return null; }
+    if (flags.length > 1) { console.log(`getAnchor: too many (red) flags!`); return null; }
+    return flags[0].pos;
+};
+
+function generateMinimalBase(_this, structuresMatrix) {
+    let minimal = getMinimalBase();
+    for (let elem of minimal) {
+        let x = elem[0] + _this.anchor.x;
+        let y = elem[1] + _this.anchor.y;
+        let type = elem[2];
+        if (type == STRUCTURE_ROAD) structuresMatrix[x * 50 + y] = 1;
+        else structuresMatrix[x * 50 + y] = 20 + structToNumber(elem[2]);
+    }
+    return minimal;
+};
+
+function getMinimalBase() {
+    return [[- 2, -2, STRUCTURE_EXTENSION],
+    [-1, -2, STRUCTURE_EXTENSION],
+    [0, -2, STRUCTURE_SPAWN],
+    [1, -2, STRUCTURE_ROAD],
+    [2, -2, STRUCTURE_EXTENSION],
+    [-2, -1, STRUCTURE_ROAD],
+    [0, -1, STRUCTURE_ROAD],
+    [1, -1, STRUCTURE_SPAWN],
+    [2, -1, STRUCTURE_EXTENSION],
+    [-2, 0, STRUCTURE_EXTENSION],
+    [-1, 0, STRUCTURE_ROAD],
+    [1, 0, STRUCTURE_POWER_SPAWN],
+    [2, 0, STRUCTURE_SPAWN],
+    [-2, 1, STRUCTURE_ROAD],
+    [0, 1, STRUCTURE_ROAD],
+    [2, 1, STRUCTURE_ROAD],
+    [-2, 2, STRUCTURE_LINK],
+    [-1, 2, STRUCTURE_STORAGE],
+    [0, 2, STRUCTURE_TERMINAL],
+    [1, 2, STRUCTURE_ROAD],
+    [2, 2, STRUCTURE_EXTENSION],
+    ];
+};
+
+function renderStructs(_this, structs) {
+    for (let elem of structs) {
+        renderElem(_this, elem);
+    }
+};
+
+
+function renderMinimal(_this) {
+    let x = _this.anchor.x;
+    let y = _this.anchor.y;
+    let points = [[x - 2.4, y - 2.4], [x + 2.4, y - 2.4], [x + 2.4, y + 2.4], [x - 2.4, y + 2.4], [x - 2.4, y - 2.4]];
+    _this.visual.poly(points, { stroke: '#ff4444', lineStyle: 'dashed' });
+}
+
+
+function renderElem(_this, elem) {
+    if (!elem) return;
+    let type = elem[2];
+    if (!type) return;
+
+    let x = _this.anchor.x + elem[0];
+    let y = _this.anchor.y + elem[1];
+    _this.visual.structure(x, y, type);
+};
+
+function structuresMatrix_updateTerrain(_this, structuresMatrix) {
+    for (var x = 0; x < 50; ++x) {
+        for (var y = 0; y < 50; ++y) {
+            if (_this.terrain.get(x, y) & TERRAIN_MASK_WALL) {
+                structuresMatrix[x * 50 + y] = 10;
+            } else {
+                structuresMatrix[x * 50 + y] = 0;
+            }
+        }
+    }
+    for (var i = 0; i < 50; ++i) {
+        let x, y;
+        x = 0; y = i; structuresMatrix[x * 50 + y] = 100;
+        x = 49; y = i; structuresMatrix[x * 50 + y] = 100;
+        x = i; y = 0; structuresMatrix[x * 50 + y] = 100;
+        x = i; y = 49; structuresMatrix[x * 50 + y] = 100;
+    }
+};
+
+function generateLabs(_this, structuresMatrix) {
+    let labs = getLabs();
+    if (!canPlaceStructs(_this.anchor, structuresMatrix, labs)) {
+        console.log('cant place labs');
+        return null;
+    }
+    structuresMatrix_updateStructures(_this, structuresMatrix, labs);
+    return labs;
+};
+
+function getLabs() {
+    return [[-1, 3, STRUCTURE_LAB],
+    [-2, 3, STRUCTURE_LAB],
+    [-2, 4, STRUCTURE_LAB],
+    [-3, 4, STRUCTURE_LAB],
+    [-3, 5, STRUCTURE_LAB],
+    [0, 4, STRUCTURE_LAB],
+    [0, 5, STRUCTURE_LAB],
+    [-1, 5, STRUCTURE_LAB],
+    [-1, 6, STRUCTURE_LAB],
+    [-2, 6, STRUCTURE_LAB]
+    ];
+};
+
+function canPlaceStructs(anchor, structuresMatrix, array) {
+    for (let elem of array) {
+        let x = anchor.x + elem[0];
+        let y = anchor.y + elem[1];
+        if (!isEmptySpot(structuresMatrix, x, y)) return false;
+    }
+    return true;
+};
+
+function isEmptySpot(structuresMatrix, x, y) {
+    return structuresMatrix[x * 50 + y] < 1;
+};
+
+function isNotWall(anchor, structuresMatrix, elem) {
+    let x = anchor.x + elem[0];
+    let y = anchor.y + elem[1];
+    let val = structuresMatrix[x * 50 + y];
+    if (val == 10 || val == 100) {
+        return false;
+    }
+    return true;
+};
+
+function structuresMatrix_updateStructures(_this, structuresMatrix, structs) {
+    for (let elem of structs) {
+        let x = _this.anchor.x + elem[0];
+        let y = _this.anchor.y + elem[1];
+        if (structuresMatrix[x * 50 + y] > 1) { console.log(x + ' ' + y + ' bad ' + structuresMatrix[x * 50 + y]); }
+        structuresMatrix[x * 50 + y] = 20 + structToNumber(elem[2]);
+    }
+};
+
+function structuresMatrix_updateStructures_revert(_this, structuresMatrix, structs) {
+    for (let elem of structs) {
+        let x = _this.anchor.x + elem[0];
+        let y = _this.anchor.y + elem[1];
+        structuresMatrix[x * 50 + y] = 0;
+    }
+};
+
+
+
+function generateExtensions(_this, structuresMatrix) {
+    let consider_points = getMinimalBaseExitPoints();
+
+    let diagonals = [[-2, -2], [2, -2], [-2, 2], [2, 2]];
+    let result = [];
+
+    let ext_no = 0;
+
+    while (consider_points.length) {
+        let consider_start = consider_points.shift();
+
+        for (let d of diagonals) {
+            let new_point = addPoints(consider_start, d);
+            let exts = tryBuildExtAroundPoint(_this.anchor, structuresMatrix, new_point);
+            if (!exts) continue;
+
+            structuresMatrix_updateStructures(_this, structuresMatrix, exts);
+
+            let res = generateRoadsBetween(structuresMatrix, exts, consider_start, new_point, _this.anchor, result);
+            if (res === null) {
+                structuresMatrix_updateStructures_revert(_this, structuresMatrix, exts);
+                continue;
+            }
+
+            structuresMatrix_updateStructures(_this, structuresMatrix, res);
+            exts = exts.concat(res);
+
+            result = result.concat(exts);
+            ext_no += exts.filter(x => x[2] == STRUCTURE_EXTENSION).length;
+
+            for (let dx = -1; dx <= 1; ++dx) {
+                if (dx == 0) continue;
+                for (let dy = -1; dy <= 1; ++dy) {
+                    if (dy == 0) continue;
+                    consider_points.push(addPoints(new_point, [dx, dy]));
+                }
+            }
+        }
+
+        if (ext_no >= 80) break;
+    }
+    return result;
+};
+
+
+function getMinimalBaseExitPoints() {
+    return [
+        [-2, -1],
+        [-2, 1],
+        [1, -2],
+        [1, 2],
+        [2, 1],
+    ];
+};
+
+function addPoints(p1, p2) {
+    return [p1[0] + p2[0], p1[1] + p2[1]];
+}
+
+function tryBuildExtAroundPoint(anchor, structuresMatrix, new_point) {
+    let exts = [];
+    for (let dx = -1; dx <= 1; ++dx) {
+        for (let dy = -1; dy <= 1; ++dy) {
+            let x = new_point[0] + dx;
+            let y = new_point[1] + dy;
+
+            if (dx == 0 && dy == 0)
+                exts.push([x, y, STRUCTURE_ROAD]);
+            else
+                exts.push([x, y, STRUCTURE_EXTENSION]);
+        }
+    }
+
+    let matching_ext = 0;
+    for (let i = exts.length - 1; i >= 0; --i) {
+        let elem = exts[i];
+        let x = anchor.x + elem[0];
+        let y = anchor.y + elem[1];
+        if (structuresMatrix[x * 50 + y] == (20 + structToNumber(STRUCTURE_EXTENSION))) matching_ext++;
+        if (structuresMatrix[x * 50 + y] > 0) {
+            exts.splice(i, 1);
+        }
+    }
+    if (matching_ext > 2 || exts.length < 6) return null;
+    return exts;
+};
+
+function generateRoadsBetween(structuresMatrix, exts, p1, p2, anchor, structs) {
+    let dx = 0;
+    let dy = 0;
+    if (p1[0] < p2[0]) dx = 1;
+    if (p1[0] > p2[0]) dx = -1;
+    if (p1[1] < p2[1]) dy = 1;
+    if (p1[1] > p2[1]) dy = -1;
+
+    let bonusExt = [];
+    const placeRoadAndBonusExt = (x, y, s) => {
+        s[2] = STRUCTURE_ROAD;
+        let e = generateBonusExtsBetween(x, y, structuresMatrix, anchor, exts);
+        for (let it_e of e) {
+            let duplicate = false;
+            for (let elem of bonusExt) {
+                if (elem[0] == it_e[0] && elem[1] == it_e[1]) { duplicate = true; break; }
+            }
+            if (!duplicate) bonusExt.push(it_e);
+        }
+    };
+
+    let x = p1[0];
+    let y = p1[1];
+    let _limit = 0;
+    while (_limit++ < 1000) {
+
+        if (!isNotWall(anchor, structuresMatrix, [x, y, STRUCTURE_ROAD])) {
+            return null;
+        }
+
+        for (let s of exts) {
+            if (s[0] == x && s[1] == y) {
+                if (s[2] == STRUCTURE_EXTENSION) {
+                    placeRoadAndBonusExt(x, y, s);
+                } else if (s[2] != STRUCTURE_ROAD) {
+                    return null;
+                }
+                break;
+            }
+        }
+
+        for (let s of structs) {
+            if (s[0] == x && s[1] == y) {
+                if (s[2] == STRUCTURE_EXTENSION) {
+                    placeRoadAndBonusExt(x, y, s);
+                } else if (s[2] != STRUCTURE_ROAD) {
+                    return null;
+                }
+                break;
+            }
+        }
+        if (x == p2[0] && y == p2[1]) break;
+        x += dx;
+        y += dy;
+    }
+
+    return bonusExt;
+};
+
+function generateBonusExtsBetween(mx, my, structuresMatrix, anchor, exts) {
+    let result = [];
+    for (let dx = -1; dx <= 1; ++dx) {
+        for (let dy = -1; dy <= 1; ++dy) {
+            if (dx == 0 && dy == 0) continue;
+            let x = anchor.x + mx + dx;
+            let y = anchor.y + my + dy;
+
+            if (!isEmptySpot(structuresMatrix, x, y)) continue;
+            let stop = false;
+            for (let s of exts) {
+                if (s[0] == (mx + dx) && s[1] == (my + dy)) stop = true;
+            }
+            if (stop) continue;
+            result.push([mx + dx, my + dy, STRUCTURE_EXTENSION]);
+        }
+    }
+
+    return result;
+};
+
+
+
+
+
+function structToNumber(s) {
+    switch (s) {
+        case STRUCTURE_SPAWN: return 1;
+        case STRUCTURE_EXTENSION: return 2;
+        case STRUCTURE_ROAD: return 3;
+        case STRUCTURE_WALL: return 4;
+        case STRUCTURE_RAMPART: return 5;
+        case STRUCTURE_KEEPER_LAIR: return 6;
+        case STRUCTURE_PORTAL: return 7;
+        case STRUCTURE_CONTROLLER: return 8;
+        case STRUCTURE_LINK: return 9;
+        case STRUCTURE_STORAGE: return 10;
+        case STRUCTURE_TOWER: return 11;
+        case STRUCTURE_OBSERVER: return 12;
+        case STRUCTURE_POWER_BANK: return 13;
+        case STRUCTURE_POWER_SPAWN: return 14;
+        case STRUCTURE_EXTRACTOR: return 15;
+        case STRUCTURE_LAB: return 16;
+        case STRUCTURE_TERMINAL: return 17;
+        case STRUCTURE_CONTAINER: return 18;
+        case STRUCTURE_NUKER: return 19;
+        case STRUCTURE_FACTORY: return 20;
+        case STRUCTURE_INVADER_CORE: return 21;
+        default: return 30;
+    }
+}
+
+
+
+
+
+
+
+
+const colors = {
+    gray: '#9c9c9c',
+    light: '#cfcfcf',
+    road: '#969696',
+    energy: '#fff1a8',
+    power: '#f98591',
+    dark: '#5e5e5e',
+    outline: '#c3dac5',
+}
+
+const speechSize = 0.5
+const speechFont = 'Times New Roman'
+function calculateFactoryLevelGapsPoly() {
+    let x = -0.08;
+    let y = -0.52;
+    let result = [];
+
+    let gapAngle = 16 * (Math.PI / 180);
+    let c1 = Math.cos(gapAngle);
+    let s1 = Math.sin(gapAngle);
+
+    let angle = 72 * (Math.PI / 180);
+    let c2 = Math.cos(angle);
+    let s2 = Math.sin(angle);
+
+    for (let i = 0; i < 5; ++i) {
+        result.push([0.0, 0.0]);
+        result.push([x, y]);
+        result.push([x * c1 - y * s1, x * s1 + y * c1]);
+        let tmpX = x * c2 - y * s2;
+        y = x * s2 + y * c2;
+        x = tmpX;
+    }
+    return result;
+}
+const factoryLevelGaps = calculateFactoryLevelGapsPoly();
+
+RoomVisual.prototype.structure = function (x, y, type, opts = {}) {
+    if (!opts.opacity) opts.opacity = 1;
+    switch (type) {
+        case STRUCTURE_FACTORY: {
+            const outline = [
+                [-0.68, -0.11],
+                [-0.84, -0.18],
+                [-0.84, -0.32],
+                [-0.44, -0.44],
+                [-0.32, -0.84],
+                [-0.18, -0.84],
+                [-0.11, -0.68],
+
+                [0.11, -0.68],
+                [0.18, -0.84],
+                [0.32, -0.84],
+                [0.44, -0.44],
+                [0.84, -0.32],
+                [0.84, -0.18],
+                [0.68, -0.11],
+
+                [0.68, 0.11],
+                [0.84, 0.18],
+                [0.84, 0.32],
+                [0.44, 0.44],
+                [0.32, 0.84],
+                [0.18, 0.84],
+                [0.11, 0.68],
+
+                [-0.11, 0.68],
+                [-0.18, 0.84],
+                [-0.32, 0.84],
+                [-0.44, 0.44],
+                [-0.84, 0.32],
+                [-0.84, 0.18],
+                [-0.68, 0.11]
+            ];
+            this.poly(outline.map(p => [p[0] + x, p[1] + y]), {
+                fill: null,
+                stroke: colors.outline,
+                strokeWidth: 0.05,
+                opacity: opts.opacity
+            });
+            this.circle(x, y, {
+                radius: 0.65,
+                fill: '#232323',
+                strokeWidth: 0.035,
+                stroke: '#140a0a',
+                opacity: opts.opacity
+            });
+            const spikes = [
+                [-0.4, -0.1],
+                [-0.8, -0.2],
+                [-0.8, -0.3],
+                [-0.4, -0.4],
+                [-0.3, -0.8],
+                [-0.2, -0.8],
+                [-0.1, -0.4],
+
+                [0.1, -0.4],
+                [0.2, -0.8],
+                [0.3, -0.8],
+                [0.4, -0.4],
+                [0.8, -0.3],
+                [0.8, -0.2],
+                [0.4, -0.1],
+
+                [0.4, 0.1],
+                [0.8, 0.2],
+                [0.8, 0.3],
+                [0.4, 0.4],
+                [0.3, 0.8],
+                [0.2, 0.8],
+                [0.1, 0.4],
+
+                [-0.1, 0.4],
+                [-0.2, 0.8],
+                [-0.3, 0.8],
+                [-0.4, 0.4],
+                [-0.8, 0.3],
+                [-0.8, 0.2],
+                [-0.4, 0.1]
+            ];
+            this.poly(spikes.map(p => [p[0] + x, p[1] + y]), {
+                fill: colors.gray,
+                stroke: '#140a0a',
+                strokeWidth: 0.04,
+                opacity: opts.opacity
+            });
+            this.circle(x, y, {
+                radius: 0.54,
+                fill: '#302a2a',
+                strokeWidth: 0.04,
+                stroke: '#140a0a',
+                opacity: opts.opacity
+            });
+            this.poly(factoryLevelGaps.map(p => [p[0] + x, p[1] + y]), {
+                fill: '#140a0a',
+                stroke: null,
+                opacity: opts.opacity
+            });
+            this.circle(x, y, {
+                radius: 0.42,
+                fill: '#140a0a',
+                opacity: opts.opacity
+            });
+            this.rect(x - 0.24, y - 0.24, 0.48, 0.48, {
+                fill: '#3f3f3f',
+                opacity: opts.opacity
+            });
+            break;
+        }
+        case STRUCTURE_EXTENSION:
+            this.circle(x, y, {
+                radius: 0.5,
+                fill: colors.dark,
+                stroke: colors.outline,
+                strokeWidth: 0.05,
+                opacity: opts.opacity
+            })
+            this.circle(x, y, {
+                radius: 0.35,
+                fill: colors.gray,
+                opacity: opts.opacity
+            })
+            break
+        case STRUCTURE_SPAWN:
+            this.circle(x, y, {
+                radius: 0.65,
+                fill: colors.dark,
+                stroke: '#CCCCCC',
+                strokeWidth: 0.10,
+                opacity: opts.opacity
+            })
+            this.circle(x, y, {
+                radius: 0.40,
+                fill: colors.energy,
+                opacity: opts.opacity
+            })
+
+            break;
+        case STRUCTURE_POWER_SPAWN:
+            this.circle(x, y, {
+                radius: 0.65,
+                fill: colors.dark,
+                stroke: colors.power,
+                strokeWidth: 0.10,
+                opacity: opts.opacity
+            })
+            this.circle(x, y, {
+                radius: 0.40,
+                fill: colors.energy,
+                opacity: opts.opacity
+            })
+            break;
+        case STRUCTURE_LINK:
+            {
+                let osize = 0.3
+                let isize = 0.2
+                let outer = [
+                    [0.0, -0.5],
+                    [0.4, 0.0],
+                    [0.0, 0.5],
+                    [-0.4, 0.0]
+                ]
+                let inner = [
+                    [0.0, -0.3],
+                    [0.25, 0.0],
+                    [0.0, 0.3],
+                    [-0.25, 0.0]
+                ]
+                outer = relPoly(x, y, outer)
+                inner = relPoly(x, y, inner)
+                outer.push(outer[0])
+                inner.push(inner[0])
+                this.poly(outer, {
+                    fill: colors.dark,
+                    stroke: colors.outline,
+                    strokeWidth: 0.05,
+                    opacity: opts.opacity
+                })
+                this.poly(inner, {
+                    fill: colors.gray,
+                    stroke: false,
+                    opacity: opts.opacity
+                })
+                break;
+            }
+        case STRUCTURE_TERMINAL:
+            {
+                let outer = [
+                    [0.0, -0.8],
+                    [0.55, -0.55],
+                    [0.8, 0.0],
+                    [0.55, 0.55],
+                    [0.0, 0.8],
+                    [-0.55, 0.55],
+                    [-0.8, 0.0],
+                    [-0.55, -0.55],
+                ]
+                let inner = [
+                    [0.0, -0.65],
+                    [0.45, -0.45],
+                    [0.65, 0.0],
+                    [0.45, 0.45],
+                    [0.0, 0.65],
+                    [-0.45, 0.45],
+                    [-0.65, 0.0],
+                    [-0.45, -0.45],
+                ]
+                outer = relPoly(x, y, outer)
+                inner = relPoly(x, y, inner)
+                outer.push(outer[0])
+                inner.push(inner[0])
+                this.poly(outer, {
+                    fill: colors.dark,
+                    stroke: colors.outline,
+                    strokeWidth: 0.05,
+                    opacity: opts.opacity
+                })
+                this.poly(inner, {
+                    fill: colors.light,
+                    stroke: false,
+                    opacity: opts.opacity
+                })
+                this.rect(x - 0.45, y - 0.45, 0.9, 0.9, {
+                    fill: colors.gray,
+                    stroke: colors.dark,
+                    strokeWidth: 0.1,
+                    opacity: opts.opacity
+                })
+                break;
+            }
+        case STRUCTURE_LAB:
+            this.circle(x, y - 0.025, {
+                radius: 0.55,
+                fill: colors.dark,
+                stroke: colors.outline,
+                strokeWidth: 0.05,
+                opacity: opts.opacity
+            })
+            this.circle(x, y - 0.025, {
+                radius: 0.40,
+                fill: colors.gray,
+                opacity: opts.opacity
+            })
+            this.rect(x - 0.45, y + 0.3, 0.9, 0.25, {
+                fill: colors.dark,
+                stroke: false,
+                opacity: opts.opacity
+            })
+            {
+                let box = [
+                    [-0.45, 0.3],
+                    [-0.45, 0.55],
+                    [0.45, 0.55],
+                    [0.45, 0.3],
+                ]
+                box = relPoly(x, y, box)
+                this.poly(box, {
+                    stroke: colors.outline,
+                    strokeWidth: 0.05,
+                    opacity: opts.opacity
+                })
+            }
+            break
+        case STRUCTURE_TOWER:
+            this.circle(x, y, {
+                radius: 0.6,
+                fill: colors.dark,
+                stroke: colors.outline,
+                strokeWidth: 0.05,
+                opacity: opts.opacity
+            })
+            this.rect(x - 0.4, y - 0.3, 0.8, 0.6, {
+                fill: colors.gray,
+                opacity: opts.opacity
+            })
+            this.rect(x - 0.2, y - 0.9, 0.4, 0.5, {
+                fill: colors.light,
+                stroke: colors.dark,
+                strokeWidth: 0.07,
+                opacity: opts.opacity
+            })
+            break;
+        case STRUCTURE_ROAD:
+            this.circle(x, y, {
+                radius: 0.175,
+                fill: colors.road,
+                stroke: false,
+                opacity: opts.opacity
+            })
+            if (!this.roads) this.roads = []
+            this.roads.push([x, y])
+            break;
+        case STRUCTURE_RAMPART:
+            this.circle(x, y, {
+                radius: 0.65,
+                fill: '#434C43',
+                stroke: '#5D735F',
+                strokeWidth: 0.10,
+                opacity: opts.opacity
+            })
+            break;
+        case STRUCTURE_WALL:
+            this.circle(x, y, {
+                radius: 0.40,
+                fill: colors.dark,
+                stroke: colors.light,
+                strokeWidth: 0.05,
+                opacity: opts.opacity
+            })
+            break;
+        case STRUCTURE_STORAGE:
+            let outline1 = relPoly(x, y, [
+                [-0.45, -0.55],
+                [0, -0.65],
+                [0.45, -0.55],
+                [0.55, 0],
+                [0.45, 0.55],
+                [0, 0.65],
+                [-0.45, 0.55],
+                [-0.55, 0],
+                [-0.45, -0.55],
+            ])
+            this.poly(outline1, {
+                stroke: colors.outline,
+                strokeWidth: 0.05,
+                fill: colors.dark,
+                opacity: opts.opacity
+            })
+            this.rect(x - 0.35, y - 0.45, 0.7, 0.9, {
+                fill: colors.energy,
+                opacity: opts.opacity,
+            })
+            break;
+        case STRUCTURE_OBSERVER:
+            this.circle(x, y, {
+                fill: colors.dark,
+                radius: 0.45,
+                stroke: colors.outline,
+                strokeWidth: 0.05,
+                opacity: opts.opacity
+            })
+            this.circle(x + 0.225, y, {
+                fill: colors.outline,
+                radius: 0.20,
+                opacity: opts.opacity
+            })
+            break;
+        case STRUCTURE_NUKER:
+            let outline = [
+                [0, -1],
+                [-0.47, 0.2],
+                [-0.5, 0.5],
+                [0.5, 0.5],
+                [0.47, 0.2],
+                [0, -1],
+            ];
+            outline = relPoly(x, y, outline)
+            this.poly(outline, {
+                stroke: colors.outline,
+                strokeWidth: 0.05,
+                fill: colors.dark,
+                opacity: opts.opacity
+            })
+            let inline = [
+                [0, -.80],
+                [-0.40, 0.2],
+                [0.40, 0.2],
+                [0, -.80],
+            ]
+            inline = relPoly(x, y, inline)
+            this.poly(inline, {
+                stroke: colors.outline,
+                strokeWidth: 0.01,
+                fill: colors.gray,
+                opacity: opts.opacity
+            })
+            break;
+        case STRUCTURE_CONTAINER:
+            this.rect(x - 0.225, y - 0.3, 0.45, 0.6, {
+                fill: colors.gray,
+                opacity: opts.opacity,
+                stroke: colors.dark,
+                strokeWidth: 0.09,
+            })
+            this.rect(x - 0.17, y + 0.07, 0.34, 0.2, {
+                fill: colors.energy,
+                opacity: opts.opacity,
+            })
+            break;
+        default:
+            this.circle(x, y, {
+                fill: colors.light,
+                radius: 0.35,
+                stroke: colors.dark,
+                strokeWidth: 0.20,
+                opacity: opts.opacity
+            })
+            break;
+    }
+
+    return this;
+}
+
+const dirs = [
+    [],
+    [0, -1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
+    [0, 1],
+    [-1, 1],
+    [-1, 0],
+    [-1, -1]
+]
+
+function relPoly(x, y, poly) {
+    return poly.map(p => {
+        p[0] += x
+        p[1] += y
+        return p
+    })
+}
+
+module.exports = planner_loop;
+return module.exports;
+}
+/********** End of module 33: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/roomPlanner.js **********/
+/********** Start module 34: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/creep.js **********/
+__modules[34] = function(module, exports) {
 Creep.prototype.sayHello = function sayHello(words="Hello") {
     this.say(words, true);
 }
@@ -2661,10 +3540,10 @@ Creep.prototype.takeEnergyFromStorage = function takeEnergyFromStorage() {
 
 
 Creep.prototype.takeEnergyFromClosest = function takeEnergyFromClosest() {
-    var dropedResource = this.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount > this.store.getCapacity() / 2});
+    var dropedResource = this.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount >= this.store.getCapacity()});
     if (dropedResource) {
         if(this.pickup(dropedResource) == ERR_NOT_IN_RANGE) {
-            this.moveTo(dropedResource);
+            this.moveToNoCreepInRoom(dropedResource);
         }
         return;
     }
@@ -2674,7 +3553,7 @@ Creep.prototype.takeEnergyFromClosest = function takeEnergyFromClosest() {
     let target = this.pos.findClosestByPath(targets);
     if (target) {
         if(this.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-            this.moveTo(target);
+            this.moveToNoCreepInRoom(target);
         }
         return;
     }
@@ -2735,17 +3614,17 @@ Creep.prototype.isAtEdge = function() {
 
 return module.exports;
 }
-/********** End of module 32: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/creep.js **********/
-/********** Start module 33: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/room.js **********/
-__modules[33] = function(module, exports) {
+/********** End of module 34: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/creep.js **********/
+/********** Start module 35: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/room.js **********/
+__modules[35] = function(module, exports) {
 Room.prototype.needStorage2Terminal = function(managerCreep) {
     return _.find(Object.keys(this.storage.store), resourceType => this.storage.store[resourceType] > 100000 && resourceType != RESOURCE_ENERGY);
 }
 return module.exports;
 }
-/********** End of module 33: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/room.js **********/
-/********** Start module 34: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/globalObjects/roomObject.js **********/
-__modules[34] = function(module, exports) {
+/********** End of module 35: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/room.js **********/
+/********** Start module 36: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/globalObjects/roomObject.js **********/
+__modules[36] = function(module, exports) {
 var roomObject = {
     W19S17: {
         restPos: new RoomPosition(24, 9, "W19S17"),
@@ -2776,12 +3655,12 @@ var roomObject = {
         managerPos: new RoomPosition(6, 19, "W12S21"),
     },
     W22S15: {
-        restPos: new RoomPosition(16, 10, "W22S15"),
+        restPos: new RoomPosition(16, 13, "W22S15"),
         managerPos: new RoomPosition(15, 16, "W22S15"),
     },
     sim: {
         restPos: new RoomPosition(19, 21, "sim"),
-        managerPos: new RoomPosition(18, 27, "sim"),
+        managerPos: new RoomPosition(23, 25, "sim"),
     },
 }
 
@@ -2789,20 +3668,20 @@ var roomObject = {
 module.exports = roomObject;
 return module.exports;
 }
-/********** End of module 34: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/globalObjects/roomObject.js **********/
-/********** Start module 35: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/index.js **********/
-__modules[35] = function(module, exports) {
+/********** End of module 36: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/globalObjects/roomObject.js **********/
+/********** Start module 37: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/index.js **********/
+__modules[37] = function(module, exports) {
 let structureLogic = {
-    rampart:  __require(37,35),
-    wall:     __require(38,35),
+    rampart:  __require(39,37),
+    wall:     __require(40,37),
 }
 
 module.exports = structureLogic;
 return module.exports;
 }
-/********** End of module 35: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/index.js **********/
-/********** Start module 36: /Users/piece/Desktop/Me/screeps/AlexBot_Js/node_modules/lodash/index.js **********/
-__modules[36] = function(module, exports) {
+/********** End of module 37: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/index.js **********/
+/********** Start module 38: /Users/piece/Desktop/Me/screeps/AlexBot_Js/node_modules/lodash/index.js **********/
+__modules[38] = function(module, exports) {
 /**
  * @license
  * lodash 3.10.1 (Custom Build) <https://lodash.com/>
@@ -14990,9 +15869,9 @@ __modules[36] = function(module, exports) {
 
 return module.exports;
 }
-/********** End of module 36: /Users/piece/Desktop/Me/screeps/AlexBot_Js/node_modules/lodash/index.js **********/
-/********** Start module 37: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/rampart.js **********/
-__modules[37] = function(module, exports) {
+/********** End of module 38: /Users/piece/Desktop/Me/screeps/AlexBot_Js/node_modules/lodash/index.js **********/
+/********** Start module 39: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/rampart.js **********/
+__modules[39] = function(module, exports) {
 var rampart = {
     targetHits: {
         0: 0,
@@ -15018,9 +15897,9 @@ var rampart = {
 module.exports = rampart;
 return module.exports;
 }
-/********** End of module 37: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/rampart.js **********/
-/********** Start module 38: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/wall.js **********/
-__modules[38] = function(module, exports) {
+/********** End of module 39: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/rampart.js **********/
+/********** Start module 40: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/wall.js **********/
+__modules[40] = function(module, exports) {
 var wall = {
     targetHits: {
         0: 0,
@@ -15046,7 +15925,7 @@ var wall = {
 module.exports = wall;
 return module.exports;
 }
-/********** End of module 38: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/wall.js **********/
+/********** End of module 40: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/wall.js **********/
 /********** Footer **********/
 if(typeof module === "object")
 	module.exports = __require(0);
