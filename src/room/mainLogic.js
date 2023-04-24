@@ -1,4 +1,4 @@
-let structureLogic = require("../structures/index");
+let structureLogic = require("../structures");
 
 function mainLogic(room) {
     //todo

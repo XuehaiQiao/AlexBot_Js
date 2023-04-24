@@ -25,7 +25,8 @@ module.exports.loop = function () {
     // make a list of all of our rooms
     Game.myRooms = _.filter(Game.rooms, r => r.controller && r.controller.level > 0 && r.controller.my);
 
-    
+    let totalRoomCpu = -Game.cpu.getUsed();
+
     // creep census
     roomLogic.roomCensus();
 
@@ -36,6 +37,7 @@ module.exports.loop = function () {
         roomLogic.defending(r);
         roomLogic.healing(r);
         roomLogic.linkTransfer(r);
+        roomLogic.labReaction(r);
 
         if(r.controller.level == 8) {
             let pSpawns = r.find(FIND_MY_STRUCTURES, {filter: struct => (
@@ -50,29 +52,36 @@ module.exports.loop = function () {
         }
     });
 
+    totalRoomCpu += Game.cpu.getUsed();
+    console.log('total room cpu: ', totalRoomCpu);
+
+
+    //if(true) return;
+
     //tools.roomPlanner('sim', { render: true });
     
-    // count creep cpu usage
-    // let total = 0
-    // _.forEach(_.keys(creepLogic), function(role) {
-    //     if(!Memory.statistics[role]) Memory.statistics[role] = 0;
-    //     else {
-    //         total += Memory.statistics[role];
-    //         Memory.statistics[role] -= Memory.statistics[role] / 100;
-    //     }
-    // });
-    // Memory.statistics.totalCreepCpu = total;
+    
+    // Memory.statistics.totalCreepCpu = Memory.statistics.totalCreepCpu / 100 * 99 -  Game.cpu.getUsed() / 100;
 
+    // for (const role in creepLogic) {
+    //     if(Memory.statistics[role] == undefined) Memory.statistics[role] = 0
+    //     Memory.statistics[role] = Memory.statistics[role] / 100 * 99;
+    // }
+    // Memory.statistics.totalCreepCpu
     // run each creep role see /creeps/index.js
+    let totalCreepCpu = -Game.cpu.getUsed();
     for(var name in Game.creeps) {
         var creep = Game.creeps[name];
 
         let role = creep.memory.role;
         
-        // Memory.statistics[role] -= Game.cpu.getUsed() / 100;
+        //Memory.statistics[role] -= Game.cpu.getUsed() / 100;
         if (creepLogic[role]) creepLogic[role].run(creep);
-        // Memory.statistics[role] += Game.cpu.getUsed() / 100;
+        //Memory.statistics[role] += Game.cpu.getUsed() / 100;
     }
+
+    totalCreepCpu += Game.cpu.getUsed();
+    console.log('total creep cpu: ', totalCreepCpu);
 
     if (Game.cpu.bucket == 10000) {
         Game.cpu.generatePixel();

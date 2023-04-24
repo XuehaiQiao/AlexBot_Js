@@ -7,6 +7,7 @@ let roomLogic = {
     linkTransfer: require('./linkTransfer'),
     roomCensus:   require('./roomCensus'),
     exportStats:  require('./exportStats'),
+    labReaction:  require('./labReaction'),
 }
 
 module.exports = roomLogic;

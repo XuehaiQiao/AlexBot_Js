@@ -1,6 +1,6 @@
 let creepLogic = require('../creeps');
 let creepTypes = ['harvester', 'carrier', 'upgrader', 'builder']; //_.keys(creepLogic);
-let creepTypes2 = ['carrier2', 'harvester2', 'upgrader2', 'builder2'];
+let creepTypes2 = ['carrier2', 'harvester2', 'upgrader2', 'builder2']; // 'mineralCarrier'
 
 function spawnCreeps(room) {
     // return if no idle spawn
@@ -26,7 +26,8 @@ function spawnCreeps(room) {
     //var types = _.find(room.find(FIND_MY_STRUCTURES), object => object.structureType == STRUCTURE_STORAGE) ? creepTypes2 : creepTypes;
     var types = creepTypes2;
     if(roomInfo[room.name] && roomInfo[room.name].managerPos) {
-        types = ['carrier2', 'harvester2', 'manager', 'upgrader2', 'builder2'];
+        // added 'manager' and 'mineralCarrier'
+        types = ['carrier2', 'harvester2', 'manager', 'upgrader2', 'builder2', 'mineralCarrier']; // 
     }
 
     if(_.find(room.find(FIND_MY_STRUCTURES), struct => struct.structureType == STRUCTURE_EXTRACTOR)) {

@@ -1,11 +1,28 @@
-var taskModels = {
-    ManagerTask: function(from, to, resourceType, volume, priority=0) {
-        this.from = from;
-        this.to = to;
-        this.resourceType = resourceType;
-        this.volume = volume;
-        this.priority = priority;
+var ManagerTask = function(from, to, resourceType, amount, priority = 0) {
+    return {
+        from: from,
+        to: to,
+        resourceType: resourceType,
+        amount: amount,
+        priority: priority,
     }
-}
+};
 
-module.exports = taskModels;
+var TowerRepairTask = function(structId, targethits = null) {
+    return {structId: structId, targethits: targethits}
+};
+
+var LabTask = function(resourceType, amount) {
+    return {resourceType: resourceType, amount: amount}
+};
+
+var transferTask = function(withdrawTarget, transferTarget, resourceType, amount) {
+    return {
+        withdrawTarget: withdrawTarget,
+        transferTarget: transferTarget,
+        resourceType: resourceType,
+        amount: amount,
+    }
+};
+
+module.exports = {ManagerTask, TowerRepairTask, LabTask, transferTask};

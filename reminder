@@ -76,22 +76,26 @@ _.forEach(
 JSON.stringify(obj)
 
 // create task
-Game.rooms['W19S17'].memory.managerTasks.push({from: STRUCTURE_STORAGE, to: STRUCTURE_NUKER, resourceType: RESOURCE_GHODIUM, volume: 200});
-Game.rooms['W21S19'].memory.managerTasks = [{from: STRUCTURE_STORAGE, to: STRUCTURE_TERMINAL, resourceType: RESOURCE_GHODIUM, volume: 400}];
+Game.rooms['W19S17'].memory.managerTasks.push({from: STRUCTURE_TERMINAL, to: STRUCTURE_STORAGE, resourceType: 'K', volume: 10000});
+Game.rooms['W22S15'].memory.managerTasks.push({from: STRUCTURE_STORAGE, to: STRUCTURE_TERMINAL, resourceType: 'K', volume: 10000});
 // orders
 Game.rooms['W18S15'].terminal.send(RESOURCE_ENERGY, 45000, 'W19S17', 'energy');
+Game.rooms['W22S15'].terminal.send('K', 10000, 'W19S17', 'K');
 
-Game.market.deal('64421a8207170e614e554c84', 10000, "W21S19");
+Game.market.deal('64462905086f78174a0d6801', 10000, "W19S17");
 
 Game.market.cancelOrder('644046f346d8195c5404a845');
 
 Game.market.createOrder({
     type: ORDER_BUY,
     resourceType: RESOURCE_ENERGY,
-    price: 8.75,
-    totalAmount: 600000,
-    roomName: "W19S17"   
+    price: 8.6,
+    totalAmount: 800000,
+    roomName: "W12S21"   
 });
+
+// create reaction task
+Game.rooms.W19S17.memory.tasks.labTasks.push({resourceType: RESOURCE_HYDROXIDE, amount: 2000});
 
 
 /*
