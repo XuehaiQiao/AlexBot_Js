@@ -5,7 +5,7 @@ W27S18
 Game.spawns['Spawn1_W18S15'].spawnCreep([MOVE, CLAIM], 'Claimer' + Game.time, {memory: {role: 'claimer', status: 1, targetRoom: 'W22S15', claim: true}});
 
 //builder2
-Game.spawns['Spawn1_W15S13'].spawnCreep([...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], 'builder2' + Game.time, {memory: {role: 'builder2', status: 1, targetRoom: 'W15S13'}});
+Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], 'builder2' + Game.time, {memory: {role: 'builder2', status: 1, targetRoom: 'W22S15'}});
 
 // upgrader2
 Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], 'upgrader2' + Game.time, {memory: {role: 'upgrader2', status: 1, targetRoom: 'W22S15', base: 'W22S15'}});
@@ -78,8 +78,12 @@ JSON.stringify(obj)
 // create task
 Game.rooms['W19S17'].memory.managerTasks.push({from: STRUCTURE_TERMINAL, to: STRUCTURE_STORAGE, resourceType: 'K', volume: 10000});
 Game.rooms['W22S15'].memory.managerTasks.push({from: STRUCTURE_STORAGE, to: STRUCTURE_TERMINAL, resourceType: 'K', volume: 10000});
+// create reaction task
+Game.rooms.W19S17.memory.tasks.labTasks.push({resourceType: 'OH', amount: 3000});
+
+
 // orders
-Game.rooms['W18S15'].terminal.send(RESOURCE_ENERGY, 45000, 'W19S17', 'energy');
+Game.rooms['W18S15'].terminal.send(RESOURCE_ENERGY, 45000, 'W22S15', 'energy');
 Game.rooms['W22S15'].terminal.send('K', 10000, 'W19S17', 'K');
 
 Game.market.deal('64462905086f78174a0d6801', 10000, "W19S17");
@@ -94,8 +98,7 @@ Game.market.createOrder({
     roomName: "W12S21"   
 });
 
-// create reaction task
-Game.rooms.W19S17.memory.tasks.labTasks.push({resourceType: RESOURCE_HYDROXIDE, amount: 2000});
+
 
 
 /*

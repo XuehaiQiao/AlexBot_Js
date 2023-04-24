@@ -52,6 +52,8 @@ module.exports.loop = function () {
         }
     });
 
+    roomLogic.resourceBalancing(Game.myRooms);
+
     totalRoomCpu += Game.cpu.getUsed();
     console.log('total room cpu: ', totalRoomCpu);
 

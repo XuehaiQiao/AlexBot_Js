@@ -22,12 +22,6 @@ var mineralCarrier = {
         // set status: 0. harvest  1. transfer 
         creep.workerSetStatus();
 
-        let labTasks = creep.room.memory.tasks.labTasks;
-        if(!labTasks.length) {
-            creep.toResPos();
-            return;
-        }
-    
         const task = creep.room.memory.tasks.labTasks[0];
 
         let allLabs = creep.room.find(FIND_MY_STRUCTURES, {filter: struct => struct.structureType == STRUCTURE_LAB});
@@ -37,7 +31,7 @@ var mineralCarrier = {
         // labStatus: 0 finished, 1 running, 2 center feed, 3 outter withdraw 
         // 0 finished: remove all minerals from lab
         if(!creep.room.memory.labStatus) {
-            creep.say(creep.room.memory.labStatus);
+            //creep.say(creep.room.memory.labStatus);
             for(const i in allLabs) {
                 let lab = allLabs[i];
                 if(lab.mineralType && lab.store.getUsedCapacity(lab.mineralType) > 0) {
@@ -63,7 +57,7 @@ var mineralCarrier = {
         }
         // 1 running: do nothing
         else if(creep.room.memory.labStatus == 1) {
-            creep.say(creep.room.memory.labStatus);
+            //creep.say(creep.room.memory.labStatus);
             // transfer to storage
             if(creep.store.getUsedCapacity() > 0) {
                 let storage = creep.room.storage;
@@ -82,7 +76,7 @@ var mineralCarrier = {
         }
         // 2 center feed: 
         else if(creep.room.memory.labStatus == 2) {
-            creep.say(creep.room.memory.labStatus);
+            //creep.say(creep.room.memory.labStatus);
             for (const i in centerLabs) {
                 let lab = centerLabs[i];
                 if(!lab.mineralType || lab.store[lab.mineralType] < 5) {
@@ -93,7 +87,7 @@ var mineralCarrier = {
         }
         // 3 outter withdraw
         else if(creep.room.memory.labStatus == 3) {
-            creep.say(creep.room.memory.labStatus);
+            //creep.say(creep.room.memory.labStatus);
             for(const i in outterLabs) {
                 let lab = outterLabs[i];
                 if(lab.mineralType && lab.store.getUsedCapacity(lab.mineralType) > 0) {
@@ -182,8 +176,6 @@ var mineralCarrier = {
         if(!room.memory.labs || !room.memory.labs.center || room.memory.labs.center.length != 2) {
             return false;
         }
-
-        console.log(room, "have both");
 
         let stage = this.getStage(room);
 

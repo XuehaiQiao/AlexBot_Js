@@ -8,6 +8,7 @@ let roomLogic = {
     roomCensus:   require('./roomCensus'),
     exportStats:  require('./exportStats'),
     labReaction:  require('./labReaction'),
+    resourceBalancing: require('./resourceBalancing'),
 }
 
 module.exports = roomLogic;

@@ -32,8 +32,8 @@ var carrier2 = {
         // extension, spawn, tower
         var needFeedStructure = _.find(creep.room.find(FIND_MY_STRUCTURES), (structure) => (
             ((structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN) && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0) ||
-            (structure.structureType == STRUCTURE_TOWER && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 300)
-            //(structure.structureType == STRUCTURE_LAB && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0)
+            (structure.structureType == STRUCTURE_TOWER && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 300) ||
+            (structure.structureType == STRUCTURE_LAB && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0)
         ))
 
         // if no need feeds, put energy to storage
@@ -121,18 +121,18 @@ var carrier2 = {
                 return;
             }
 
-            // //lab
-            // var lab = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
-            //     filter: function(object) {
-            //         return object.structureType == STRUCTURE_LAB && object.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-            //     }
-            // });
-            // if (lab) {
-            //     if(creep.transfer(lab, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-            //         creep.moveToNoCreepInRoom(lab);
-            //     }
-            //     return;
-            // }
+            //lab
+            var lab = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
+                filter: function(object) {
+                    return object.structureType == STRUCTURE_LAB && object.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                }
+            });
+            if (lab) {
+                if(creep.transfer(lab, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveToNoCreepInRoom(lab);
+                }
+                return;
+            }
             
 
             // if no transfer needs
