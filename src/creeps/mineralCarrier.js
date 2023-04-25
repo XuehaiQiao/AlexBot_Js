@@ -161,8 +161,12 @@ var mineralCarrier = {
                     console.log(creep.room, "mineral " + resourceType + " not enough");
                     return;
                 }
-                if(creep.withdraw(storage, resourceType) == ERR_NOT_IN_RANGE) {
+                let result = creep.withdraw(storage, resourceType);
+                if(result == ERR_NOT_IN_RANGE) {
                     creep.moveToNoCreepInRoom(storage);
+                }
+                else if(result == OK) {
+                    creep.memory.status = 1;
                 }
             }
         }

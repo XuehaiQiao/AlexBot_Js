@@ -5,7 +5,7 @@ var remoteHarvester = {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, WORK, CARRY, MOVE], number: 2},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 1},
             4: {maxEnergyCapacity: 1300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
-            7: {maxEnergyCapacity: 5600, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], number: 1},
+            7: {maxEnergyCapacity: 5600, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], number: 1},
         },
     },
     /** @param {Creep} creep **/
@@ -28,7 +28,7 @@ var remoteHarvester = {
         if(creep.memory.target != undefined && result == ERR_NOT_ENOUGH_RESOURCES) {
             let source = creep.room.find(FIND_SOURCES)[creep.memory.target];
             creep.say('no e')
-            if(creep.memory.containerId == undefined) {
+            if(!creep.memory.containerId) {
                 let containerList = source.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_CONTAINER});
                 if(containerList.length) creep.memory.containerId = containerList[0].id;
             }
@@ -84,7 +84,7 @@ var remoteHarvester = {
         const existingThisTypeCreeps = _.filter(Game.creeps, creep => (
             creep.memory.role == this.properties.role && 
             creep.memory.targetRoom == outSourceRoomName &&
-            creep.ticksToLive >= creep.body.length * 3
+            !(creep.ticksToLive < creep.body.length * 3)
         ));
         var existingTargets = _.map(existingThisTypeCreeps, creep => creep.memory.target)
 

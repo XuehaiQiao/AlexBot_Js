@@ -836,8 +836,12 @@ var mineralCarrier = {
                     console.log(creep.room, "mineral " + resourceType + " not enough");
                     return;
                 }
-                if(creep.withdraw(storage, resourceType) == ERR_NOT_IN_RANGE) {
+                let result = creep.withdraw(storage, resourceType);
+                if(result == ERR_NOT_IN_RANGE) {
                     creep.moveToNoCreepInRoom(storage);
+                }
+                else if(result == OK) {
+                    creep.memory.status = 1;
                 }
             }
         }
@@ -849,8 +853,6 @@ var mineralCarrier = {
         if(!room.memory.labs || !room.memory.labs.center || room.memory.labs.center.length != 2) {
             return false;
         }
-
-        console.log(room, "have both");
 
         let stage = this.getStage(room);
 
@@ -1717,7 +1719,7 @@ var remoteHarvester = {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, WORK, CARRY, MOVE], number: 2},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 1},
             4: {maxEnergyCapacity: 1300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
-            7: {maxEnergyCapacity: 5600, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], number: 1},
+            7: {maxEnergyCapacity: 5600, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], number: 1},
         },
     },
     /** @param {Creep} creep **/
@@ -1734,7 +1736,7 @@ var remoteHarvester = {
         if(creep.memory.target != undefined && result == ERR_NOT_ENOUGH_RESOURCES) {
             let source = creep.room.find(FIND_SOURCES)[creep.memory.target];
             creep.say('no e')
-            if(creep.memory.containerId == undefined) {
+            if(!creep.memory.containerId) {
                 let containerList = source.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_CONTAINER});
                 if(containerList.length) creep.memory.containerId = containerList[0].id;
             }
@@ -1783,7 +1785,7 @@ var remoteHarvester = {
         const existingThisTypeCreeps = _.filter(Game.creeps, creep => (
             creep.memory.role == this.properties.role && 
             creep.memory.targetRoom == outSourceRoomName &&
-            creep.ticksToLive >= creep.body.length * 3
+            !(creep.ticksToLive < creep.body.length * 3)
         ));
         var existingTargets = _.map(existingThisTypeCreeps, creep => creep.memory.target)
 
@@ -3828,6 +3830,7 @@ Creep.prototype.collectEnergy = function collectEnergy(changeStatus=false) {
 
 Creep.prototype.harvestEnergy = function harvestEnergy() {
     let source;
+    let result;
     if (this.memory.target != undefined) {
         source = this.room.find(FIND_SOURCES)[this.memory.target];
     }
@@ -3843,28 +3846,32 @@ Creep.prototype.harvestEnergy = function harvestEnergy() {
 
     if(!this.pos.inRangeTo(source.pos, 1)) {
         this.moveTo(source, {reusePath: 10});
-        return ERR_NOT_IN_RANGE;
+        result = ERR_NOT_IN_RANGE;
     }
     else {
-        let result = this.harvest(source);
         let links = this.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_LINK && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0});
-        if(links.length > 0 && (this.store.getFreeCapacity() < 20 || this.ticksToLive < 2 || result == ERR_NOT_ENOUGH_RESOURCES)) {
-            this.transfer(links[0], RESOURCE_ENERGY);
+        if(links.length > 0) {
+            result = this.harvest(source);
+            if(links.length > 0 && (this.store.getFreeCapacity() < 20 || this.ticksToLive < 2 || result == ERR_NOT_ENOUGH_RESOURCES)) {
+                this.transfer(links[0], RESOURCE_ENERGY);
+            }
         }
-        if(links.length == 0) {
+        else {
             let contianer = this.pos.findClosestByPath(FIND_STRUCTURES, {filter: struct => (
                 struct.structureType == STRUCTURE_CONTAINER &&
                 struct.pos.inRangeTo(source.pos, 1)
             )});
-            if(contianer && !contianer.pos.isEqualTo(this.pos)) {
-                this.moveTo(contianer);
+            if(contianer) {
+                if(!contianer.pos.isEqualTo(this.pos)) this.moveTo(contianer);
+                if(contianer.store.getFreeCapacity() > 0) result = this.harvest(source);
+            }
+            else {
+                result = this.harvest(source);
             }
         }
-
-        return result;
     }
 
-    
+    return result;
 }
 
 Creep.prototype.takeEnergyFromStorage = function takeEnergyFromStorage() {

@@ -151,6 +151,7 @@ Creep.prototype.harvestEnergy = function harvestEnergy() {
     // todo:
     // add targetRoom option, to create harvest path before enter the target room.
     let source;
+    let result;
     if (this.memory.target != undefined) {
         source = this.room.find(FIND_SOURCES)[this.memory.target];
     }
@@ -166,30 +167,33 @@ Creep.prototype.harvestEnergy = function harvestEnergy() {
 
     if(!this.pos.inRangeTo(source.pos, 1)) {
         this.moveTo(source, {reusePath: 10});
-        return ERR_NOT_IN_RANGE;
+        result = ERR_NOT_IN_RANGE;
     }
     else {
-        let result = this.harvest(source);
         let links = this.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_LINK && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0});
-        if(links.length > 0 && (this.store.getFreeCapacity() < 20 || this.ticksToLive < 2 || result == ERR_NOT_ENOUGH_RESOURCES)) {
-            this.transfer(links[0], RESOURCE_ENERGY);
+        if(links.length > 0) {
+            result = this.harvest(source);
+            if(links.length > 0 && (this.store.getFreeCapacity() < 20 || this.ticksToLive < 2 || result == ERR_NOT_ENOUGH_RESOURCES)) {
+                this.transfer(links[0], RESOURCE_ENERGY);
+            }
         }
-
-        // if not near link, move to containers
-        if(links.length == 0) {
+        // if not near link, move to container / check if container is full
+        else {
             let contianer = this.pos.findClosestByPath(FIND_STRUCTURES, {filter: struct => (
                 struct.structureType == STRUCTURE_CONTAINER &&
                 struct.pos.inRangeTo(source.pos, 1)
             )});
-            if(contianer && !contianer.pos.isEqualTo(this.pos)) {
-                this.moveTo(contianer);
+            if(contianer) {
+                if(!contianer.pos.isEqualTo(this.pos)) this.moveTo(contianer);
+                if(contianer.store.getFreeCapacity() > 0) result = this.harvest(source);
+            }
+            else {
+                result = this.harvest(source);
             }
         }
-
-        return result;
     }
 
-    
+    return result;
 }
 
 Creep.prototype.takeEnergyFromStorage = function takeEnergyFromStorage() {
