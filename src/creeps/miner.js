@@ -44,7 +44,7 @@ var miner = {
         // mineral has resources, room have extractor, storage have less than 100000 this mineral type
         if(mineral.mineralAmount == 0) return false;
         if(!extractor) return false;
-        if(room.storage && room.storage.store[mineral.mineralType] > 100000) return false;
+        if(room.storage && room.storage.store[mineral.mineralType] > 50000) return false;
         
         let creepCount;
         if(global.roomCensus[room.name][this.properties.role]) creepCount = global.roomCensus[room.name][this.properties.role]

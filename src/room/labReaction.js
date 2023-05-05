@@ -1,5 +1,5 @@
 const { transferTask } = require("../models/taskModels");
-const { reactoinResources } = require("../constants")
+const { reactionResources } = require("../constants")
 
 var labReaction = function(room) {
     if(!room.memory.tasks) room.memory.tasks = {};
@@ -42,7 +42,7 @@ var labReaction = function(room) {
     else if(room.memory.labStatus == 1) {
         // check if mineral type is correct for all labs
         for(const i in centerLabs) {
-            if(centerLabs[i].mineralType && centerLabs[i].mineralType != reactoinResources[task.resourceType][i]) {
+            if(centerLabs[i].mineralType && centerLabs[i].mineralType != reactionResources[task.resourceType][i]) {
                 room.memory.labStatus = 0;
                 return;
             }

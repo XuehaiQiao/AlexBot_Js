@@ -1,4 +1,4 @@
-var roomObject = {
+var roomConfigs = {
     W19S17: {
         restPos: new RoomPosition(24, 9, "W19S17"),
         managerPos: new RoomPosition(31, 9, "W19S17"),
@@ -31,11 +31,15 @@ var roomObject = {
         restPos: new RoomPosition(16, 13, "W22S15"),
         managerPos: new RoomPosition(15, 16, "W22S15"),
     },
+    W13S15: {
+        restPos: new RoomPosition(18, 20, "W13S15"),
+        managerPos: new RoomPosition(22, 18, "W13S15"),
+    },
     sim: {
         restPos: new RoomPosition(19, 21, "sim"),
-        managerPos: new RoomPosition(23, 25, "sim"),
+        managerPos: new RoomPosition(23, 26, "sim"),
     },
 }
 
 
-module.exports = roomObject;
+module.exports = roomConfigs;

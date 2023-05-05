@@ -22,7 +22,7 @@ Creep.prototype.moveToNoCreepInRoom = function(target) {
 
 Creep.prototype.moveToRoom = function(roomName) {
     if(this.isStuck()) {
-        this.moveTo(roomName);
+        this.moveTo(new RoomPosition(25, 25, roomName));
     }
     return this.moveToNoCreep(new RoomPosition(25, 25, roomName));
 }
@@ -157,7 +157,7 @@ Creep.prototype.harvestEnergy = function harvestEnergy() {
     }
     else {
         this.say('!target')
-        source = this.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+        source = this.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
     }
 
     if(!source) {
@@ -179,13 +179,14 @@ Creep.prototype.harvestEnergy = function harvestEnergy() {
         }
         // if not near link, move to container / check if container is full
         else {
-            let contianer = this.pos.findClosestByPath(FIND_STRUCTURES, {filter: struct => (
+            let contianer = this.pos.findClosestByRange(FIND_STRUCTURES, {filter: struct => (
                 struct.structureType == STRUCTURE_CONTAINER &&
                 struct.pos.inRangeTo(source.pos, 1)
             )});
             if(contianer) {
                 if(!contianer.pos.isEqualTo(this.pos)) this.moveTo(contianer);
                 if(contianer.store.getFreeCapacity() > 0) result = this.harvest(source);
+                else result = ERR_NOT_ENOUGH_RESOURCES;
             }
             else {
                 result = this.harvest(source);
@@ -212,7 +213,7 @@ Creep.prototype.takeEnergyFromStorage = function takeEnergyFromStorage() {
 
 Creep.prototype.takeEnergyFromClosest = function takeEnergyFromClosest() {
     // first find droped resource
-    var dropedResource = this.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount >= this.store.getCapacity()});
+    var dropedResource = this.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount >= this.store.getCapacity()});
     if (dropedResource) {
         if(this.pickup(dropedResource) == ERR_NOT_IN_RANGE) {
             this.moveToNoCreepInRoom(dropedResource);
@@ -224,7 +225,7 @@ Creep.prototype.takeEnergyFromClosest = function takeEnergyFromClosest() {
     let targets = _.filter(this.room.find(FIND_STRUCTURES), structure => (
         (structure.structureType == STRUCTURE_CONTAINER || structure.structureType == STRUCTURE_STORAGE) && 
         structure.store.getUsedCapacity(RESOURCE_ENERGY) > this.store.getFreeCapacity()));
-    let target = this.pos.findClosestByPath(targets);
+    let target = this.pos.findClosestByRange(targets);
     if (target) {
         if(this.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
             this.moveToNoCreepInRoom(target);

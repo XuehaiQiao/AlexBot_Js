@@ -1,5 +1,5 @@
 let constants = {
-    reactoinResources:  require('./reactoinResources'),
+    reactionResources:  require('./reactionResources'),
 }
 
 module.exports = constants;

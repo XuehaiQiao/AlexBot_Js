@@ -77,7 +77,7 @@ var carrier2 = {
         // transfer
         else {
             if(creep.transfer(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(storage);
+                creep.moveToNoCreepInRoom(storage);
             }
             return;
         }

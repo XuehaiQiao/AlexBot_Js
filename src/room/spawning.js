@@ -41,9 +41,11 @@ function spawnCreeps(room) {
 
     // get the data for spawning a new creep of creepTypeNeeded
     let creepSpawnData = creepLogic[creepTypeNeeded] && creepLogic[creepTypeNeeded].spawnData(room);
-    let result = spawnCreepUsingSpawnData(creepSpawnData);
-    if(result == OK) return;
+    spawnCreepUsingSpawnData(creepSpawnData);
+    if(creepTypeNeeded) return;
     
+    // ---------------------------------------------------------------------------------------------------
+
     // serviver creeps
     let creeps = room.find(FIND_MY_CREEPS);
     if (creeps.length < 2 && result == ERR_NOT_ENOUGH_ENERGY) {
@@ -98,7 +100,7 @@ function spawnCreeps(room) {
         // remote harvest
         let outSourceTypes;
         // level 6 to use remoteHarvester/remoteHauler
-        if(room.energyCapacityAvailable < 800) {
+        if(room.energyCapacityAvailable < 550) {
             outSourceTypes = []
         }
         else if(room.energyCapacityAvailable < 1300) {

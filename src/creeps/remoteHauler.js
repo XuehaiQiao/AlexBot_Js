@@ -140,7 +140,8 @@ var remoteHauler = {
                     return;
                 };
             }
-            if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+            let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
+            if(creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
                 creep.moveToNoCreep(target);
             }
         }

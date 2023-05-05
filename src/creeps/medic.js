@@ -4,28 +4,44 @@ var medic = {
     },
     /** @param {Creep} creep **/
     run: function(creep) {
-        let targetId = creep.memory.target
-        if(!targetId || !Game.getObjectById(targetId)) {
-            let defender = creep.pos.findClosestByPath(FIND_MY_CREEPS, {filter: creep => creep.memory.role == 'defender'});
-            if (!defender) {
+        // heal any creep
+        if(creep.memory.status == 1) {
+            if (creep.moveToRoomAdv(creep.memory.targetRoom)) {
                 return;
-            }
-            creep.memory.target = defender.id;
-        }
-        
-        let target = Game.getObjectById(creep.memory.target);
-        if (target) {
-            if (creep.hits < creep.hitsMax){
-                creep.heal(creep);
-            }
-            else {
+            }    
+            let target = creep.pos.findClosestByRange(FIND_MY_CREEPS, {filter: creep => creep.hits < creep.hitsMax})
+            if (target) {
+                creep.rangedHeal(target);
                 creep.heal(target);
-                if(creep.rangedHeal(target) == ERR_NOT_IN_RANGE) {
-                    creep.heal(creep);
-                }
+                creep.moveTo(target);
             }
-            creep.moveTo(target);
+        }
+        // heal defender
+        else {
+            let targetId = creep.memory.target
+            if(!targetId || !Game.getObjectById(targetId)) {
+                let defender = creep.pos.findClosestByPath(FIND_MY_CREEPS, {filter: creep => creep.memory.role == 'defender'});
+                if (!defender) {
+                    return;
+                }
+                creep.memory.target = defender.id;
+            }
             
+            let target = Game.getObjectById(creep.memory.target);
+            if (target) {
+                if (creep.hits < creep.hitsMax){
+                    creep.heal(creep);
+                    creep.moveTo(target);
+                }
+                else {
+                    creep.heal(target);
+                    if(creep.rangedHeal(target) == ERR_NOT_IN_RANGE) {
+                        creep.heal(creep);
+                    }
+                }
+                creep.moveTo(target);
+                
+            }
         }
     },
 

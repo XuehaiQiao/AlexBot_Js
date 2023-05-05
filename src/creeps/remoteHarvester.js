@@ -4,7 +4,8 @@ var remoteHarvester = {
         stages: {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, WORK, CARRY, MOVE], number: 2},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 1},
-            4: {maxEnergyCapacity: 1300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
+            3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
+            4: {maxEnergyCapacity: 1300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE], number: 1},
             7: {maxEnergyCapacity: 5600, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], number: 1},
         },
     },
@@ -16,8 +17,8 @@ var remoteHarvester = {
         }
 
         // move to its target room if not in
-        if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
-            creep.moveToRoomAdv(creep.memory.targetRoom);
+        // move to its target room if not in
+        if (creep.moveToRoomAdv(creep.memory.targetRoom)) {
             return;
         }
 
@@ -42,7 +43,7 @@ var remoteHarvester = {
                 }
                 creep.repair(container);
             }
-            else {
+            else if(source.energy == 0) {
                 creep.memory.rest = source.ticksToRegeneration;
             }
             return;
@@ -88,7 +89,10 @@ var remoteHarvester = {
         ));
         var existingTargets = _.map(existingThisTypeCreeps, creep => creep.memory.target)
 
-        const sourceCount = Memory.outSourceRooms[outSourceRoomName].sourceNum;
+        let sourceCount = 1;
+        if(Memory.outSourceRooms[outSourceRoomName]) {
+            sourceCount = Memory.outSourceRooms[outSourceRoomName].sourceNum;
+        }
         var sourceTarget;
         for(var i = 0; i < sourceCount; i++) {
             if (!existingTargets.includes(i)) {

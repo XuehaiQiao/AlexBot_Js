@@ -1,5 +1,7 @@
+// const { roomResourceConfig } = require("../config");
+
 /*
-    manager: manage link, storage, terminal...
+    manager manage: link, storage, terminal, factory, power spawn, nuke.
     logic:
         for status == 0: find withdraw target, withdraw and set transfer target.
         for status == 1: transfer whatever resource to target.
@@ -47,48 +49,81 @@ var manager = {
         }
         // status:0 withdraw
         else {
-            let link = Game.getObjectById(creep.memory[STRUCTURE_LINK]);
-            let powerSpawn = Game.getObjectById(creep.memory[STRUCTURE_POWER_SPAWN]);
-            let terminal = Game.getObjectById(creep.memory[STRUCTURE_TERMINAL]);
             let storage = Game.getObjectById(creep.memory[STRUCTURE_STORAGE]);
-            let nuker = Game.getObjectById(creep.memory[STRUCTURE_NUKER]);
-            let controllerLink = Game.getObjectById(creep.memory.controllerLink);
 
-            // from storage to managerLink
-            if(controllerLink && link && controllerLink.store[RESOURCE_ENERGY] < 100 && link.store[RESOURCE_ENERGY] < 700 && link.cooldown <= 3) {
-                creep.say('S2L');
-                this.fromA2B(creep, storage, link, RESOURCE_ENERGY, Math.min(link.store.getFreeCapacity(RESOURCE_ENERGY), controllerLink.store.getFreeCapacity(RESOURCE_ENERGY)));
-            }
-            else if(link && link.store[RESOURCE_ENERGY] > 0 && controllerLink.store[RESOURCE_ENERGY] >= 100 && storage.store.getFreeCapacity() > creep.store.getCapacity()) {
-                creep.say('L2S');
-                this.fromA2B(creep, link, storage, RESOURCE_ENERGY);
-            }
-            // terminal energy balance
-            else if(terminal && terminal.store[RESOURCE_ENERGY] < 50000 && storage.store[RESOURCE_ENERGY] > creep.store.getCapacity()) {
-                creep.say('S2T');
-                this.fromA2B(creep, storage, terminal, RESOURCE_ENERGY);
-            }
-            // transfer energy to powerSpawn 
-            else if(powerSpawn && storage && powerSpawn.store.getFreeCapacity(RESOURCE_ENERGY) > creep.store.getCapacity()) {
-                creep.say('2PS');
-                this.fromA2B(creep, storage, powerSpawn, RESOURCE_ENERGY);
-            }
-            // transfer power to powerSpawn
-            else if(powerSpawn && storage && powerSpawn.store[RESOURCE_POWER] == 0 && storage.store[RESOURCE_POWER] > 0) {
-                creep.say('2PS');
-                this.fromA2B(creep, storage, powerSpawn, RESOURCE_POWER, 100);
-            }
-            else if(terminal && terminal.store[RESOURCE_ENERGY] > 60000 && storage.store.getFreeCapacity() > creep.store.getCapacity()) {
-                creep.say('T2S');
-                this.fromA2B(creep, terminal, storage, RESOURCE_ENERGY);
-            }
-            // other tasks
+            // link, terminal balance, ps, factory, nuke, taskQueue
+            if(this.coreWork(creep, storage)) return;
+            else if(this.terminalBalance(creep, storage)) return;
+            else if(this.feedPowerSpawn(creep, storage)) return;
             else {
-                if(creep.room.memory.managerTasks && creep.room.memory.managerTasks.length > 0) {
+                let managerTasks = creep.room.memory.managerTasks;
+                if(managerTasks && managerTasks.length > 0) {
                     this.doTask(creep);
                 }
             }
         }
+    },
+    
+    // link to storage & storage to controllerLink
+    coreWork: function(creep, storage) {
+        let link = Game.getObjectById(creep.memory[STRUCTURE_LINK]);
+        let controllerLink = Game.getObjectById(creep.memory.controllerLink);
+        // upgrade: from storage to managerLink
+        if(controllerLink && link && controllerLink.store[RESOURCE_ENERGY] < 100 && link.store[RESOURCE_ENERGY] < 700 && link.cooldown <= 3) {
+            creep.say('S2L');
+            this.fromA2B(creep, storage, link, RESOURCE_ENERGY, Math.min(link.store.getFreeCapacity(RESOURCE_ENERGY), controllerLink.store.getFreeCapacity(RESOURCE_ENERGY)));
+            return true;
+        }
+        // collect link energy
+        else if(link && link.store[RESOURCE_ENERGY] > 0 && controllerLink.store[RESOURCE_ENERGY] >= 100 && storage.store.getFreeCapacity() > creep.store.getCapacity()) {
+            creep.say('L2S');
+            this.fromA2B(creep, link, storage, RESOURCE_ENERGY);
+            return true;
+        }
+
+        return false
+    },
+
+    terminalBalance: function(creep, storage) {
+        let terminal = Game.getObjectById(creep.memory[STRUCTURE_TERMINAL]);
+        if(!terminal) return false;
+
+        for(const resourceType in roomResourceConfig) {
+            let targetAmount = roomResourceConfig[resourceType].terminal;
+            if(terminal.store[resourceType] < targetAmount && storage.store[resourceType] > 0 && terminal.store.getFreeCapacity() > 0) {
+                creep.say('S2T');
+                let amount = targetAmount - terminal.store[resourceType];
+                this.fromA2B(creep, storage, terminal, resourceType, amount);
+                return true;
+            }
+            else if(terminal.store[resourceType] > targetAmount && terminal.store[resourceType] > 0 && storage.store.getFreeCapacity() > 0) {
+                creep.say('T2S');
+                let amount = terminal.store[resourceType] - targetAmount;
+                this.fromA2B(creep, terminal, storage, resourceType, amount);
+                return true;
+            }
+        }
+
+        return false;
+    },
+
+    feedPowerSpawn: function(creep, storage) {
+        let powerSpawn = Game.getObjectById(creep.memory[STRUCTURE_POWER_SPAWN]);
+        if(!powerSpawn) return false;
+
+        if(storage && powerSpawn.store.getFreeCapacity(RESOURCE_ENERGY) > creep.store.getCapacity()) {
+            creep.say('2PS');
+            this.fromA2B(creep, storage, powerSpawn, RESOURCE_ENERGY);
+            return true;
+        }
+        // transfer power to powerSpawn
+        else if(storage && powerSpawn.store[RESOURCE_POWER] == 0 && storage.store[RESOURCE_POWER] > 0) {
+            creep.say('2PS');
+            this.fromA2B(creep, storage, powerSpawn, RESOURCE_POWER, Math.min(100, storage.store[RESOURCE_POWER]));
+            return true;
+        }
+
+        return false;
     },
 
     fromA2B: function(creep, fromStruct, toStruct, resourceType, amount = null) {
@@ -96,11 +131,13 @@ var manager = {
             console.log("some struct is missing");
             return;
         }
-
+        
         if(fromStruct.store[resourceType] > 0) {
             if(amount == null) creep.withdraw(fromStruct, resourceType);
-            else creep.withdraw(fromStruct, resourceType, amount);
-
+            else {
+                amount = _.min([creep.store.getCapacity(), fromStruct.store[resourceType], amount]);
+                creep.withdraw(fromStruct, resourceType, amount);
+            }
             creep.memory.status = 1;
         }
         // set transfer target
@@ -157,9 +194,6 @@ var manager = {
 
     // checks if the room needs to spawn a creep
     spawn: function(room) {
-        // var thisTypeCreeps = _.filter(Game.creeps, (creep) => creep.memory.role == this.properties.role && creep.room.name == room.name);
-        // console.log(this.properties.role + ': ' + thisTypeCreeps.length, room.name);
-    
         // 1 manager
         let creepCount;
         if(global.roomCensus[room.name][this.properties.role]) creepCount = global.roomCensus[room.name][this.properties.role]

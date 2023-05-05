@@ -28,11 +28,12 @@ var transporter = {
 
     // collect droped resources
     collectDropedResources: function(creep, resourceType) {
+        creep.say('cdr');
         // harvest
-        if(creep.memory.status == 0) {
+        if(!creep.memory.status) {
             // move to its target room if not in
             if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
-                creep.moveToRoom(creep.memory.targetRoom);
+                creep.moveToRoomAdv(creep.memory.targetRoom);
                 return;
             }
 
@@ -41,14 +42,28 @@ var transporter = {
             if(resourceType) {
                 dropedRecource = _.find(creep.room.find(FIND_DROPPED_RESOURCES), resource => resource.resourceType == resourceType);
             }
-            else dropedRecource = _.find(creep.room.find(FIND_DROPPED_RESOURCES));
+            else dropedRecource = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES);
 
             if (dropedRecource) {
                 if(creep.pickup(dropedRecource) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(dropedRecource, {visualizePathStyle: {stroke: '#ffffff'}});
                 }
+                return;
             }
-            else creep.suicide();
+
+            // find tomstone
+            let tomstone = _.find(creep.room.find(FIND_TOMBSTONES), ts => ts.store.getUsedCapacity() >= creep.store.getCapacity());
+            if (tomstone) {
+                resourceType = _.find(Object.keys(tomstone.store), resource => tomstone.store[resource] > 0);
+                let result = creep.withdraw(tomstone, resourceType);
+                if(result == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(tomstone);
+                }
+                return;
+            }
+
+            if(creep.store.getUsedCapacity() > 0) creep.memory.status = 1;
+            //else creep.suicide();
         }
         // transfer
         else {
@@ -76,6 +91,7 @@ var transporter = {
 
     // transfer energy from one room to another (base room controll level < 6, no terminal)
     tranEnergyBetweenMyRooms: function(creep) {
+        creep.say('tebr');
         // harvest
         if(!creep.memory.status) {
             // move to its target room if not in

@@ -1,23 +1,22 @@
-W22S15
-W27S18
+//W27S18
 
 // claimer spawn
 Game.spawns['Spawn1_W18S15'].spawnCreep([MOVE, CLAIM], 'Claimer' + Game.time, {memory: {role: 'claimer', status: 1, targetRoom: 'W22S15', claim: true}});
 
 //builder2
-Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], 'builder2' + Game.time, {memory: {role: 'builder2', status: 1, targetRoom: 'W22S15'}});
+Game.spawns['Spawn1_W22S15'].spawnCreep([...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], 'builder2' + Game.time, {memory: {role: 'builder2', status: 1, targetRoom: 'W22S15'}});
 
 // upgrader2
-Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], 'upgrader2' + Game.time, {memory: {role: 'upgrader2', status: 1, targetRoom: 'W22S15', base: 'W22S15'}});
+Game.spawns['Spawn1_W15S13'].spawnCreep([...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], 'upgrader2' + Game.time, {memory: {role: 'upgrader2', status: 1, targetRoom: 'W13S15'}});
 
 // carrier spawn
 Game.spawns['Spawn2_W18S15'].spawnCreep([...new Array(4).fill(CARRY), ...new Array(2).fill(MOVE)], 'Carrier' + Game.time, {memory: {role: 'carrier'}});
 
 // transporter spawn
-Game.spawns['Spawn2'].spawnCreep([...new Array(25).fill(CARRY), ...new Array(25).fill(MOVE)], 'transporter' + Game.time, {memory: {role: 'transporter', base: 'W22S15', targetRoom: 'W19S17'}});
+Game.spawns['Spawn2_W15S13'].spawnCreep([...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], 'transporter' + Game.time, {memory: {role: 'transporter', base: 'W15S13', targetRoom: 'W13S12', workType: 1}});
 
 // defender
-Game.spawns['Spawn2_W13S21'].spawnCreep([MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, RANGED_ATTACK, MOVE], 'defender' + Game.time, {memory: {role: 'defender', targetRoom: 'W22S15'}});
+Game.spawns['Spawn2_W15S13'].spawnCreep([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], 'defender' + Game.time, {memory: {role: 'defender', targetRoom: 'W13S15'}});
 
 
 Game.spawns['Spawn1_W18S15'].spawnCreep([WORK, WORK, MOVE], 'Harvester2' + Game.time, {memory: {role: 'harvester2', status: 1, target: 0}});
@@ -64,38 +63,33 @@ outSourceRooms = {
 
 // destroy structures
 _.forEach(
-    _.filter(Game.rooms['roomName'].find(FIND_STRUCTURES), struct => struct.structureType == STRUCTURE_EXTENSION), 
-    function(wall){
-        console.log(wall);
-        wall.destroy();
-    }
+    Game.rooms['roomName'].find(FIND_STRUCTURES), 
+    struct => struct.destroy()
 );
 
-[].
-
-JSON.stringify(obj)
+JSON.stringify(obj);
 
 // create task
 Game.rooms['W19S17'].memory.managerTasks.push({from: STRUCTURE_TERMINAL, to: STRUCTURE_STORAGE, resourceType: 'K', volume: 10000});
-Game.rooms['W22S15'].memory.managerTasks.push({from: STRUCTURE_STORAGE, to: STRUCTURE_TERMINAL, resourceType: 'K', volume: 10000});
+Game.rooms['W21S19'].memory.managerTasks.push({from: STRUCTURE_STORAGE, to: STRUCTURE_NUKER, resourceType: RESOURCE_ENERGY, volume: 100000});
 // create reaction task
 Game.rooms.W19S17.memory.tasks.labTasks.push({resourceType: 'OH', amount: 3000});
 
 
 // orders
 Game.rooms['W18S15'].terminal.send(RESOURCE_ENERGY, 45000, 'W22S15', 'energy');
-Game.rooms['W22S15'].terminal.send('K', 10000, 'W19S17', 'K');
+Game.rooms['W15S13'].terminal.send('power', 1000, 'W18S15', 'power');
 
-Game.market.deal('64462905086f78174a0d6801', 10000, "W19S17");
+Game.market.deal('64423469382e5b26622ad3a9', 20000, "W18S15");
 
 Game.market.cancelOrder('644046f346d8195c5404a845');
 
 Game.market.createOrder({
     type: ORDER_BUY,
-    resourceType: RESOURCE_ENERGY,
-    price: 8.6,
-    totalAmount: 800000,
-    roomName: "W12S21"   
+    resourceType: RESOURCE_OXYGEN,
+    price: 25,
+    totalAmount: 50000,
+    roomName: "W18S15"   
 });
 
 
@@ -110,11 +104,7 @@ Mineral mining
 - miner creep
 - mineral carrier creep
 
-Lab logic
-
 Remote sourcing
-- harvester
-- carrier
 - knight (pertect & heal others)
 
 Queues
@@ -199,3 +189,5 @@ Scouting
 //     "cost":118,
 //     "incomplete":false，
 // }
+
+// auto new room operation
