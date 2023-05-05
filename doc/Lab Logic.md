@@ -1,6 +1,6 @@
-# Lab Reaction Design
+# Lab Logic Design
 
-## Reaction procedure
+## Reaction procedures
 
 1. Take a task from labTasks queue, change labStatus from 0 to 2.
 2. Status 2: Mineral carrier bring required reaction sources to center labs.
