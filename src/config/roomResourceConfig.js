@@ -1,4 +1,5 @@
 // resourceType: {terminal: amount, storage: [ShortageLine, AbundantLine, ExceededLine]}
+// if resource below shrtageLine, it requires to other rooms, if its below abundantLine, 
 const resourcesConfig = {
     energy: {terminal: 50000, storage: [200000, 500000, 600000]},
 

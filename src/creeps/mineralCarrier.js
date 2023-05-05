@@ -13,6 +13,12 @@ var mineralCarrier = {
 
     /** @param {Creep} creep **/
     run: function(creep) {
+        // to avoid dead when holding resources,, if tick to live less than 30, and finished transfer, suicide.
+        if(creep.ticksToLive < 30 && creep.memory.status == 0) {
+            creep.suicide();
+            return;
+        }
+
         // move to its target room if not in
         if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
             creep.moveToRoom(creep.memory.targetRoom);
