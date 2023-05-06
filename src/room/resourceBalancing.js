@@ -19,6 +19,7 @@ module.exports = function(myRooms) {
             for(const i in myRooms) {
                 // todo: choose sender & receiver based on room distance
                 if(sender[i] && receiver[i]) {
+                    if(resourceType == RESOURCE_ENERGY) amount /= 2;
                     sender[i].memory.tasks.terminalTasks.push({receiver: receiver[i].name, resourceType: resourceType, amount: roomResourceConfig[resourceType].terminal});
                 }
             }

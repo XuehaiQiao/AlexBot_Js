@@ -1,4 +1,4 @@
-const { reactoinResources } = require("../constants")
+const { reactionResources } = require("../constants");
 
 module.exports = {
     properties: {
@@ -6,16 +6,15 @@ module.exports = {
         stages: {
             1: {maxEnergyCapacity: 300, bodyParts:[CARRY, MOVE, CARRY, MOVE], number: 0},
             6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(20).fill(CARRY), ...new Array(10).fill(MOVE)], number: 1},
-            7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(30).fill(CARRY), ...new Array(15).fill(MOVE)], number: 1},
-            8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(30).fill(CARRY), ...new Array(15).fill(MOVE)], number: 1},
         },
     },
 
     /** @param {Creep} creep **/
     run: function(creep) {
-        // to avoid dead when holding resources,, if tick to live less than 30, and finished transfer, suicide.
-        if(creep.ticksToLive < 30 && creep.memory.status == 0) {
-            creep.suicide();
+        // to avoid dead when holding resources, if tick to live less than 30, and finished transfer, suicide.
+        if(creep.ticksToLive < 30) {
+            if(creep.store.getUsedCapacity() > 0) creep.memory.status = 1;
+            else creep.suicide();
             return;
         }
 
@@ -41,7 +40,7 @@ module.exports = {
             for(const i in allLabs) {
                 let lab = allLabs[i];
                 if(lab.mineralType && lab.store.getUsedCapacity(lab.mineralType) > 0) {
-                    this.labWithdraw(creep, lab);
+                    labWithdraw(creep, lab);
                     return;
                 }
             }
@@ -86,7 +85,12 @@ module.exports = {
             for (const i in centerLabs) {
                 let lab = centerLabs[i];
                 if(!lab.mineralType || lab.store[lab.mineralType] < 5) {
-                    this.labTransfer(creep, lab, reactoinResources[task.resourceType][i]);
+                    let resourceType = reactionResources[task.resourceType][i]
+                    // if storage no resources, set task amount to zero (set to complete)
+                    if(creep.store[resourceType] === 0 && creep.room.storage.store[resourceType] === 0) {
+                        creep.room.memory.tasks.labTasks[0].amount = 0;
+                    }
+                    labTransfer(creep, lab, resourceType);
                     return;
                 }
             }
@@ -97,7 +101,7 @@ module.exports = {
             for(const i in outterLabs) {
                 let lab = outterLabs[i];
                 if(lab.mineralType && lab.store.getUsedCapacity(lab.mineralType) > 0) {
-                    this.labWithdraw(creep, lab);
+                    labWithdraw(creep, lab);
                     return;
                 }
             }
@@ -172,10 +176,12 @@ var labWithdraw = function(creep, targetLab) {
 };
 
 var labTransfer = function(creep, targetLab, resourceType) {
+    // check lab remaining resourceType
     if(targetLab.mineralType && targetLab.mineralType != resourceType) {
         console.log(creep.room, "Lab transfer error, mineral type not correct");
     }
 
+    // check creep.store resourceType
     if(creep.store.getUsedCapacity() > 0) {
         let creepResourceTypes = _.filter(Object.keys(creep.store), resource => creep.store[resource] > 0);
         if(creepResourceTypes.length > 1 || creepResourceTypes[0] != resourceType) {
@@ -185,7 +191,8 @@ var labTransfer = function(creep, targetLab, resourceType) {
             return;
         }
     }
-
+    
+    // status 1: transfer
     if(creep.memory.status) {
         if((!targetLab.mineralType || targetLab.store.getFreeCapacity(targetLab.mineralType) > 0) && creep.store[resourceType] > 0) {
             if(creep.transfer(targetLab, resourceType) == ERR_NOT_IN_RANGE) {
@@ -203,6 +210,7 @@ var labTransfer = function(creep, targetLab, resourceType) {
             }
         }
     }
+    // status 0: withdraw
     else {
         let storage = creep.room.storage;
         if(storage) {

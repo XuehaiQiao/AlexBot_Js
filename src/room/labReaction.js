@@ -1,20 +1,97 @@
-const { transferTask } = require("../models/taskModels");
-const { reactionResources } = require("../constants")
+const { transferTask, LabTask } = require("../models/taskModels");
+const { reactionResources } = require("../constants");
+const { compondsRequirements } = require("../config");
+
 
 module.exports = function(room) {
-    runLab(room);
-};
-
-
-var runLab = function(room) {
+    // check avalibility 
+    if(!room) return;
+    if(room.controller.level < 6) return;
     if(!room.memory.tasks) room.memory.tasks = {};
     if(!room.memory.tasks.labTasks) room.memory.tasks.labTasks = [];
+    if(!room.storage) return;
     if(!room.memory.labs) room.memory.labs = {};
     if(!room.memory.labs.center) {
         room.memory.labs.center = [];
         return;
     }
     if(room.memory.labs.center.length != 2) return;
+
+    // test on W19S17
+    if(room.name != 'W19S17') return;
+
+    // For every 500 ticks, check & assign tasks if no tasks
+    if(Game.time % 5 === 3) {
+        if(room.memory.tasks.labTasks.length === 0) {
+            let {compond, amount} = checkRequiredComponds(room);
+            if(compond && amount) {
+                let createdTasks = createLabTasks(room.storage, compond, amount);
+                if(createdTasks) room.memory.tasks.labTasks.push(...createdTasks);
+                else {
+                    if(!Memory.resourceShortage) Memory.resourceShortage = {};
+                    else Memory.resourceShortage[room.name] = compond;
+                }
+            }
+        }
+    }
+
+    // lab reaction
+    runLab(room);
+};
+
+var checkRequiredComponds = function(room) {
+    let storage = room.storage;
+    for (const compond in compondsRequirements) {
+        //check amount
+        let amount = compondsRequirements[compond][1] - storage.store[compond];
+        if(amount < 100) {
+            continue;
+        }
+
+        return {compond, amount};
+    }
+
+    return {};
+};
+
+// create labTasks if there are enough resources in the storage (recursive dfs-POT)
+// return value: false/array
+var createLabTasks = function(storage, resourceType, amount, reactantAmount = {}) {
+    if(amount > 5000) amount = 5000;
+    if(amount < 5) amount = 5;
+
+    // for base reactants, check if enough
+    if(!reactionResources[resourceType]) {
+        let short = (reactantAmount[resourceType]? reactantAmount[resourceType] : 0) + amount - storage.store[resourceType];
+        if(short <= 0) return [];
+        else return false;
+    }
+
+    let taskList = [];
+    for(const reactant in reactionResources[resourceType]) {
+        let short = (reactantAmount[reactant]? reactantAmount[reactant] : 0) + amount - storage.store[reactant];
+        // need sub reaction
+        if(short > 0) {
+            if(reactantAmount[reactant]) reactantAmount[reactant] += amount - short;
+            else reactantAmount[reactant] = amount - short;
+
+            let subTasks = createLabTasks(storage, reactant, short, reactantAmount);
+            if (subTasks === false) return false;
+            else taskList.push(...subTasks);
+        }
+        else {
+            if(reactantAmount[reactant]) reactantAmount[reactant] += amount;
+            else reactantAmount[reactant] = amount;
+        }
+    }
+
+    taskList.push(new LabTask(resourceType, amount));
+
+    return taskList;
+};
+
+
+var runLab = function(room) {
     let labTasks = room.memory.tasks.labTasks;
     if(!labTasks.length) {
         return;
