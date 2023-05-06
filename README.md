@@ -27,7 +27,7 @@ This bot is still under development, currently it's a semi-automation bot. Use t
 
 1. Lab logic
     - Lab reaction creation logic. :white_check_mark:
-    - Auto generate tasks to get sources, including creating sub-reaction task to create required sources.
+    - Auto generate tasks to get sources, including creating sub-reaction task to create required sources. :white_check_mark:
     - Cooperate with treading logic to get sources if not enough.
 2. Factory logic
 3. Active defense logic

@@ -18,10 +18,10 @@ module.exports = function(room) {
     if(room.memory.labs.center.length != 2) return;
 
     // test on W19S17
-    if(room.name != 'W19S17') return;
+    //if(room.name != 'W19S17') return;
 
     // For every 500 ticks, check & assign tasks if no tasks
-    if(Game.time % 5 === 3) {
+    if(Game.time % 200 === 123) {
         if(room.memory.tasks.labTasks.length === 0) {
             let {compond, amount} = checkRequiredComponds(room);
             if(compond && amount) {
@@ -31,6 +31,9 @@ module.exports = function(room) {
                     if(!Memory.resourceShortage) Memory.resourceShortage = {};
                     else Memory.resourceShortage[room.name] = compond;
                 }
+            }
+            else {
+                Memory.resourceShortage[room.name] = 'NO Compond Shortage'
             }
         }
     }
@@ -68,7 +71,8 @@ var createLabTasks = function(storage, resourceType, amount, reactantAmount = {}
     }
 
     let taskList = [];
-    for(const reactant in reactionResources[resourceType]) {
+    for(const i in reactionResources[resourceType]) {
+        let reactant = reactionResources[resourceType][i];
         let short = (reactantAmount[reactant]? reactantAmount[reactant] : 0) + amount - storage.store[reactant];
         // need sub reaction
         if(short > 0) {
@@ -104,6 +108,12 @@ var runLab = function(room) {
 
 
     const task = room.memory.tasks.labTasks[0];
+
+    if(task.amount <= 0) {
+        room.memory.tasks.labTasks.shift();
+        room.memory.labStatus = 0;
+        return;
+    }
     
     // labStatis: 0 finished, 1 running, 2 center feed, 3 outter withdraw 
     // 0 finished

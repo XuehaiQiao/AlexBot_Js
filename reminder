@@ -78,9 +78,9 @@ Game.rooms.W19S17.memory.tasks.labTasks.push({resourceType: 'OH', amount: 3000})
 
 // orders
 Game.rooms['W18S15'].terminal.send(RESOURCE_ENERGY, 45000, 'W22S15', 'energy');
-Game.rooms['W15S13'].terminal.send('power', 1000, 'W18S15', 'power');
+Game.rooms['W15S13'].terminal.send('power', 500, 'W18S15', 'power');
 
-Game.market.deal('64531e6503ae105467a49038', 20000, "W19S17");
+Game.market.deal('6456a5ddef71884bb133df78', 20000, "W18S15");
 
 Game.market.cancelOrder('644046f346d8195c5404a845');
 

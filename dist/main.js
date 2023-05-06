@@ -2779,8 +2779,7 @@ module.exports = function(room) {
         return;
     }
     if(room.memory.labs.center.length != 2) return;
-    if(room.name != 'W19S17') return;
-    if(Game.time % 5 === 3) {
+    if(Game.time % 200 === 123) {
         if(room.memory.tasks.labTasks.length === 0) {
             let {compond, amount} = checkRequiredComponds(room);
             if(compond && amount) {
@@ -2790,6 +2789,9 @@ module.exports = function(room) {
                     if(!Memory.resourceShortage) Memory.resourceShortage = {};
                     else Memory.resourceShortage[room.name] = compond;
                 }
+            }
+            else {
+                Memory.resourceShortage[room.name] = 'NO Compond Shortage'
             }
         }
     }
@@ -2819,7 +2821,8 @@ var createLabTasks = function(storage, resourceType, amount, reactantAmount = {}
     }
 
     let taskList = [];
-    for(const reactant in reactionResources[resourceType]) {
+    for(const i in reactionResources[resourceType]) {
+        let reactant = reactionResources[resourceType][i];
         let short = (reactantAmount[reactant]? reactantAmount[reactant] : 0) + amount - storage.store[reactant];
         if(short > 0) {
             if(reactantAmount[reactant]) reactantAmount[reactant] += amount - short;
@@ -2854,6 +2857,12 @@ var runLab = function(room) {
 
 
     const task = room.memory.tasks.labTasks[0];
+
+    if(task.amount <= 0) {
+        room.memory.tasks.labTasks.shift();
+        room.memory.labStatus = 0;
+        return;
+    }
     if(!room.memory.labStatus) {
         for(const i in allLabs) {
             if(allLabs[i].mineralType) return;
@@ -2924,7 +2933,7 @@ __modules[34] = function(module, exports) {
 const { roomResourceConfig } = __require(38,34);
 
 module.exports = function(myRooms) {
-    if(Game.time % 500 == 5) {
+    if(Game.time % 200 === 115) {
         for(const i in myRooms) {
             if(!myRooms[i].memory.tasks) myRooms[i].memory.tasks = {};
             if(!myRooms[i].memory.tasks.terminalTasks) myRooms[i].memory.tasks.terminalTasks = [];
@@ -4261,6 +4270,9 @@ return module.exports;
 __modules[44] = function(module, exports) {
 // order based on creation priority
 module.exports = {
+    OH: [5000, 10000],
+    G: [5000, 10000],
+
     XUH2O: [10000, 20000], // attack
     XLH2O: [10000, 20000],  // repair & build
     XKH2O: [10000, 20000],  // carry

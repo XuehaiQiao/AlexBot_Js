@@ -2,7 +2,7 @@ const { roomResourceConfig } = require("../config");
 
 module.exports = function(myRooms) {
     // check room resource
-    if(Game.time % 500 == 5) {
+    if(Game.time % 200 === 115) {
         // check memory object, create task queue if don't have.
         for(const i in myRooms) {
             if(!myRooms[i].memory.tasks) myRooms[i].memory.tasks = {};
