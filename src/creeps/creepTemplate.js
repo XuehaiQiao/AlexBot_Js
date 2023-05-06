@@ -1,4 +1,4 @@
-var creepTemplate = {
+module.exports = {
     properties: {
         role: "template"
     },
@@ -30,6 +30,4 @@ var creepTemplate = {
 
         return {name, body, memory};
     },
-}
-
-module.exports = creepTemplate;
+};

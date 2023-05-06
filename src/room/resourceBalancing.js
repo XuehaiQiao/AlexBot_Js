@@ -1,7 +1,6 @@
-const ENERGY_SEND_BOUND = 500000;
-const ENERGY_RECEIVE_BOUND = 300000;
+const { roomResourceConfig } = require("../config");
 
-var resourceBalancing = function(myRooms) {
+module.exports = function(myRooms) {
     // check room resource
     if(Game.time % 500 == 5) {
         // check memory object, create task queue if don't have.
@@ -55,6 +54,4 @@ var resourceBalancing = function(myRooms) {
     //     }
     // }
 
-}
-
-module.exports = resourceBalancing;
+};

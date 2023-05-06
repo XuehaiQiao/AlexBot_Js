@@ -1,6 +1,7 @@
 const config = {
-    roomConfigs:        require('./roomConfigs'),
-    roomResourceConfig:   require('./roomResourceConfig'),
+    roomInfo:               require('./roomConfig'),
+    roomResourceConfig:     require('./roomResourceConfig'),
+    compondsRequirements:   require('./labProductConfig'),
 }
 
 module.exports = config;

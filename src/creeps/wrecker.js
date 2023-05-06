@@ -1,4 +1,4 @@
-var wrecker = {
+module.exports = {
     properties: {
         role: "wrecker"
     },
@@ -48,6 +48,4 @@ var wrecker = {
 
         return {name, body, memory};
     },
-}
-
-module.exports = wrecker;
+};

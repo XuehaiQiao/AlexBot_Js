@@ -1,12 +1,7 @@
-let creepLogic = require('./creeps');
-let roomLogic = require('./room');
-let tools = require('./tools');
-const configs = require('./config');
+const creepLogic = require('./creeps');
+const roomLogic = require('./room');
+const tools = require('./tools');
 require('./prototypes');
-
-// set global object
-global.roomInfo = configs.roomConfigs;
-global.roomResourceConfig = configs.roomResourceConfig;
 
 module.exports.loop = function () {
     //Memory.outSourceRooms['W16S13'] = {base: 'W15S13', sourceNum: 2};

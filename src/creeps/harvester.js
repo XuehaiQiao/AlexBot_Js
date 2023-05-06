@@ -1,4 +1,6 @@
-var harvester = {
+const { roomInfo } = require("../config");
+
+module.exports = {
         properties: {
         stages: {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, MOVE], number: 4},
@@ -136,5 +138,3 @@ var harvester = {
             return {name, body, memory};
     }
 };
-
-module.exports = harvester;

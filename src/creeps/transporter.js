@@ -1,4 +1,4 @@
-var transporter = {
+module.exports = {
     properties: {
         type: 'transporter',
         stages: {
@@ -172,5 +172,3 @@ var transporter = {
         return stage;
     }
 };
-
-module.exports = transporter;

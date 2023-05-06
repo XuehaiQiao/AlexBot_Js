@@ -1,4 +1,4 @@
-var roomConfigs = {
+module.exports = {
     W19S17: {
         restPos: new RoomPosition(24, 9, "W19S17"),
         managerPos: new RoomPosition(31, 9, "W19S17"),
@@ -40,6 +40,3 @@ var roomConfigs = {
         managerPos: new RoomPosition(23, 26, "sim"),
     },
 }
-
-
-module.exports = roomConfigs;

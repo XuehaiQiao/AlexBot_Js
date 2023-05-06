@@ -1,4 +1,4 @@
-var remoteHarvester = {
+module.exports = {
     properties: {
         role: "remoteHarvester",
         stages: {
@@ -116,6 +116,4 @@ var remoteHarvester = {
         }
         return stage;
     }
-}
-
-module.exports = remoteHarvester;
+};

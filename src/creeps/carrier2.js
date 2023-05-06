@@ -1,4 +1,4 @@
-var carrier2 = {
+module.exports = {
     properties: {
         type: 'carrier2',
         stages: {
@@ -176,5 +176,3 @@ var carrier2 = {
         return stage;
     }
 };
-
-module.exports = carrier2;

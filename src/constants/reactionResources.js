@@ -1,4 +1,4 @@
-const reactionResources = {
+module.exports = {
     OH: [ 'H', 'O' ],
     LH: [ 'H', 'L' ],
     KH: [ 'H', 'K' ],
@@ -33,6 +33,4 @@ const reactionResources = {
     XGH2O: [ 'X', 'GH2O' ],
     XGHO2: [ 'X', 'GHO2' ],
     G: [ 'ZK', 'UL' ]
-}
-
-module.exports = reactionResources;
+};

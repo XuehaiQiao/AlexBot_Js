@@ -1,4 +1,4 @@
-var defender = {
+module.exports = {
     properties: {
         role: "defender",
         stages: {
@@ -74,6 +74,4 @@ var defender = {
         }
         return stage;
     }
-}
-
-module.exports = defender;
+};

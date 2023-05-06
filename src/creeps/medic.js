@@ -1,4 +1,4 @@
-var medic = {
+module.exports = {
     properties: {
         role: "medic"
     },
@@ -65,6 +65,4 @@ var medic = {
 
         return {name, body, memory};
     },
-}
-
-module.exports = medic;
+};

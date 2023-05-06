@@ -1,3 +1,5 @@
+const { roomInfo } = require("../config");
+
 Creep.prototype.sayHello = function sayHello(words="Hello") {
     this.say(words, true);
 }

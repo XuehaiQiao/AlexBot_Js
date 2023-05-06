@@ -1,5 +1,5 @@
 
-var miner = {
+module.exports = {
     properties: {
         role: "miner"
     },
@@ -63,6 +63,4 @@ var miner = {
 
         return {name, body, memory};
     },
-}
-
-module.exports = miner;
+};

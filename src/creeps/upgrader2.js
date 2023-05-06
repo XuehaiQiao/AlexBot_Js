@@ -1,6 +1,6 @@
-const { min } = require("lodash");
+const { roomInfo } = require("../config");
 
-var upgrader2 = {
+module.exports = {
     properties: {
         type: 'upgrader2',
         stages: {
@@ -87,8 +87,8 @@ var upgrader2 = {
         }
 
         // create more upgrader2 for more energy in storage
-        if (storage && storage.store[RESOURCE_ENERGY] > 300000) {
-            num += Math.min(Math.floor((storage.store[RESOURCE_ENERGY] + 300000) / (1 + storage.store.getFreeCapacity())), 4);
+        if (storage && storage.store[RESOURCE_ENERGY] > 200000) {
+            num += Math.min(Math.ceil((storage.store[RESOURCE_ENERGY] + 300000) / (1 + storage.store.getFreeCapacity())), 4);
         }
 
         // return upgraders.length < num ? true : false;
@@ -126,5 +126,3 @@ var upgrader2 = {
         return stage;
     }
 };
-
-module.exports = upgrader2;

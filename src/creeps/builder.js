@@ -1,6 +1,7 @@
-let structureLogic = require("../structures/index");
+const { roomInfo } = require("../config");
+const structureLogic = require("../structures");
 
-var builder = {
+module.exports = {
     properties: {
         stages: {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, MOVE], number: 6, wall: 1000},
@@ -144,5 +145,3 @@ var builder = {
             return {name, body, memory};
     }
 };
-
-module.exports = builder;

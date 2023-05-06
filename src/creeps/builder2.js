@@ -1,6 +1,7 @@
-let structureLogic = require("../structures/index");
+const structureLogic = require("../structures");
+const { roomInfo } = require("../config");
 
-var builder2 = {
+module.exports = {
     properties: {
         type: "builder2",
         stages: {
@@ -132,5 +133,3 @@ var builder2 = {
         }
     }
 };
-
-module.exports = builder2;

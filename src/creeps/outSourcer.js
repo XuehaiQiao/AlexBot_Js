@@ -1,14 +1,13 @@
+const { roomInfo } = require("../config");
+
 /*
 outSourcer1 - first generation out sourcer
 
 description:
 have equal amount of [WORK, MOVE, CARRY],
 harvest energy source from other room and bring energy back.
-
-
-
 */
-var outSourcer = {
+module.exports = {
     properties: {
         role: "outSourcer",
         stages: {
@@ -126,6 +125,4 @@ var outSourcer = {
 
         return stage;
     }
-}
-
-module.exports = outSourcer;
+};

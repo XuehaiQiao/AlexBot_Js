@@ -1,10 +1,12 @@
+const { roomInfo } = require("../config");
+
 /*
     NOT FINISHED
     todo:
     1. calculate bodypart(WORK MOVE CARRY) / number needed for each room
     2. advance strategys.
 */
-var remoteHauler = {
+module.exports = {
     properties: {
         
     },
@@ -189,5 +191,3 @@ var remoteHauler = {
         return stage;
     }
 };
-
-module.exports = remoteHauler;

@@ -1,7 +1,12 @@
 const { transferTask } = require("../models/taskModels");
 const { reactionResources } = require("../constants")
 
-var labReaction = function(room) {
+module.exports = function(room) {
+    runLab(room);
+};
+
+
+var runLab = function(room) {
     if(!room.memory.tasks) room.memory.tasks = {};
     if(!room.memory.tasks.labTasks) room.memory.tasks.labTasks = [];
     if(!room.memory.labs) room.memory.labs = {};
@@ -91,7 +96,4 @@ var labReaction = function(room) {
 
         room.memory.labStatus = 1;
     }
-
 }
-
-module.exports = labReaction;

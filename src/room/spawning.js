@@ -1,6 +1,6 @@
-let creepLogic = require('../creeps');
-let creepTypes = ['harvester', 'carrier', 'upgrader', 'builder']; //_.keys(creepLogic);
-let creepTypes2 = ['carrier2', 'harvester2', 'upgrader2', 'builder2']; // 'mineralCarrier'
+const { roomInfo } = require("../config");
+const creepLogic = require("../creeps");
+const creepTypes2 = ['carrier2', 'harvester2', 'upgrader2', 'builder2']; // 'mineralCarrier'
 
 function spawnCreeps(room) {
     // return if no idle spawn

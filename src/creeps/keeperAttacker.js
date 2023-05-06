@@ -1,6 +1,6 @@
 // todo
 
-var keeperAttacker = {
+module.exports = {
     properties: {
         role: "keeperAttacker"
     },
@@ -30,6 +30,4 @@ var keeperAttacker = {
 
         return {name, body, memory};
     },
-}
-
-module.exports = keeperAttacker;
+};

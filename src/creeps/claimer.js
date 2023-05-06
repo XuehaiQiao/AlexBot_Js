@@ -1,4 +1,4 @@
-var claimer = {
+module.exports = {
     properties: {
         role: "claimer",
         stages: {
@@ -84,5 +84,3 @@ var claimer = {
         return stage;
     }
 }
-
-module.exports = claimer;

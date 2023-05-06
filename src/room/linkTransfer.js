@@ -1,4 +1,6 @@
-function linkTransfer(room) {
+const { roomInfo } = require("../config");
+
+module.exports = function(room) {
     if (roomInfo[room.name] == undefined || roomInfo[room.name].managerPos == undefined) {
         return;
     }
@@ -117,6 +119,4 @@ function updateMemory(room) {
     });
 
     console.log('room link memory updated');
-}
-
-module.exports = linkTransfer;
+};

@@ -1,4 +1,4 @@
-var harvester2 = {
+module.exports = {
     properties: {
         role: 'harvester2',
         stages: {
@@ -83,6 +83,4 @@ var harvester2 = {
 
         return stage;
     }
-}
-
-module.exports = harvester2;
+};

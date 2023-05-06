@@ -1,4 +1,4 @@
-var upgrader = {
+module.exports = {
     properties: {
         stages: {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, MOVE], number: 6},
@@ -103,5 +103,3 @@ var upgrader = {
         return {name, body, memory};
     }
 };
-
-module.exports = upgrader;

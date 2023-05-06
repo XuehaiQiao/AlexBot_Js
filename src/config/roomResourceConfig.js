@@ -1,6 +1,6 @@
 // resourceType: {terminal: amount, storage: [ShortageLine, AbundantLine, ExceededLine]}
 // if resource below shrtageLine, it requires to other rooms, if its below abundantLine, 
-const resourcesConfig = {
+module.exports = {
     energy: {terminal: 50000, storage: [200000, 500000, 600000]},
 
     O: {terminal: 5000, storage: [5000, 15000, 50000]},
@@ -26,6 +26,4 @@ const resourcesConfig = {
     power: {terminal: 1000, storage: [1000, 5000, 20000]},
     ops: {terminal: 1000, storage: [1000, 5000, 20000]},
     battery: {terminal: 2000, storage: [2000, 5000, 10000]},
-}
-
-module.exports = resourcesConfig;
+};
