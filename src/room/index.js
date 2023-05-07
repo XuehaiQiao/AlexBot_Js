@@ -10,6 +10,7 @@ let roomLogic = {
     labReaction:        require('./labReaction'),
     resourceBalancing:  require('./resourceBalancing'),
     powerOperation:     require('./powerOperation'),
+    factorayLogic:      require('./factorayLogic'),
 }
 
 module.exports = roomLogic;

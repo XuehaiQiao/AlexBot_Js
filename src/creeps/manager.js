@@ -55,7 +55,7 @@ module.exports = {
                 coreWork,
                 terminalBalance,
                 feedPowerSpawn,
-                terminalWork,
+                factoryWork,
                 doTask,
             ]
 
@@ -164,33 +164,48 @@ var feedPowerSpawn = function(creep) {
     return false;
 };
 
-var terminalWork = function(creep) {
+var factoryWork = function(creep) {
+    let storage = Game.getObjectById(creep.memory[STRUCTURE_STORAGE]);
+    let factory = Game.getObjectById(creep.memory[STRUCTURE_FACTORY]);
+    if(!factory || !storage) return false;
+
+    if(factory.store[RESOURCE_ENERGY] < 1000) {
+        creep.say('S2F');
+        fromA2B(creep, storage, factory, RESOURCE_ENERGY);
+        return true;
+    }
+
     return false;
 }
 
 var doTask = function(creep) {
-    let managerTasks = creep.room.memory.managerTasks;
-    if(!managerTasks || managerTasks.length === 0) return false;
-    let task = creep.room.memory.managerTasks[creep.room.memory.managerTasks.length - 1];
+    if(!creep.room.memory.tasks) creep.room.memory.tasks = {};
+    if(!creep.room.memory.tasks.managerTasks) creep.room.memory.tasks.managerTasks = [];
+    let managerTasks = creep.room.memory.tasks.managerTasks;
+    if(managerTasks.length === 0) return false;
+
+    let task = managerTasks[0];
     // delete task if withdraw meets requirements
     let transferVolume;
     if(task.volume <= creep.store.getFreeCapacity()) {
         transferVolume = task.volume;
-        creep.room.memory.managerTasks.pop();
+        managerTasks.shift();
     }
     else {
         transferVolume = creep.store.getFreeCapacity();
-        creep.room.memory.managerTasks[creep.room.memory.managerTasks.length - 1].volume -= transferVolume;
+        task.volume -= transferVolume;
     }
 
     // withdraw
     let target = Game.getObjectById(creep.memory[task.from]);
     if(target && creep.withdraw(target, task.resourceType, transferVolume) == OK) {
+        creep.say('DoTask');
         creep.memory.status = 1;
+        creep.memory.target = creep.memory[task.to];
+        return true;
     }
 
-    // set transfer target
-    creep.memory.target = creep.memory[task.to];
+    return false;
 };
 
 // ========================================================= Util Functions ======================================================================================

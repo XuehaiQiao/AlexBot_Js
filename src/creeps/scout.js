@@ -4,7 +4,10 @@ module.exports = {
     },
     /** @param {Creep} creep **/
     run: function(creep) {
-        creep.moveToRoom(creep.memory.targetRoom);
+        // move to target room if not in
+        if (creep.moveToRoomAdv(creep.memory.targetRoom)) {
+            return;
+        }
     },
 
     // checks if the room needs to spawn a creep
@@ -19,10 +22,10 @@ module.exports = {
     },
 
     // returns an object with the data to spawn a new creep
-    spawnData: function(room) {
+    spawnData: function(room, targetRoomName) {
         let name = this.properties.role + Game.time;
         let body = [WORK, CARRY, MOVE];
-        let memory = {role: this.properties.role, status: 0};
+        let memory = {role: this.properties.role, status: 0, base: room.name, targetRoom: targetRoomName};
 
         return {name, body, memory};
     },

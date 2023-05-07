@@ -46,7 +46,7 @@ module.exports.loop = function () {
         roomLogic.linkTransfer(r);
         roomLogic.labReaction(r);
         roomLogic.powerOperation(r);
-
+        roomLogic.factorayLogic(r);
     });
     roomLogic.resourceBalancing(Game.myRooms);
     totalRoomCpu += Game.cpu.getUsed();

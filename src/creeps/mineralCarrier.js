@@ -15,7 +15,6 @@ module.exports = {
         if(creep.ticksToLive < 30) {
             if(creep.store.getUsedCapacity() > 0) creep.memory.status = 1;
             else creep.suicide();
-            return;
         }
 
         // move to its target room if not in

@@ -1,4 +1,6 @@
-//W27S18
+// W27S18
+// W11S27
+// W14S29
 
 // claimer spawn
 Game.spawns['Spawn1_W18S15'].spawnCreep([MOVE, CLAIM], 'Claimer' + Game.time, {memory: {role: 'claimer', status: 1, targetRoom: 'W22S15', claim: true}});
@@ -18,6 +20,10 @@ Game.spawns['Spawn2_W15S13'].spawnCreep([...new Array(10).fill(CARRY), ...new Ar
 // defender
 Game.spawns['Spawn2_W15S13'].spawnCreep([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], 'defender' + Game.time, {memory: {role: 'defender', targetRoom: 'W13S15'}});
 
+// scout
+
+// keeperAttacker
+Game.spawns['Spawn3_W16S17'].spawnCreep([...new Array(25).fill(MOVE), ...new Array(19).fill(ATTACK), ...new Array(6).fill(HEAL)], 'keeperAttacker' + Game.time, {memory: {role: 'keeperAttacker', base: 'W16S17', targetRoom: 'W16S16'}});
 
 Game.spawns['Spawn1_W18S15'].spawnCreep([WORK, WORK, MOVE], 'Harvester2' + Game.time, {memory: {role: 'harvester2', status: 1, target: 0}});
 [WORK, WORK, MOVE]
@@ -70,8 +76,9 @@ _.forEach(
 JSON.stringify(obj);
 
 // create task
-Game.rooms['W21S19'].memory.managerTasks.push({from: STRUCTURE_TERMINAL, to: STRUCTURE_STORAGE, resourceType: 'GO', volume: 9020});
-Game.rooms['W21S19'].memory.managerTasks.push({from: STRUCTURE_STORAGE, to: STRUCTURE_NUKER, resourceType: RESOURCE_ENERGY, volume: 100000});
+Game.rooms['W18S15'].memory.tasks.managerTasks.push({from: STRUCTURE_TERMINAL, to: STRUCTURE_STORAGE, resourceType: 'GO', volume: 6000});
+Game.rooms['W21S19'].memory.tasks.managerTasks.push({from: STRUCTURE_STORAGE, to: STRUCTURE_NUKER, resourceType: RESOURCE_ENERGY, volume: 100000});
+Game.rooms['W16S17'].memory.tasks.managerTasks.push({from: STRUCTURE_FACTORY, to: STRUCTURE_STORAGE, resourceType: RESOURCE_CATALYST, volume: 10000});
 // create reaction task
 Game.rooms.W19S17.memory.tasks.labTasks.push({resourceType: 'OH', amount: 3000});
 
@@ -80,16 +87,16 @@ Game.rooms.W19S17.memory.tasks.labTasks.push({resourceType: 'OH', amount: 3000})
 Game.rooms['W18S15'].terminal.send(RESOURCE_ENERGY, 45000, 'W22S15', 'energy');
 Game.rooms['W15S13'].terminal.send('power', 500, 'W18S15', 'power');
 
-Game.market.deal('64547cdf03ae105cdf1200bc', 5000, "W18S15");
+Game.market.deal('64572b9c03ae105b34e9e388', 20000, "W22S15");
 
 Game.market.cancelOrder('644046f346d8195c5404a845');
 
 Game.market.createOrder({
     type: ORDER_BUY,
-    resourceType: RESOURCE_OXYGEN,
-    price: 25,
-    totalAmount: 50000,
-    roomName: "W18S15"   
+    resourceType: RESOURCE_ENERGY,
+    price: 8.7,
+    totalAmount: 100000,
+    roomName: "W13S15"   
 });
 
 
