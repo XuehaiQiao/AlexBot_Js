@@ -22,6 +22,7 @@ This bot is still under development, currently it's a semi-automation bot. Use t
 - Adjust worker size based on room income
 - Out-sourcing
 - Resources balancing between rooms
+- Lab auto create T3 compounds.
 
 ### Expected Functionalities
 

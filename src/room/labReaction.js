@@ -17,81 +17,64 @@ module.exports = function(room) {
     }
     if(room.memory.labs.center.length != 2) return;
 
-    // test on W19S17
-    //if(room.name != 'W19S17') return;
-
-    // For every 500 ticks, check & assign tasks if no tasks
-    if(Game.time % 200 === 123) {
-        if(room.memory.tasks.labTasks.length === 0) {
-            let {compond, amount} = checkRequiredComponds(room);
-            if(compond && amount) {
-                let createdTasks = createLabTasks(room.storage, compond, amount);
-                if(createdTasks) room.memory.tasks.labTasks.push(...createdTasks);
-                else {
-                    if(!Memory.resourceShortage) Memory.resourceShortage = {};
-                    else Memory.resourceShortage[room.name] = compond;
-                }
+    // For every 200 ticks, check & assign tasks if no tasks
+    if(Game.time % 200 === 123 && room.memory.tasks.labTasks.length === 0) {
+        let shortage = 'NO Compond Shortage';
+        for (const compond in compondsRequirements) {
+            let targetAmount = compondsRequirements[compond][0];
+            let createdTasks = createLabTasks(room.storage, compond, targetAmount);
+            if(createdTasks.length > 0) {
+                room.memory.tasks.labTasks.push(...createdTasks);
+                break;
             }
-            else {
-                Memory.resourceShortage[room.name] = 'NO Compond Shortage'
+            else if(createdTasks === false) {
+                shortage = compond;
+                break;
             }
         }
+
+        if(!Memory.resourceShortage) Memory.resourceShortage = {};
+        else Memory.resourceShortage[room.name] = shortage;
     }
 
     // lab reaction
     runLab(room);
 };
 
-var checkRequiredComponds = function(room) {
-    let storage = room.storage;
-    for (const compond in compondsRequirements) {
-        //check amount
-        let amount = compondsRequirements[compond][1] - storage.store[compond];
-        if(amount < 100) {
-            continue;
-        }
-
-        return {compond, amount};
-    }
-
-    return {};
-};
-
 // create labTasks if there are enough resources in the storage (recursive dfs-POT)
 // return value: false/array
-var createLabTasks = function(storage, resourceType, amount, reactantAmount = {}) {
-    if(amount > 5000) amount = 5000;
-    if(amount < 5) amount = 5;
+var createLabTasks = function(storage, resourceType, targetAmount, resourceTotal = {}) {
+    if(!storage) return false;
 
-    // for base reactants, check if enough
-    if(!reactionResources[resourceType]) {
-        let short = (reactantAmount[resourceType]? reactantAmount[resourceType] : 0) + amount - storage.store[resourceType];
-        if(short <= 0) return [];
-        else return false;
+    // amount of resourceType still needs
+    let short = (resourceTotal[resourceType]? resourceTotal[resourceType] : 0) + targetAmount - storage.store[resourceType];
+    // resourceType is enough - no need for further reactions, add amount to resourceTotal and return [];
+    if(short <= 0) {
+        if(resourceTotal[resourceType]) resourceTotal[resourceType] += targetAmount;
+        else resourceTotal[resourceType] = targetAmount;
+
+        return [];
     }
+    // resourceType is not enough and is base reactant
+    else if(!reactionResources[resourceType]) {
+        return false;
+    }
+    // resourceType is not enough but can be produced by further reactions
+    else {
+        // task amount range 200-2000
+        if(short > 2000) short = 2000;
+        else if(short < 200) short = 200;
 
-    let taskList = [];
-    for(const i in reactionResources[resourceType]) {
-        let reactant = reactionResources[resourceType][i];
-        let short = (reactantAmount[reactant]? reactantAmount[reactant] : 0) + amount - storage.store[reactant];
-        // need sub reaction
-        if(short > 0) {
-            if(reactantAmount[reactant]) reactantAmount[reactant] += amount - short;
-            else reactantAmount[reactant] = amount - short;
-
-            let subTasks = createLabTasks(storage, reactant, short, reactantAmount);
+        let taskList = [];
+        for(const i in reactionResources[resourceType]) {
+            let reactant = reactionResources[resourceType][i];
+            let subTasks = createLabTasks(storage, reactant, short, resourceTotal);
             if (subTasks === false) return false;
             else taskList.push(...subTasks);
         }
-        else {
-            if(reactantAmount[reactant]) reactantAmount[reactant] += amount;
-            else reactantAmount[reactant] = amount;
-        }
+        taskList.push(new LabTask(resourceType, short));
+        return taskList;
     }
-
-    taskList.push(new LabTask(resourceType, amount));
-
-    return taskList;
 };
 
 

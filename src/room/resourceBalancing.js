@@ -2,8 +2,9 @@ const { roomResourceConfig } = require("../config");
 
 module.exports = function(myRooms) {
     // check room resource
-    if(Game.time % 200 === 115) {
+    if(Game.time % 200 == 45) {
         // check memory object, create task queue if don't have.
+        console.log("assign terminal task")
         for(const i in myRooms) {
             if(!myRooms[i].memory.tasks) myRooms[i].memory.tasks = {};
             if(!myRooms[i].memory.tasks.terminalTasks) myRooms[i].memory.tasks.terminalTasks = [];
@@ -19,8 +20,15 @@ module.exports = function(myRooms) {
             for(const i in myRooms) {
                 // todo: choose sender & receiver based on room distance
                 if(sender[i] && receiver[i]) {
-                    if(resourceType == RESOURCE_ENERGY) amount /= 2;
-                    sender[i].memory.tasks.terminalTasks.push({receiver: receiver[i].name, resourceType: resourceType, amount: roomResourceConfig[resourceType].terminal});
+                    let task = {receiver: receiver[i].name, resourceType: resourceType};
+                    if(resourceType == RESOURCE_ENERGY) {
+                        task.amount = roomResourceConfig[resourceType].terminal / 2;
+                    }
+                    else {
+                        task.amount = roomResourceConfig[resourceType].terminal;
+                    }
+                    sender[i].memory.tasks.terminalTasks.push(task);
+                    
                 }
             }
         }
