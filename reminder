@@ -79,7 +79,7 @@ JSON.stringify(obj);
 // create task
 Game.rooms['W18S15'].memory.tasks.managerTasks.push({from: STRUCTURE_TERMINAL, to: STRUCTURE_STORAGE, resourceType: 'GO', volume: 6000});
 Game.rooms['W21S19'].memory.tasks.managerTasks.push({from: STRUCTURE_STORAGE, to: STRUCTURE_NUKER, resourceType: RESOURCE_ENERGY, volume: 100000});
-Game.rooms['W16S17'].memory.tasks.managerTasks.push({from: STRUCTURE_FACTORY, to: STRUCTURE_STORAGE, resourceType: RESOURCE_CATALYST, volume: 20000});
+Game.rooms['W16S17'].memory.tasks.managerTasks.push({from: STRUCTURE_FACTORY, to: STRUCTURE_STORAGE, resourceType: RESOURCE_CATALYST, volume: 41100});
 // create reaction task
 Game.rooms.W19S17.memory.tasks.labTasks.push({resourceType: 'OH', amount: 3000});
 
@@ -88,7 +88,7 @@ Game.rooms.W19S17.memory.tasks.labTasks.push({resourceType: 'OH', amount: 3000})
 Game.rooms['W18S15'].terminal.send(RESOURCE_ENERGY, 45000, 'W22S15', 'energy');
 Game.rooms['W15S13'].terminal.send('power', 500, 'W18S15', 'power');
 
-Game.market.deal('64572b9c03ae105b34e9e388', 20000, "W21S19");
+Game.market.deal('64572b9c03ae105b34e9e388', 20000, "W13S21");
 
 Game.market.cancelOrder('644046f346d8195c5404a845');
 
