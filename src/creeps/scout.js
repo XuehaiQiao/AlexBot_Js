@@ -4,8 +4,22 @@ module.exports = {
     },
     /** @param {Creep} creep **/
     run: function(creep) {
+        // directly move to pos if have one.
+        if(creep.memory.targetPos) {
+            let targetPos = creep.memory.targetPos;
+            creep.moveTo(new RoomPosition(targetPos.x, targetPos.y, targetPos.roomName), {reusePath: 50});
+            return;
+        }
+
         // move to target room if not in
         if (creep.moveToRoomAdv(creep.memory.targetRoom)) {
+            return;
+        }
+        
+        if(creep.memory.target) {
+            let target = Game.getObjectById(creep.memory.target);
+            if(target) creep.moveTo(creep.memory.target, {reusePath: 50});
+
             return;
         }
     },

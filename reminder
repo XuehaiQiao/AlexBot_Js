@@ -21,6 +21,7 @@ Game.spawns['Spawn2_W15S13'].spawnCreep([...new Array(10).fill(CARRY), ...new Ar
 Game.spawns['Spawn2_W15S13'].spawnCreep([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], 'defender' + Game.time, {memory: {role: 'defender', targetRoom: 'W13S15'}});
 
 // scout
+Game.spawns['Spawn1_W12S21'].spawnCreep([MOVE], 'scout' + Game.time, {memory: {role: 'scout', targetPos: {x:42, y:35, roomName:'W10S20'}}});
 
 // keeperAttacker
 Game.spawns['Spawn3_W16S17'].spawnCreep([...new Array(25).fill(MOVE), ...new Array(19).fill(ATTACK), ...new Array(6).fill(HEAL)], 'keeperAttacker' + Game.time, {memory: {role: 'keeperAttacker', base: 'W16S17', targetRoom: 'W16S16'}});

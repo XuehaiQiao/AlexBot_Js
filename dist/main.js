@@ -57,7 +57,7 @@ const tools = __require(3,0);
 __require(4,0);
 
 module.exports.loop = function () {
-    console.log("---------- Start Tick: " + Game.time + " ----------");
+    console.log("---------- " + Game.shard.name + ", Start Tick: " + Game.time + " ----------");
     if (Game.cpu.bucket < 20) {
         console.log('CPU bucket is low, skip this tick..');
         return;
@@ -2436,7 +2436,19 @@ module.exports = {
     },
     /** @param {Creep} creep **/
     run: function(creep) {
+        if(creep.memory.targetPos) {
+            let targetPos = creep.memory.targetPos;
+            creep.moveTo(new RoomPosition(targetPos.x, targetPos.y, targetPos.roomName), {reusePath: 50});
+            return;
+        }
         if (creep.moveToRoomAdv(creep.memory.targetRoom)) {
+            return;
+        }
+        
+        if(creep.memory.target) {
+            let target = Game.getObjectById(creep.memory.target);
+            if(target) creep.moveTo(creep.memory.target, {reusePath: 50});
+
             return;
         }
     },

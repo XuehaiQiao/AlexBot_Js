@@ -4,7 +4,7 @@ const tools = require('./tools');
 require('./prototypes');
 
 module.exports.loop = function () {
-    console.log("---------- Start Tick: " + Game.time + " ----------");
+    console.log("---------- " + Game.shard.name + ", Start Tick: " + Game.time + " ----------");
 
     //Memory.outSourceRooms['W16S13'] = {base: 'W15S13', sourceNum: 2};
     if (Game.cpu.bucket < 20) {
