@@ -1,3 +1,4 @@
+const { min } = require("lodash");
 const { reactionResources } = require("../constants");
 
 module.exports = {
@@ -11,6 +12,11 @@ module.exports = {
 
     /** @param {Creep} creep **/
     run: function(creep) {
+        if(creep.memory.restTime) {
+            creep.memory.restTime -= 1;
+            return;
+        }
+
         // to avoid dead when holding resources, if tick to live less than 30, and finished transfer, suicide.
         if(creep.ticksToLive < 30) {
             if(creep.store.getUsedCapacity() > 0) creep.memory.status = 1;
@@ -55,27 +61,19 @@ module.exports = {
                 }
             }
             else {
-                // go rest
-                creep.toResPos();
+                if(!mineralContainerWithdraw(creep)) {
+                    // go rest
+                    creep.toResPos(20);
+                }
             }
         }
         // 1 running: do nothing
         else if(creep.room.memory.labStatus == 1) {
             //creep.say(creep.room.memory.labStatus);
             // transfer to storage
-            if(creep.store.getUsedCapacity() > 0) {
-                let storage = creep.room.storage;
-                if(storage) {
-                    let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
-                    if(creep.transfer(storage, resourceType) == ERR_NOT_IN_RANGE) {
-                        creep.moveToNoCreepInRoom(storage);
-                    }
-                    
-                }
-            }
-            else {
+            if(!mineralContainerWithdraw(creep)) {
                 // go rest
-                creep.toResPos();
+                creep.toResPos(20);
             }
         }
         // 2 center feed: 
@@ -84,11 +82,7 @@ module.exports = {
             for (const i in centerLabs) {
                 let lab = centerLabs[i];
                 if(!lab.mineralType || lab.store[lab.mineralType] < 5) {
-                    let resourceType = reactionResources[task.resourceType][i]
-                    // if storage no resources, set task amount to zero (set to complete)
-                    if(creep.store[resourceType] === 0 && creep.room.storage.store[resourceType] === 0) {
-                        creep.room.memory.tasks.labTasks[0].amount = 0;
-                    }
+                    let resourceType = reactionResources[task.resourceType][i];
                     labTransfer(creep, lab, resourceType);
                     return;
                 }
@@ -110,10 +104,14 @@ module.exports = {
 
     // checks if the room needs to spawn a creep
     spawn: function(room) {
-        if(!room.memory.tasks || !room.memory.tasks.labTasks || room.memory.tasks.labTasks.length == 0) {
+        let miner = global.roomCensus[room.name]['miner'];
+        if(miner) {
+            // run rest codes
+        }
+        else if(!room.memory.tasks || !room.memory.tasks.labTasks || room.memory.tasks.labTasks.length == 0) {
             return false;
         }
-        if(!room.memory.labs || !room.memory.labs.center || room.memory.labs.center.length != 2) {
+        else if(!room.memory.labs || !room.memory.labs.center || room.memory.labs.center.length != 2) {
             return false;
         }
 
@@ -211,19 +209,76 @@ var labTransfer = function(creep, targetLab, resourceType) {
     }
     // status 0: withdraw
     else {
-        let storage = creep.room.storage;
-        if(storage) {
-            if(storage.store[resourceType] == 0) {
-                console.log(creep.room, "mineral " + resourceType + " not enough");
-                return;
-            }
-            let result = creep.withdraw(storage, resourceType);
+        let target;
+        if(creep.room.terminal && creep.room.terminal.store[resourceType] > 0) target = creep.room.terminal;
+        else if(creep.room.storage && creep.room.storage.store[resourceType] > 0) target = creep.room.storage;
+        else {
+            creep.room.memory.tasks.labTasks[0].amount = 0;
+            console.log(creep.room, "mineral " + resourceType + " not enough");
+            return;
+        }
+
+        let result = creep.withdraw(target, resourceType);
+        if(result == ERR_NOT_IN_RANGE) creep.moveToNoCreepInRoom(target);
+        else if(result == OK) creep.memory.status = 1;
+        
+    }
+};
+
+var mineralContainerWithdraw = function(creep) {
+    let storage = creep.room.storage;
+    let mineral = creep.room.find(FIND_MINERALS)[0];
+    if(!mineral || !storage) return false;
+
+    // status 1: transfer
+    if(creep.memory.status) {
+        let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
+        let result = creep.transfer(storage, resourceType);
+        if(result === ERR_NOT_IN_RANGE) {
+            creep.moveToNoCreepInRoom(storage);
+        }
+    }
+    else {
+        //droped
+        let dropedMineral = _.find(creep.room.find(FIND_DROPPED_RESOURCES), resource => resource.resourceType != RESOURCE_ENERGY && resource.amount >= 500);
+        if (dropedMineral) {
+            let result = creep.pickup(dropedMineral);
             if(result == ERR_NOT_IN_RANGE) {
-                creep.moveToNoCreepInRoom(storage);
+                creep.moveToNoCreepInRoom(dropedMineral);
             }
             else if(result == OK) {
                 creep.memory.status = 1;
             }
+            return true;
+        }
+
+        //container
+        let target = Game.getObjectById(creep.memory.minerContainerId);
+        if(!target) {
+            let containers = creep.room.find(FIND_STRUCTURES, {
+                filter: struct => 
+                (struct.structureType === STRUCTURE_CONTAINER && 
+                struct.pos.inRangeTo(mineral.pos, 1))
+            });
+            if(containers.length === 0) return false;
+
+            target = containers[0];
+            creep.memory.minerContainerId = target.id;
+        }
+
+        if(target.store.getUsedCapacity() < creep.store.getFreeCapacity()) {
+            return false;
+        }
+        
+        let resourceType = _.find(Object.keys(target.store), resource => target.store[resource] > 0);
+        let result = creep.withdraw(target, resourceType);
+        if(result === ERR_NOT_IN_RANGE) {
+            creep.moveToNoCreepInRoom(target);
+        }
+        else if(result === OK) {
+            if(target.store.getUsedCapacity() === 0) creep.memory.status = 1;
         }
     }
-};
+
+    return true;
+}

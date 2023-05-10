@@ -3,7 +3,7 @@ const { roomResourceConfig } = require("../config");
 module.exports = function(myRooms) {
     // check room resource
     if(Game.time % 200 == 45) {
-        // check memory object, create task queue if don't have.
+        // Assign tasks: check memory object, create task queue if don't have.
         console.log("assign terminal task")
         for(const i in myRooms) {
             if(!myRooms[i].memory.tasks) myRooms[i].memory.tasks = {};
@@ -21,12 +21,7 @@ module.exports = function(myRooms) {
                 // todo: choose sender & receiver based on room distance
                 if(sender[i] && receiver[i]) {
                     let task = {receiver: receiver[i].name, resourceType: resourceType};
-                    if(resourceType == RESOURCE_ENERGY) {
-                        task.amount = roomResourceConfig[resourceType].terminal / 2;
-                    }
-                    else {
-                        task.amount = roomResourceConfig[resourceType].terminal;
-                    }
+                    task.amount = roomResourceConfig[resourceType].terminal / 2;
                     sender[i].memory.tasks.terminalTasks.push(task);
                     
                 }
@@ -34,7 +29,7 @@ module.exports = function(myRooms) {
         }
     }
 
-    //send resources
+    // Run terminals: send resources
     if(Game.time % 10 == 0) {
         for(const i in myRooms) {
             let senderRoom = myRooms[i];
@@ -49,18 +44,4 @@ module.exports = function(myRooms) {
             console.log(senderRoom, 'Try to send resource', JSON.stringify(terminalTask), result);
         }
     }
-
-
-    // let energySender = _.filter(myRooms, room => room.storage && room.terminal && room.storage.store[RESOURCE_ENERGY] > ENERGY_SEND_BOUND);
-    // let energyReceiver = _.filter(myRooms, room => room.storage && room.terminal && room.storage.store[RESOURCE_ENERGY] < ENERGY_RECEIVE_BOUND);
-    // energyReceiver.sort((r1, r2) => r1.storage.store[RESOURCE_ENERGY] - r2.storage.store[RESOURCE_ENERGY]);
-
-    // for(const i in myRooms) {
-    //     // todo: choose sender & receiver based on room distance
-    //     if(energySender[i] && energyReceiver[i]) {
-    //         let result = energySender[i].terminal.send(RESOURCE_ENERGY, 25000, energyReceiver[i].name, 'energy');
-    //         if(result == OK) console.log('Sent 25000 energy from', energySender[i], 'to', energyReceiver[i]);
-    //     }
-    // }
-
 };

@@ -49,6 +49,7 @@ module.exports.loop = function () {
         roomLogic.factorayLogic(r);
     });
     roomLogic.resourceBalancing(Game.myRooms);
+    roomLogic.marketLogic();
     totalRoomCpu += Game.cpu.getUsed();
 
     //tools.roomPlanner('sim', { render: true });

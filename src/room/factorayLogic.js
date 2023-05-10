@@ -3,7 +3,7 @@ module.exports = function(room) {
     let factory = _.find(room.find(FIND_MY_STRUCTURES), struct => struct.structureType === STRUCTURE_FACTORY);
     if(!factory) return;
 
-    if(factory.store[RESOURCE_PURIFIER] > 100 && factory.cooldown === 0) {
-        factory.produce(RESOURCE_CATALYST);
+    if(factory.store[RESOURCE_REDUCTANT] >= 100 && factory.cooldown === 0) {
+        factory.produce(RESOURCE_HYDROGEN);
     }
 }

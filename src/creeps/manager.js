@@ -88,7 +88,7 @@ module.exports = {
     // returns an object with the data to spawn a new creep
     spawnData: function(room) {
         let name = this.properties.role + Game.time;
-        let body = [MOVE, ...new Array(16).fill(CARRY)];
+        let body = [MOVE, ...new Array(20).fill(CARRY)];
         let memory = {role: this.properties.role, status: 0, base: room.name};
 
         return {name, body, memory};

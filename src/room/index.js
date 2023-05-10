@@ -11,6 +11,7 @@ let roomLogic = {
     resourceBalancing:  require('./resourceBalancing'),
     powerOperation:     require('./powerOperation'),
     factorayLogic:      require('./factorayLogic'),
+    marketLogic : require('./marketLogic'),
 }
 
 module.exports = roomLogic;

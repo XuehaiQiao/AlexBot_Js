@@ -132,9 +132,14 @@ module.exports = {
             }
 
             // transfer to base room container / storage
-            var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter: struct => (
-                (struct.structureType == STRUCTURE_STORAGE || struct.structureType == STRUCTURE_CONTAINER) && struct.store.getFreeCapacity() > 0
-            )});
+            let target = creep.room.storage;
+            
+            if(!target) {
+                target = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter: struct => (
+                    (struct.structureType == STRUCTURE_CONTAINER) && struct.store.getFreeCapacity() > 0
+                )});
+            }
+
             if (!target) {
                 // go rest
                 if (roomInfo[creep.room.name]) {
