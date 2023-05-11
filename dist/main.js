@@ -1921,12 +1921,14 @@ module.exports = {
         else creepCount = 0;
         
         let sourceNum = 1;
-        if(Memory.outSourceRooms[roomName] && Memory.outSourceRooms[roomName].sourceNum) {
+        if(!Memory.outSourceRooms[roomName]) Memory.outSourceRooms[roomName] = {};
+        if(Memory.outSourceRooms[roomName].sourceNum != undefined) {
             sourceNum = Memory.outSourceRooms[roomName].sourceNum;
         }
         else if(Game.rooms[roomName]) {
-            Memory.outSourceRooms[roomName] = {sourceNum: Game.rooms[roomName].find(FIND_SOURCES).length};
+            Memory.outSourceRooms[roomName].sourceNum = Game.rooms[roomName].find(FIND_SOURCES).length;
         }
+        
         if (creepCount < sourceNum * this.properties.stages[this.getStage(room)].number) {
             return true;
         }
@@ -2050,12 +2052,14 @@ module.exports = {
             }
             let containers = source.pos.findInRange(FIND_STRUCTURES, 3, {filter: structure => (
                 structure.structureType == STRUCTURE_CONTAINER && 
-                structure.store[RESOURCE_ENERGY] > creep.store.getFreeCapacity()
+                structure.store.getCapacity() >= creep.store.getFreeCapacity()
             )});
             if (containers.length) {
-                let result = creep.withdraw(containers[0], RESOURCE_ENERGY);
+                let container = containers[0];
+                let resourceType = _.find(Object.keys(container.store), resource => container.store[resource] > 0);
+                let result = creep.withdraw(container, resourceType);
                 if(result == ERR_NOT_IN_RANGE) {
-                    creep.moveToNoCreepInRoom(containers[0]);
+                    creep.moveToNoCreepInRoom(container);
                 }
                 return;
             }
@@ -2115,11 +2119,12 @@ module.exports = {
         else creepCount = 0;
 
         let sourceNum = 1;
-        if(Memory.outSourceRooms[roomName] && Memory.outSourceRooms[roomName].sourceNum) {
+        if(!Memory.outSourceRooms[roomName]) Memory.outSourceRooms[roomName] = {};
+        if(Memory.outSourceRooms[roomName].sourceNum != undefined) {
             sourceNum = Memory.outSourceRooms[roomName].sourceNum;
         }
         else if(Game.rooms[roomName]) {
-            Memory.outSourceRooms[roomName] = {sourceNum: Game.rooms[roomName].find(FIND_SOURCES).length};
+            Memory.outSourceRooms[roomName].sourceNum = Game.rooms[roomName].find(FIND_SOURCES).length;
         }
 
         if (creepCount < sourceNum * this.properties.stages[this.getStage(room)].number) {
@@ -3151,12 +3156,20 @@ module.exports = function(myRooms) {
         for(const resourceType in roomResourceConfig) {
             const abundantLine = roomResourceConfig[resourceType].storage[1];
             const lowerBoundLine = roomResourceConfig[resourceType].storage[0];
-            let sender = _.filter(myRooms, room => room.storage && room.terminal && room.storage.store[resourceType] > abundantLine);
+            let sender = _.filter(myRooms, room => room.controller.level === 8 && room.storage && room.terminal && room.storage.store[resourceType] > abundantLine);
             let receiver = _.filter(myRooms, room => room.storage && room.terminal && room.storage.store[resourceType] < lowerBoundLine);
+            if(receiver.length === 0 && resourceType === RESOURCE_ENERGY) {
+                receiver = _.filter(myRooms, room => (
+                    room.storage && 
+                    room.terminal && 
+                    room.controller.level < 8 && 
+                    room.storage.store[resourceType] < abundantLine)
+                );
+            }
             receiver.sort((r1, r2) => r1.storage.store[resourceType] - r2.storage.store[resourceType]);
     
-            for(const i in myRooms) {
-                if(sender[i] && receiver[i]) {
+            for(const i in sender) {
+                if(receiver[i]) {
                     let task = {receiver: receiver[i].name, resourceType: resourceType};
                     task.amount = roomResourceConfig[resourceType].terminal / 2;
                     sender[i].memory.tasks.terminalTasks.push(task);
