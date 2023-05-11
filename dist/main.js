@@ -198,10 +198,8 @@ return module.exports;
 /********** End of module 3: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/index.js **********/
 /********** Start module 4: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/index.js **********/
 __modules[4] = function(module, exports) {
-let files = {
-    creep: __require(40,4),
-    room: __require(41,4),
-}
+__require(40,4);
+__require(41,4);
 return module.exports;
 }
 /********** End of module 4: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/index.js **********/
@@ -722,7 +720,7 @@ module.exports = {
             3: {maxEnergyCapacity: 800, bodyParts:[CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2},
             4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(16).fill(CARRY), ...new Array(8).fill(MOVE)], number: 2},
             5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(20).fill(CARRY), ...new Array(10).fill(MOVE)], number: 2},
-            8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(24).fill(CARRY), ...new Array(12).fill(MOVE)], number: 2},
+            8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(32).fill(CARRY), ...new Array(16).fill(MOVE)], number: 1},
         },
     },
 
@@ -16712,25 +16710,25 @@ __modules[48] = function(module, exports) {
 module.exports = {
     energy: {terminal: 50000, storage: [200000, 500000, 600000]},
 
-    O: {terminal: 4000, storage: [15000, 30000, 50000]},
-    H: {terminal: 4000, storage: [15000, 30000, 50000]},
+    O: {terminal: 4000, storage: [10000, 20000, 30000]},
+    H: {terminal: 4000, storage: [10000, 20000, 30000]},
     U: {terminal: 4000, storage: [5000, 10000, 20000]},
     K: {terminal: 4000, storage: [5000, 10000, 20000]},
     L: {terminal: 4000, storage: [5000, 10000, 20000]},
     Z: {terminal: 4000, storage: [5000, 10000, 20000]},
-    X: {terminal: 4000, storage: [10000, 20000, 30000]},
+    X: {terminal: 4000, storage: [5000, 15000, 30000]},
     G: {terminal: 4000, storage: [5000, 10000, 20000]},
 
-    XUH2O: {terminal: 4000, storage: [5000, 20000, 30000]}, // attack
-    XUHO2: {terminal: 4000, storage: [5000, 20000, 30000]}, // harvest
-    XKH2O: {terminal: 4000, storage: [5000, 20000, 30000]}, // carry
-    XKHO2: {terminal: 4000, storage: [5000, 20000, 30000]}, // ranged_attack
-    XLH2O: {terminal: 4000, storage: [5000, 20000, 30000]}, // repair & build
-    XLHO2: {terminal: 4000, storage: [5000, 20000, 30000]}, // heal
-    XZH2O: {terminal: 4000, storage: [5000, 20000, 30000]}, // dismantle
-    XZHO2: {terminal: 4000, storage: [5000, 20000, 30000]}, // move
-    XGH2O: {terminal: 4000, storage: [5000, 20000, 30000]}, // upgradeController
-    XGHO2: {terminal: 4000, storage: [5000, 20000, 30000]}, // tough
+    XUH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // attack
+    XUHO2: {terminal: 4000, storage: [5000, 10000, 20000]}, // harvest
+    XKH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // carry
+    XKHO2: {terminal: 4000, storage: [5000, 10000, 20000]}, // ranged_attack
+    XLH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // repair & build
+    XLHO2: {terminal: 4000, storage: [5000, 10000, 20000]}, // heal
+    XZH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // dismantle
+    XZHO2: {terminal: 4000, storage: [5000, 10000, 20000]}, // move
+    XGH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // upgradeController
+    XGHO2: {terminal: 4000, storage: [5000, 10000, 20000]}, // tough
     
     power: {terminal: 1000, storage: [1000, 5000, 20000]},
     ops: {terminal: 1000, storage: [1000, 5000, 20000]},

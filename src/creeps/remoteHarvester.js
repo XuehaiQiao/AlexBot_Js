@@ -64,12 +64,14 @@ module.exports = {
         else creepCount = 0;
         
         let sourceNum = 1;
-        if(Memory.outSourceRooms[roomName] && Memory.outSourceRooms[roomName].sourceNum) {
+        if(!Memory.outSourceRooms[roomName]) Memory.outSourceRooms[roomName] = {};
+        if(Memory.outSourceRooms[roomName].sourceNum != undefined) {
             sourceNum = Memory.outSourceRooms[roomName].sourceNum;
         }
         else if(Game.rooms[roomName]) {
-            Memory.outSourceRooms[roomName] = {sourceNum: Game.rooms[roomName].find(FIND_SOURCES).length};
+            Memory.outSourceRooms[roomName].sourceNum = Game.rooms[roomName].find(FIND_SOURCES).length;
         }
+        
         if (creepCount < sourceNum * this.properties.stages[this.getStage(room)].number) {
             return true;
         }
