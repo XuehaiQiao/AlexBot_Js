@@ -83,7 +83,7 @@ module.exports = {
             }
         
             // find container
-            let containers = source.pos.findInRange(FIND_STRUCTURES, 3, {filter: structure => (
+            let containers = source.pos.findInRange(FIND_STRUCTURES, 2, {filter: structure => (
                 structure.structureType == STRUCTURE_CONTAINER && 
                 structure.store.getCapacity() >= creep.store.getFreeCapacity()
             )});
@@ -199,3 +199,17 @@ module.exports = {
         return stage;
     }
 };
+
+function findTarget(creep) {
+    let otherHaulerTargets = _.map(
+        creep.room.find(FIND_MY_CREEPS, {filter: c => c.memory.role = creep.memory.role && c.memory.targetRoom == creep.memory.targetRoom && c != creep}), 
+        c => c.memory.target
+    );
+    let dropedResources = creep.room.find(FIND_DROPPED_RESOURCES, {filter: resource.amount > Math.min(creep.store.getFreeCapacity(), creep.store.getCapacity() / 2)});
+    dropedResources.sort((a, b) => b.amount - a.amount);
+    for(const re of dropedResources) {
+        if(!otherHaulerTargets.contains(re.id)) {
+            creep.move
+        }
+    }
+}

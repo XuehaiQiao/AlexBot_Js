@@ -1,47 +1,21 @@
-
-function roomCensus() {
-    // let stat = {};
-    // _.forEach(room.find(FIND_MY_CREEPS), creep => {
-    //     if(stat[creep.memory.role] == undefined) stat[creep.memory.role] = 1;
-    //     else stat[creep.memory.role] += 1;
-    // })
-
-    // console.log(room.name + " CREEPS: "  + JSON.stringify(stat));
-    // return stat;
-
+module.exports = function() {
     // reset the global object
     global.roomCensus = {};
-    _.forEach(Game.rooms, room => {
-        global.roomCensus[room.name] = {}
-    });
-    
+
     // census
     _.forEach(Game.creeps, creep => {
         // don't count dying creeps
         if(creep.body.length * 3 > creep.ticksToLive) return;
 
+        let role = creep.memory.role;
         // if creep has targetRoom, count into the targetRoom creeps
         if(creep.memory.targetRoom) {
-            if(global.roomCensus[creep.memory.targetRoom] == undefined) {
-                global.roomCensus[creep.memory.targetRoom] = {}
-            }
-            if (global.roomCensus[creep.memory.targetRoom][creep.memory.role] == undefined) {
-                global.roomCensus[creep.memory.targetRoom][creep.memory.role] = 1;
-            }
-            else {
-                global.roomCensus[creep.memory.targetRoom][creep.memory.role] += 1;
-            }
+            let roomName = creep.memory.targetRoom;
+            addInCensusObj(creep, roomName, role);
         }
         else if(creep.memory.base) {
-            if(global.roomCensus[creep.memory.base] == undefined) {
-                global.roomCensus[creep.memory.base] = {}
-            }
-            if (global.roomCensus[creep.memory.base][creep.memory.role] == undefined) {
-                global.roomCensus[creep.memory.base][creep.memory.role] = 1;
-            }
-            else {
-                global.roomCensus[creep.memory.base][creep.memory.role] += 1;
-            }
+            let roomName = creep.memory.base;
+            addInCensusObj(creep, roomName, role);
         }
     })
 
@@ -51,4 +25,14 @@ function roomCensus() {
     })
 }
 
-module.exports = roomCensus;
+function addInCensusObj(creep, roomName, role) {
+    if(global.roomCensus[roomName] == undefined) {
+        global.roomCensus[roomName] = {};
+    }
+    if (global.roomCensus[roomName][role] == undefined) {
+        global.roomCensus[roomName][role] = 1;
+    }
+    else {
+        global.roomCensus[roomName][role] += 1;
+    }
+}

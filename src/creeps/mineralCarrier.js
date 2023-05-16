@@ -20,7 +20,10 @@ module.exports = {
         // to avoid dead when holding resources, if tick to live less than 30, and finished transfer, suicide.
         if(creep.ticksToLive < 30) {
             if(creep.store.getUsedCapacity() > 0) creep.memory.status = 1;
-            else creep.suicide();
+            else {
+                creep.suicide();
+                return;
+            }
         }
 
         // move to its target room if not in

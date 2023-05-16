@@ -13,7 +13,7 @@ module.exports = function(myRooms) {
         for(const resourceType in roomResourceConfig) {
             const abundantLine = roomResourceConfig[resourceType].storage[1];
             const lowerBoundLine = roomResourceConfig[resourceType].storage[0];
-            let sender = _.filter(myRooms, room => room.controller.level === 8 && room.storage && room.terminal && room.storage.store[resourceType] > abundantLine);
+            let sender = _.filter(myRooms, room => room.storage && room.terminal && room.storage.store[resourceType] > abundantLine);
             let receiver = _.filter(myRooms, room => room.storage && room.terminal && room.storage.store[resourceType] < lowerBoundLine);
             if(receiver.length === 0 && resourceType === RESOURCE_ENERGY) {
                 receiver = _.filter(myRooms, room => (

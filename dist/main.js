@@ -1441,7 +1441,10 @@ module.exports = {
         }
         if(creep.ticksToLive < 30) {
             if(creep.store.getUsedCapacity() > 0) creep.memory.status = 1;
-            else creep.suicide();
+            else {
+                creep.suicide();
+                return;
+            }
         }
         if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
             creep.moveToRoom(creep.memory.targetRoom);
@@ -2050,7 +2053,7 @@ module.exports = {
                 }
                 return;
             }
-            let containers = source.pos.findInRange(FIND_STRUCTURES, 3, {filter: structure => (
+            let containers = source.pos.findInRange(FIND_STRUCTURES, 2, {filter: structure => (
                 structure.structureType == STRUCTURE_CONTAINER && 
                 structure.store.getCapacity() >= creep.store.getFreeCapacity()
             )});
@@ -2150,6 +2153,20 @@ module.exports = {
         return stage;
     }
 };
+
+function findTarget(creep) {
+    let otherHaulerTargets = _.map(
+        creep.room.find(FIND_MY_CREEPS, {filter: c => c.memory.role = creep.memory.role && c.memory.targetRoom == creep.memory.targetRoom && c != creep}), 
+        c => c.memory.target
+    );
+    let dropedResources = creep.room.find(FIND_DROPPED_RESOURCES, {filter: resource.amount > Math.min(creep.store.getFreeCapacity(), creep.store.getCapacity() / 2)});
+    dropedResources.sort((a, b) => b.amount - a.amount);
+    for(const re of dropedResources) {
+        if(!otherHaulerTargets.contains(re.id)) {
+            creep.move
+        }
+    }
+}
 return module.exports;
 }
 /********** End of module 19: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/remoteHauler.js **********/
@@ -2912,35 +2929,19 @@ return module.exports;
 /********** End of module 31: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/linkTransfer.js **********/
 /********** Start module 32: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/roomCensus.js **********/
 __modules[32] = function(module, exports) {
-
-function roomCensus() {
+module.exports = function() {
     global.roomCensus = {};
-    _.forEach(Game.rooms, room => {
-        global.roomCensus[room.name] = {}
-    });
     _.forEach(Game.creeps, creep => {
         if(creep.body.length * 3 > creep.ticksToLive) return;
+
+        let role = creep.memory.role;
         if(creep.memory.targetRoom) {
-            if(global.roomCensus[creep.memory.targetRoom] == undefined) {
-                global.roomCensus[creep.memory.targetRoom] = {}
-            }
-            if (global.roomCensus[creep.memory.targetRoom][creep.memory.role] == undefined) {
-                global.roomCensus[creep.memory.targetRoom][creep.memory.role] = 1;
-            }
-            else {
-                global.roomCensus[creep.memory.targetRoom][creep.memory.role] += 1;
-            }
+            let roomName = creep.memory.targetRoom;
+            addInCensusObj(creep, roomName, role);
         }
         else if(creep.memory.base) {
-            if(global.roomCensus[creep.memory.base] == undefined) {
-                global.roomCensus[creep.memory.base] = {}
-            }
-            if (global.roomCensus[creep.memory.base][creep.memory.role] == undefined) {
-                global.roomCensus[creep.memory.base][creep.memory.role] = 1;
-            }
-            else {
-                global.roomCensus[creep.memory.base][creep.memory.role] += 1;
-            }
+            let roomName = creep.memory.base;
+            addInCensusObj(creep, roomName, role);
         }
     })
     _.forEach(_.keys(global.roomCensus), roomName => {
@@ -2948,7 +2949,17 @@ function roomCensus() {
     })
 }
 
-module.exports = roomCensus;
+function addInCensusObj(creep, roomName, role) {
+    if(global.roomCensus[roomName] == undefined) {
+        global.roomCensus[roomName] = {};
+    }
+    if (global.roomCensus[roomName][role] == undefined) {
+        global.roomCensus[roomName][role] = 1;
+    }
+    else {
+        global.roomCensus[roomName][role] += 1;
+    }
+}
 return module.exports;
 }
 /********** End of module 32: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/roomCensus.js **********/
@@ -3156,7 +3167,7 @@ module.exports = function(myRooms) {
         for(const resourceType in roomResourceConfig) {
             const abundantLine = roomResourceConfig[resourceType].storage[1];
             const lowerBoundLine = roomResourceConfig[resourceType].storage[0];
-            let sender = _.filter(myRooms, room => room.controller.level === 8 && room.storage && room.terminal && room.storage.store[resourceType] > abundantLine);
+            let sender = _.filter(myRooms, room => room.storage && room.terminal && room.storage.store[resourceType] > abundantLine);
             let receiver = _.filter(myRooms, room => room.storage && room.terminal && room.storage.store[resourceType] < lowerBoundLine);
             if(receiver.length === 0 && resourceType === RESOURCE_ENERGY) {
                 receiver = _.filter(myRooms, room => (
