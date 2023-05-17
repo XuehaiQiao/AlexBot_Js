@@ -36,14 +36,15 @@ module.exports = {
                 return;
             }
 
-            // pick up near energy
+            // pick up near resources
             const nearResouce = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1);
             if (nearResouce.length > 0) creep.pickup(nearResouce[0]);
             // tomstone
-            const nearTomstone = creep.pos.findInRange(FIND_TOMBSTONES, 1, { filter: ts => ts.store[RESOURCE_ENERGY] > 0 });
+            const nearTomstone = creep.pos.findInRange(FIND_TOMBSTONES, 1, { filter: ts => ts.store.getUsedCapacity() > 0 });
             if (nearTomstone.length > 0) {
-                if (nearTomstone[0].store.getUsedCapacity() > creep.store.getCapacity() * 0.9) creep.memory.status = 1;
-                creep.withdraw(nearTomstone[0], RESOURCE_ENERGY);
+                if (creep.store.getUsedCapacity() > creep.store.getCapacity() * 0.9) creep.memory.status = 1;
+                let resourceType = _.find(Object.keys(nearTomstone[0].store), resourceType => nearTomstone[0].store[resourceType] > 0);
+                creep.withdraw(nearTomstone[0], resourceType);
                 return;
             }
 
@@ -51,16 +52,16 @@ module.exports = {
             if (creep.moveToRoomAdv(creep.memory.targetRoom)) return;
 
             // keep lair logic
-            if(Memory.outSourceRooms[creep.memory.targetRoom] && Memory.outSourceRooms[creep.memory.targetRoom].sourceKeeper === true) {
+            if (Memory.outSourceRooms[creep.memory.targetRoom] && Memory.outSourceRooms[creep.memory.targetRoom].sourceKeeper === true) {
                 let hostileCreep = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-                if(hostileCreep) {
+                if (hostileCreep) {
                     let distance = creep.pos.getRangeTo(hostileCreep);
-    
-                    if(distance <= 3) {
+
+                    if (distance <= 3) {
                         // move away
                         return;
                     }
-                    else if(distance < 5) {
+                    else if (distance < 5) {
                         return;
                     }
                 }
@@ -105,34 +106,48 @@ module.exports = {
                 if (creep.build(myConstuct[0]) == OK) return;
             }
 
-            // move to base room if not in
-            if (creep.memory.base && creep.memory.base != creep.room.name) {
-                creep.moveToRoom(creep.memory.base);
-                return;
+            // directly move to storage if can
+            let baseRoom = Game.rooms[creep.memory.base]
+            if (baseRoom) {
+                let target = baseRoom.storage;
+                if(target) {
+                    let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
+                    if (creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
+                        creep.moveToNoCreep(target);
+                    }
+                }
             }
-
-            // transfer to base room container / storage
-            let target = creep.room.storage;
-
-            if (!target) {
-                target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                    filter: struct => (
-                        (struct.structureType == STRUCTURE_CONTAINER) && struct.store.getFreeCapacity() > 0
-                    )
-                });
-            }
-
-            if (!target) {
-                // go rest
-                if (roomInfo[creep.room.name]) {
-                    creep.moveToNoCreep(roomInfo[creep.room.name].restPos);
+            else {
+                // move to base room if not in
+                if (creep.memory.base && creep.memory.base != creep.room.name) {
+                    creep.moveToRoom(creep.memory.base);
                     return;
-                };
+                }
+
+                // transfer to base room container / storage
+                let target = creep.room.storage;
+
+                if (!target) {
+                    target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                        filter: struct => (
+                            (struct.structureType == STRUCTURE_CONTAINER) && struct.store.getFreeCapacity() > 0
+                        )
+                    });
+                }
+
+                if (!target) {
+                    // go rest
+                    if (roomInfo[creep.room.name]) {
+                        creep.moveToNoCreep(roomInfo[creep.room.name].restPos);
+                        return;
+                    };
+                }
+                let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
+                if (creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
+                    creep.moveToNoCreep(target);
+                }
             }
-            let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
-            if (creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
-                creep.moveToNoCreep(target);
-            }
+
         }
     },
 
@@ -186,17 +201,20 @@ function findTarget(creep) {
     if (!targetQ || targetQ.length === 0) {
         let takenIds = _.map(creep.room.find(FIND_MY_CREEPS, { filter: creep => creep.role === 'remoteHauler' }), creep => creep.memory.targetId);
         let containers = creep.room.find(FIND_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_CONTAINER && !takenIds.includes(struct.id) && struct.store.getUsedCapacity() > creep.store.getCapacity() });
-        let dropedResources = creep.room.find(FIND_DROPPED_RESOURCES, { filter: resource => !takenIds.includes(resource.id) && resource.amount > creep.store.getCapacity()});
+        let dropedResources = creep.room.find(FIND_DROPPED_RESOURCES, { filter: resource => !takenIds.includes(resource.id) && resource.amount > creep.store.getCapacity() });
 
         let targets = [...containers, ...dropedResources]
         Memory.outSourceRooms[creep.room.name].haulerTargets = _.map(targets, target => { return { id: target.id, amount: (target.store ? target.store.getUsedCapacity() : target.amount) } });
     }
     targetQ = Memory.outSourceRooms[creep.room.name].haulerTargets;
-    
+
     while (targetQ.length > 0) {
         let { id, amount } = targetQ[targetQ.length - 1];
         if (Game.getObjectById(id)) {
-            if (amount - creep.store.getFreeCapacity() < creep.store.getCapacity()) targetQ.pop();
+            if (amount < creep.store.getCapacity()) {
+                targetQ.pop();
+                continue;
+            }
             else Memory.outSourceRooms[creep.room.name].haulerTargets[targetQ.length - 1].amount -= creep.store.getFreeCapacity();
             return id;
         }

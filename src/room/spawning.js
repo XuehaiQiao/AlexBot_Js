@@ -95,7 +95,7 @@ function spawnCreeps(room) {
             outSourceTypes = ['remoteHarvester', 'remoteHauler'];
         }
         else if(room.energyCapacityAvailable >= 5600) {
-            outSourceTypes = ['keeperAttacker', 'claimer', 'remoteHarvester', 'remoteHauler', 'remoteMiner'];
+            outSourceTypes = ['invaderAttacker', 'keeperAttacker', 'claimer', 'remoteHarvester', 'remoteHauler', 'remoteMiner'];
         }
         else {
             outSourceTypes = ['claimer', 'remoteHarvester', 'remoteHauler'];

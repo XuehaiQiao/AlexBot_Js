@@ -26,6 +26,9 @@ module.exports = {
             if(creep.claimController(controller) == ERR_NOT_IN_RANGE) {
                 creep.moveToNoCreepInRoom(controller);
             }
+            else {
+                creep.signController(controller, "Keep Growing!!!");
+            }
         }
         else if ((controller.reservation && controller.reservation.username != 'LeTsCrEEp') || (controller.owner && !controller.my)) {
             if(creep.attackController(controller) == ERR_NOT_IN_RANGE) {

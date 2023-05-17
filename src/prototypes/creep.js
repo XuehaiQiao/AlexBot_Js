@@ -10,7 +10,7 @@ Creep.prototype.damaged = function() {
 
 Creep.prototype.moveToNoCreep = function(target) {
     if(this.isStuck()) {
-        this.moveTo(target);
+        this.moveTo(target, {reusePath: 20});
     }
     this.moveTo(target, {reusePath: 50, ignoreCreeps: true});
 }
@@ -58,11 +58,11 @@ Creep.prototype.moveToRoomAdv = function(roomName) {
 
 Creep.prototype.workerSetStatus = function() {
     // set status: 0. harvest  1. work 
-    if(this.memory.status && this.store.getUsedCapacity() == 0) {
+    if(this.memory.status && this.store.getUsedCapacity() === 0 && this.store.getCapacity() > 0) {
         this.memory.status = 0;
         // this.say('🔄 harvest');
     }
-    if(!this.memory.status && this.store.getFreeCapacity() == 0) {
+    if(!this.memory.status && this.store.getFreeCapacity() === 0) {
         this.memory.status = 1;
         // this.say('home');
     }

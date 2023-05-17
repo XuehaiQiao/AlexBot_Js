@@ -20,6 +20,7 @@ let creepLogic = {
     remoteHarvester:require('./remoteHarvester'),
     remoteHauler:   require('./remoteHauler'),
     keeperAttacker: require('./keeperAttacker'),
+    invaderAttacker:require('./invaderAttacker'),
     transporter:    require('./transporter'),
     defender:       require('./defender'),
     remoteMiner:    require('./remoteMiner'),

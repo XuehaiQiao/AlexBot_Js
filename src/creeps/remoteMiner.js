@@ -1,3 +1,5 @@
+const { drop } = require("lodash");
+
 // no repair logic yet, no added to creeps yet
 module.exports = {
     properties: {
@@ -26,7 +28,12 @@ module.exports = {
             haveContainerMineLogic(creep, mineral, container);
         }
         else {
-            noContainerMineLogic(creep, mineral);
+            container = mineral.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_CONTAINER})[0];
+            if(container) {
+                creep.memory.containerId = container.id;
+                haveContainerMineLogic(creep, mineral, container);
+            }
+            else noContainerMineLogic(creep, mineral);
         }
 
         if(mineral.ticksToRegeneration > 0) {
@@ -69,8 +76,13 @@ module.exports = {
 var haveContainerMineLogic = function(creep, mine, container) {
     if(!creep.pos.isEqualTo(container.pos)) {
         creep.moveToNoCreepInRoom(container);
+        return;
     }
-    else if(container.hits < container.hitsMax) {
+
+    let drops = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1, {filter: droped => droped.resourceType === RESOURCE_ENERGY});
+    let tombs = creep.pos.findInRange(FIND_TOMBSTONES, 1, {filter: tomeb => tomeb.store[RESOURCE_ENERGY] > 0});
+    if(container.hits < container.hitsMax && (drops.length > 0 || tombs.length > 0)) {
+        creep.say("repair")
         let nonEnergy = _.find(Object.keys(creep.store), resourceType => creep.store[resourceType] > 0 && resourceType !== RESOURCE_ENERGY);
         if(nonEnergy) {
             creep.drop(nonEnergy);
@@ -78,8 +90,6 @@ var haveContainerMineLogic = function(creep, mine, container) {
         }
 
         if(creep.store[RESOURCE_ENERGY] === 0) {
-            let drops = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1, {filter: droped => droped.resourceType === RESOURCE_ENERGY});
-            let tombs = creep.pos.findInRange(FIND_TOMBSTONES, 1, {filter: tomeb => tomeb.store[RESOURCE_ENERGY] > 0});
             if(drops.length) creep.pickup(drops[0]);
             else if(tombs.length) creep.withdraw(tombs[0], RESOURCE_ENERGY);
             else if(container.store[RESOURCE_ENERGY] > 0) creep.withdraw(container, RESOURCE_ENERGY);
@@ -87,8 +97,9 @@ var haveContainerMineLogic = function(creep, mine, container) {
         creep.repair(container);
     }
     else {
+        creep.say('har')
         creep.harvest(mine);
-        creep.memory.rest = 4;
+        creep.memory.rest = 5;
     }
 };
 
@@ -128,10 +139,10 @@ function keeperLairLogic(creep, mineral) {
             creep.memory.keeperLairId = mineral.pos.findInRange(FIND_STRUCTURES, 5, {filter: struct => struct.structureType === STRUCTURE_KEEPER_LAIR})[0].id;
         }
         let keeperLair = Game.getObjectById(creep.memory.keeperLairId);
-        if(keeperLair.ticksToSpawn < 10) {
+        if(keeperLair.ticksToSpawn <= 12) {
             creep.memory.rest = 0;
             if(creep.store.getUsedCapacity() > 0) {
-                let resourceType = _.find(Object.keys(creep.store), rt => creep.store[rt] > 0 && rt !== RESOURCE_ENERGY);
+                let resourceType = _.find(Object.keys(creep.store), rt => creep.store[rt] > 0);
                 creep.drop(resourceType);
             }
             if(creep.pos.getRangeTo(keeperLair) < 8) creep.moveToRoomAdv(creep.memory.base);

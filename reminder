@@ -27,10 +27,10 @@ Game.spawns['Spawn2_W15S13'].spawnCreep([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOV
 Game.spawns['Spawn1_W12S21'].spawnCreep([MOVE], 'scout' + Game.time, {memory: {role: 'scout', targetPos: {x:42, y:35, roomName:'W10S20'}}});
 
 // keeperAttacker
-Game.spawns['Spawn3_W16S17'].spawnCreep([...new Array(25).fill(MOVE), ...new Array(19).fill(ATTACK), ...new Array(6).fill(HEAL)], 'keeperAttacker' + Game.time, {memory: {role: 'keeperAttacker', base: 'W16S17', targetRoom: 'W16S16'}});
+Game.spawns['Spawn3_W16S17'].spawnCreep([...new Array(25).fill(MOVE), ...new Array(19).fill(RANGED_ATTACK), ...new Array(6).fill(HEAL)], 'keeperAttacker' + Game.time, {memory: {role: 'keeperAttacker', base: 'W16S17', targetRoom: 'W16S16'}});
 
-Game.spawns['Spawn1_W18S15'].spawnCreep([WORK, WORK, MOVE], 'Harvester2' + Game.time, {memory: {role: 'harvester2', status: 1, target: 0}});
-[WORK, WORK, MOVE]
+// wrecker
+Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(25).fill(WORK), ...new Array(25).fill(MOVE)], 'wrecker' + Game.time, {memory: {role: 'wrecker', targetRoom: 'W17S14'}});
 
 _.forEach(_.filter(Game.rooms['W18S15'].find(FIND_STRUCTURES), structure => structure.structureType == STRUCTURE_TOWER), function(object) {
     object.destroy();
@@ -49,7 +49,7 @@ for(let i in wallList) {
 }
 
 // wrecker spawn
-Game.spawns['Spawn1'].spawnCreep([WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE], 'wrecker' + Game.time, {memory: {role: 'wrecker', targetRoom: 'W21S15', target: '63dbf3057bc7d9c61fb347ce'}});
+Game.spawns['Spawn1'].spawnCreep([WORK, WORK, WORK, WORK, WORK, MOVE, MOVE, MOVE, MOVE, MOVE], 'wrecker' + Game.time, {memory: {role: 'wrecker', targetRoom: 'W17S14'}});
 // scout spawn
 Game.spawns['Spawn1_W21S19'].spawnCreep([MOVE], 'scout' + Game.time, {memory: {role: 'scout', targetRoom: 'W22S18'}});
 
