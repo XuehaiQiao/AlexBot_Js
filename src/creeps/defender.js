@@ -40,9 +40,10 @@ module.exports = {
 
     // checks if the room needs to spawn a creep
     spawn: function(room, roomName) {
-        // var thisTypeCreeps = _.filter(Game.creeps, (creep) => creep.memory.role == this.properties.role && creep.memory.targetRoom == roomName);
-        // console.log(this.properties.role + ': ' + thisTypeCreeps.length, roomName);
-    
+        if(Memory.outSourceRooms[roomName] && Memory.outSourceRooms[roomName].neutral === true) {
+            return false;
+        }
+
         // check if need spawn
         let creepCount;
         if(global.roomCensus[roomName] && global.roomCensus[roomName][this.properties.role]) {

@@ -1,6 +1,6 @@
 const { roomInfo } = require("../config");
 const creepLogic = require("../creeps");
-const creepTypes2 = ['carrier2', 'harvester2', 'upgrader2', 'builder2']; // 'mineralCarrier'
+// const creepTypes2 = ['carrier2', 'harvester2', 'upgrader2', 'builder2']; // 'mineralCarrier'
 
 function spawnCreeps(room) {
     // return if no idle spawn
@@ -22,14 +22,11 @@ function spawnCreeps(room) {
         return result;
     }
 
-    // use creeptype2 if room have storage.
-    //var types = _.find(room.find(FIND_MY_STRUCTURES), object => object.structureType == STRUCTURE_STORAGE) ? creepTypes2 : creepTypes;
-    var types = creepTypes2;
+    let types = ['carrier2', 'harvester2', 'upgrader2', 'builder2'];
     if(roomInfo[room.name] && roomInfo[room.name].managerPos) {
         // added 'manager' and 'mineralCarrier'
         types = ['carrier2', 'harvester2', 'manager', 'upgrader2', 'builder2', 'mineralCarrier']; // 
     }
-
     if(_.find(room.find(FIND_MY_STRUCTURES), struct => struct.structureType == STRUCTURE_EXTRACTOR)) {
         types.push('miner')
     }
@@ -54,26 +51,17 @@ function spawnCreeps(room) {
         console.log("Spawning backup tiny Servivor001");
         return;
     }
-    
-    // if still have basic spawn needs. stop producing out sourcing creeps
-    if(creepTypeNeeded) {
-
-    }
 
     // stop sending outSourcer if base room found enemy
     var hostileParts = [WORK, ATTACK, RANGED_ATTACK, HEAL, CLAIM];
     var enemy = _.find(room.find(FIND_HOSTILE_CREEPS), creep =>
         _.filter(creep.body, object => hostileParts.includes(object.type)).length > 0
     );
-    if (enemy) {
-        return;
-    }
-
+    if (enemy) return
     
     if(room.memory.outSourceRooms) {
         // create defencer
-        for (let index in room.memory.outSourceRooms) {
-            var roomName = room.memory.outSourceRooms[index];
+        for (roomName of room.memory.outSourceRooms) {
             if (Game.rooms[roomName]) {
                 var hostileCreeps = Game.rooms[roomName].find(FIND_HOSTILE_CREEPS);
                 var invaderCore = _.find(Game.rooms[roomName].find(FIND_HOSTILE_STRUCTURES), struct => struct.structureType == STRUCTURE_INVADER_CORE);
@@ -106,13 +94,15 @@ function spawnCreeps(room) {
         else if(room.energyCapacityAvailable < 1300) {
             outSourceTypes = ['remoteHarvester', 'remoteHauler'];
         }
+        else if(room.energyCapacityAvailable >= 5600) {
+            outSourceTypes = ['keeperAttacker', 'claimer', 'remoteHarvester', 'remoteHauler', 'remoteMiner'];
+        }
         else {
             outSourceTypes = ['claimer', 'remoteHarvester', 'remoteHauler'];
         }
 
         // create outsource creeps / claim creeps (copy of about spawn logic)
-        for(let index in outSourceTypes) {
-            let cType = outSourceTypes[index];
+        for(const cType of outSourceTypes) {
             let needCreepRoomName = _.find(room.memory.outSourceRooms, roomName => creepLogic[cType].spawn(room, roomName));
             if(needCreepRoomName) {
                 let creepSpawnData = creepLogic[cType].spawnData(room, needCreepRoomName);

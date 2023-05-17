@@ -14,10 +14,12 @@ module.exports = {
         if (creep.memory.target) {
             hostileStruct = Game.getObjectById(creep.memory.target);
         } else {
-            hostileStruct = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES);
+            hostileStruct = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES);
         }
 
-        
+        if(!hostileStruct && creep.memory.wall) {
+            hostileStruct = creep.pos.findClosestByRange(FIND_STRUCTURES, {filter: struct => struct.structureType === STRUCTURE_WALL});
+        }
 
         if (hostileStruct) {
             creep.say(creep.dismantle(hostileStruct));
@@ -26,6 +28,8 @@ module.exports = {
             }
             return;
         }
+
+
     
     },
 

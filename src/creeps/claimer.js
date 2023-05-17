@@ -56,6 +56,10 @@ module.exports = {
             creepCount = global.roomCensus[roomName][this.properties.role];
         }
 
+        if(Memory.outSourceRooms[roomName] && Memory.outSourceRooms[roomName].neutral === true) {
+            return false;
+        }
+
         if (creepCount < this.properties.stages[this.getStage(room)].number) return true;
 
         return false;

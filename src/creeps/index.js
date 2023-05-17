@@ -22,6 +22,7 @@ let creepLogic = {
     keeperAttacker: require('./keeperAttacker'),
     transporter:    require('./transporter'),
     defender:       require('./defender'),
+    remoteMiner:    require('./remoteMiner'),
 
     // others
     wrecker:        require('./wrecker'),

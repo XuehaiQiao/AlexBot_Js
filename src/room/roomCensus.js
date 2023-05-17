@@ -5,7 +5,8 @@ module.exports = function() {
     // census
     _.forEach(Game.creeps, creep => {
         // don't count dying creeps
-        if(creep.body.length * 3 > creep.ticksToLive) return;
+        if(creep.ticksToLive < creep.body.length * 3) return;
+        if(creep.memory.role === 'keeperAttacker' && creep.ticksToLive < creep.body.length * 3 + 50) return;
 
         let role = creep.memory.role;
         // if creep has targetRoom, count into the targetRoom creeps

@@ -18,9 +18,8 @@ module.exports = {
         //find nearest keeper creep, attack.
         let targetKeeper = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
         if(targetKeeper) {
-            if(creep.attack(targetKeeper) === ERR_NOT_IN_RANGE) {
-                creep.moveTo(targetKeeper);
-            }
+            creep.attack(targetKeeper);
+            creep.moveTo(targetKeeper);
         }
         //if no keeper, find closest spawning time keeper lair, move to it.
         else {
@@ -41,6 +40,7 @@ module.exports = {
 
     // checks if the room needs to spawn a creep
     spawn: function(room, targetRoomName) {
+        if(Memory.outSourceRooms[targetRoomName] && Memory.outSourceRooms[targetRoomName].neutral !== true) return false;
         if(room.energyCapacityAvailable < 5600) return false;
 
         let creepCount;
