@@ -12,16 +12,46 @@ module.exports = {
             return;
         }
         
-        let invader = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {filter: c => c.owner.username === 'Invader'});
+        let invaders = creep.room.find(FIND_HOSTILE_CREEPS, {filter: c => c.owner.username === 'Invader'});
         //find nearest keeper creep, attack.
-        if(invader) {
-            if(creep.rangedAttack(invader) === ERR_NOT_IN_RANGE) {
-                creep.moveTo(targetKeeper);
+        if(invaders.length) {
+            let medic = _.find(invaders, invader => {
+                for(const bodyPart of invader.body) {
+                    if(bodyPart.type === HEAL) return true;
+                }
+                return false;
+            })
+
+            let invader;
+            if(medic) invader = medic;
+            else invader = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {filter: c => c.owner.username === 'Invader'});
+
+            
+            if(creep.pos.getRangeTo(invader) > 2) {
+                creep.rangedAttack(invader);
+                creep.moveTo(invader);
             }
-            else if(creep.pos.getRangeTo(invader <= 2)) {
+            else if(creep.pos.getRangeTo(invader) < 2) {
                 // flee
+                creep.rangedMassAttack();
+            }
+            else {
+                creep.rangedAttack(invader);
             }
             creep.heal(creep);
+        }
+        else {
+            let damaged = creep.pos.findClosestByRange(FIND_MY_CREEPS, {filter: c => c.hits < c.hitsMax});
+            if(damaged) {
+                if(creep.heal(damaged) === ERR_NOT_IN_RANGE) {
+                    creep.moveTo(damaged, {reusePath: 20});
+                    creep.rangedHeal(damaged);
+                }
+                
+            }
+            else {
+                creep.suicide();
+            }
         }
     },
 
@@ -47,7 +77,7 @@ module.exports = {
     // returns an object with the data to spawn a new creep
     spawnData: function(room, targetRoomName) {
         let name = this.properties.role + Game.time;
-        let body = [...new Array(10).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(5).fill(MOVE), ...new Array(5).fill(HEAL)]; // $3500
+        let body = [...new Array(20).fill(MOVE), ...new Array(20).fill(RANGED_ATTACK), ...new Array(5).fill(MOVE), ...new Array(5).fill(HEAL)]; // $5500
         let memory = {role: this.properties.role, status: 0, base: room.name, targetRoom: targetRoomName};
 
         return {name, body, memory};

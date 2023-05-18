@@ -1701,6 +1701,9 @@ module.exports = {
             if(creep.claimController(controller) == ERR_NOT_IN_RANGE) {
                 creep.moveToNoCreepInRoom(controller);
             }
+            else {
+                creep.signController(controller, "Keep Growing!!!");
+            }
         }
         else if ((controller.reservation && controller.reservation.username != 'LeTsCrEEp') || (controller.owner && !controller.my)) {
             if(creep.attackController(controller) == ERR_NOT_IN_RANGE) {
@@ -2385,14 +2388,44 @@ module.exports = {
             return;
         }
         
-        let invader = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {filter: c => c.owner.username === 'Invader'});
-        if(invader) {
-            if(creep.rangedAttack(invader) === ERR_NOT_IN_RANGE) {
-                creep.moveTo(targetKeeper);
+        let invaders = creep.room.find(FIND_HOSTILE_CREEPS, {filter: c => c.owner.username === 'Invader'});
+        if(invaders.length) {
+            let medic = _.find(invaders, invader => {
+                for(const bodyPart of invader.body) {
+                    if(bodyPart.type === HEAL) return true;
+                }
+                return false;
+            })
+
+            let invader;
+            if(medic) invader = medic;
+            else invader = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {filter: c => c.owner.username === 'Invader'});
+
+            
+            if(creep.pos.getRangeTo(invader) > 2) {
+                creep.rangedAttack(invader);
+                creep.moveTo(invader);
             }
-            else if(creep.pos.getRangeTo(invader <= 2)) {
+            else if(creep.pos.getRangeTo(invader) < 2) {
+                creep.rangedMassAttack();
+            }
+            else {
+                creep.rangedAttack(invader);
             }
             creep.heal(creep);
+        }
+        else {
+            let damaged = creep.pos.findClosestByRange(FIND_MY_CREEPS, {filter: c => c.hits < c.hitsMax});
+            if(damaged) {
+                if(creep.heal(damaged) === ERR_NOT_IN_RANGE) {
+                    creep.moveTo(damaged, {reusePath: 20});
+                    creep.rangedHeal(damaged);
+                }
+                
+            }
+            else {
+                creep.suicide();
+            }
         }
     },
     spawn: function(room, targetRoomName) {
@@ -2414,7 +2447,7 @@ module.exports = {
     },
     spawnData: function(room, targetRoomName) {
         let name = this.properties.role + Game.time;
-        let body = [...new Array(10).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(5).fill(MOVE), ...new Array(5).fill(HEAL)]; // $3500
+        let body = [...new Array(20).fill(MOVE), ...new Array(20).fill(RANGED_ATTACK), ...new Array(5).fill(MOVE), ...new Array(5).fill(HEAL)]; // $5500
         let memory = {role: this.properties.role, status: 0, base: room.name, targetRoom: targetRoomName};
 
         return {name, body, memory};
@@ -2501,7 +2534,6 @@ module.exports = {
         }
     },
     tranEnergyBetweenMyRooms: function(creep) {
-        creep.say('tebr');
         if(!creep.memory.status) {
             if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
                 creep.moveToRoom(creep.memory.targetRoom);
@@ -2531,7 +2563,7 @@ module.exports = {
                 if(creep.pos.inRangeTo(creep.room.controller.pos, 2)) {
                     creep.drop(RESOURCE_ENERGY);
                 }
-                else creep.moveTo(storage);
+                else creep.moveToNoCreepInRoom(creep.room.controller);
             }
             else if(storage.store.getFreeCapacity() == 0) {
                 if(creep.pos.inRangeTo(storage.pos, 2)) {
@@ -17108,6 +17140,9 @@ module.exports = {
     W13S15: {
         restPos: new RoomPosition(19, 21, "W13S15"),
         managerPos: new RoomPosition(22, 18, "W13S15"),
+    },
+    W17S14: {
+        restPos: new RoomPosition(34, 35, "W17S14"),
     },
     sim: {
         restPos: new RoomPosition(19, 21, "sim"),

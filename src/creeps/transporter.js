@@ -89,9 +89,8 @@ module.exports = {
         }
     },
 
-    // transfer energy from one room to another (base room controll level < 6, no terminal)
+    // transfer energy from targetRoom to base (base room controll level < 6, no terminal)
     tranEnergyBetweenMyRooms: function(creep) {
-        creep.say('tebr');
         // harvest
         if(!creep.memory.status) {
             // move to its target room if not in
@@ -128,7 +127,7 @@ module.exports = {
                 if(creep.pos.inRangeTo(creep.room.controller.pos, 2)) {
                     creep.drop(RESOURCE_ENERGY);
                 }
-                else creep.moveTo(storage);
+                else creep.moveToNoCreepInRoom(creep.room.controller);
             }
             else if(storage.store.getFreeCapacity() == 0) {
                 if(creep.pos.inRangeTo(storage.pos, 2)) {

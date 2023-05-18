@@ -6,22 +6,25 @@
 // W6S18 L
 
 // claimer spawn
-Game.spawns['Spawn1_W18S15'].spawnCreep([MOVE, CLAIM], 'Claimer' + Game.time, {memory: {role: 'claimer', status: 1, targetRoom: 'W22S15', claim: true}});
+Game.spawns['Spawn1_W18S15'].spawnCreep([MOVE, CLAIM], 'Claimer' + Game.time, {memory: {role: 'claimer', status: 1, targetRoom: 'W17S14', claim: true}});
+
+// harvester2
+Game.spawns['Spawn1_W18S15'].spawnCreep([WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], 'harvester2' + Game.time, {memory: {role: 'harvester2', target: 0, targetRoom: 'W17S14'}});
 
 //builder2
-Game.spawns['Spawn1_W22S15'].spawnCreep([...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], 'builder2' + Game.time, {memory: {role: 'builder2', status: 1, targetRoom: 'W22S15'}});
+Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], 'builder2' + Game.time, {memory: {role: 'builder2', status: 0, targetRoom: 'W17S14'}});
 
 // upgrader2
-Game.spawns['Spawn1_W15S13'].spawnCreep([...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], 'upgrader2' + Game.time, {memory: {role: 'upgrader2', status: 1, targetRoom: 'W13S15'}});
+Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], 'upgrader2' + Game.time, {memory: {role: 'upgrader2', status: 0, targetRoom: 'W17S14'}});
 
 // carrier spawn
-Game.spawns['Spawn2_W18S15'].spawnCreep([...new Array(4).fill(CARRY), ...new Array(2).fill(MOVE)], 'Carrier' + Game.time, {memory: {role: 'carrier'}});
+Game.spawns['Spawn2_W18S15'].spawnCreep([...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], 'carrier2' + Game.time, {memory: {role: 'carrier2', targetRoom: 'W17S14'}});
 
 // transporter spawn
-Game.spawns['Spawn2_W18S15'].spawnCreep([...new Array(7).fill(CARRY), ...new Array(7).fill(MOVE)], 'transporter' + Game.time, {memory: {role: 'transporter', base: 'W18S15', targetRoom: 'W17S15', workType: 1}});
+Game.spawns['Spawn2_W18S15'].spawnCreep([...new Array(25).fill(CARRY), ...new Array(25).fill(MOVE)], 'transporter' + Game.time, {memory: {role: 'transporter', base: 'W17S14', targetRoom: 'W18S15'}});
 
 // defender
-Game.spawns['Spawn2_W15S13'].spawnCreep([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], 'defender' + Game.time, {memory: {role: 'defender', targetRoom: 'W13S15'}});
+Game.spawns['Spawn2_W18S15'].spawnCreep([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], 'defender' + Game.time, {memory: {role: 'defender', targetRoom: 'W17S14'}});
 
 // scout
 Game.spawns['Spawn1_W12S21'].spawnCreep([MOVE], 'scout' + Game.time, {memory: {role: 'scout', targetPos: {x:42, y:35, roomName:'W10S20'}}});

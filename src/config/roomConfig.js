@@ -35,6 +35,10 @@ module.exports = {
         restPos: new RoomPosition(19, 21, "W13S15"),
         managerPos: new RoomPosition(22, 18, "W13S15"),
     },
+    W17S14: {
+        restPos: new RoomPosition(34, 35, "W17S14"),
+        //managerPos: new RoomPosition(42, 37, "W17S14"),
+    },
     sim: {
         restPos: new RoomPosition(19, 21, "sim"),
         managerPos: new RoomPosition(23, 26, "sim"),
