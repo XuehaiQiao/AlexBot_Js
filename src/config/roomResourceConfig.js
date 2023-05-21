@@ -9,7 +9,7 @@ module.exports = {
     K: {terminal: 4000, storage: [5000, 10000, 20000]},
     L: {terminal: 4000, storage: [5000, 10000, 20000]},
     Z: {terminal: 4000, storage: [5000, 10000, 20000]},
-    X: {terminal: 4000, storage: [5000, 15000, 30000]},
+    X: {terminal: 4000, storage: [10000, 20000, 30000]},
     G: {terminal: 4000, storage: [5000, 10000, 20000]},
 
     XUH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // attack

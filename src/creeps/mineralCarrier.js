@@ -26,91 +26,54 @@ module.exports = {
             }
         }
 
-        // move to its target room if not in
-        if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
-            creep.moveToRoom(creep.memory.targetRoom);
-            return;
-        }
-        
+        // move to room if not in
+        if (creep.moveToRoomAdv(creep.memory.targetRoom)) return;
         // set status: 0. harvest  1. transfer 
         creep.workerSetStatus();
 
-        const task = creep.room.memory.tasks.labTasks[0];
-
-        let allLabs = creep.room.find(FIND_MY_STRUCTURES, {filter: struct => struct.structureType == STRUCTURE_LAB});
-        let outterLabs =  _.filter(allLabs, lab => !creep.room.memory.labs.center.includes(lab.id));
-        let centerLabs = _.map(creep.room.memory.labs.center, id => Game.getObjectById(id));
+        const labTasks = creep.room.memory.tasks.labTasks;
+        const labStatus = creep.room.memory.labStatus;
         
-        // labStatus: 0 finished, 1 running, 2 center feed, 3 outter withdraw 
-        // 0 finished: remove all minerals from lab
-        if(!creep.room.memory.labStatus) {
-            //creep.say(creep.room.memory.labStatus);
-            for(const i in allLabs) {
-                let lab = allLabs[i];
-                if(lab.mineralType && lab.store.getUsedCapacity(lab.mineralType) > 0) {
-                    labWithdraw(creep, lab);
-                    return;
-                }
-            }
+        if(this.feedBoostLabs(creep)) {
+            creep.say('Boost!');
+        }
+        else if(labTasks && labTasks.length > 0 && labStatus !== undefined && labStatus !== 1) {
+            this.labReactionWork(creep);
+        }
+        else if(!mineralContainerWithdraw(creep)) {
+            // empty store.
+            if(creep.store.getUsedCapacity() > 0) creep.memory.status = 1;
 
-            if(creep.store.getUsedCapacity() > 0) {
-                let storage = creep.room.storage;
+            if(creep.memory.status === 1) {
+                const storage = creep.room.storage;
                 if(storage) {
                     let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
                     if(creep.transfer(storage, resourceType) == ERR_NOT_IN_RANGE) {
                         creep.moveToNoCreepInRoom(storage);
                     }
-                    
                 }
             }
             else {
-                if(!mineralContainerWithdraw(creep)) {
-                    // go rest
-                    creep.toResPos(20);
-                }
-            }
-        }
-        // 1 running: do nothing
-        else if(creep.room.memory.labStatus == 1) {
-            //creep.say(creep.room.memory.labStatus);
-            // transfer to storage
-            if(!mineralContainerWithdraw(creep)) {
                 // go rest
-                creep.toResPos(20);
+                creep.toResPos(10);
             }
         }
-        // 2 center feed: 
-        else if(creep.room.memory.labStatus == 2) {
-            //creep.say(creep.room.memory.labStatus);
-            for (const i in centerLabs) {
-                let lab = centerLabs[i];
-                if(!lab.mineralType || lab.store[lab.mineralType] < 5) {
-                    let resourceType = reactionResources[task.resourceType][i];
-                    labTransfer(creep, lab, resourceType);
-                    return;
-                }
-            }
-        }
-        // 3 outter withdraw
-        else if(creep.room.memory.labStatus == 3) {
-            //creep.say(creep.room.memory.labStatus);
-            for(const i in outterLabs) {
-                let lab = outterLabs[i];
-                if(lab.mineralType && lab.store.getUsedCapacity(lab.mineralType) > 0) {
-                    labWithdraw(creep, lab);
-                    return;
-                }
-            }
-        }
-
     },
 
     // checks if the room needs to spawn a creep
     spawn: function(room) {
+        if(room.controller.level < 6) return false;
+
+        // check miner
         let miner = global.roomCensus[room.name]['miner'];
         if(miner) {
             // run rest codes
         }
+        // check boostLab
+        else if(room.memory.labs && room.memory.labs.boostLab && Object.keys(room.memory.labs.boostLab).length > 0) {
+            // run rest codes
+        }
+        // check labTasks
         else if(!room.memory.tasks || !room.memory.tasks.labTasks || room.memory.tasks.labTasks.length == 0) {
             return false;
         }
@@ -147,12 +110,99 @@ module.exports = {
         }
 
         return stage;
+    },
+
+    labReactionWork: function(creep) {
+        const task = creep.room.memory.tasks.labTasks[0];
+        let allLabs = creep.room.find(FIND_MY_STRUCTURES, {filter: struct => struct.structureType == STRUCTURE_LAB});
+        let outterLabs =  _.filter(allLabs, lab => lab.isActive() && !creep.room.memory.labs.center.includes(lab.id) && !creep.room.memory.labs.boostLab[lab.id] && lab.cooldown === 0);
+        let centerLabs = _.map(creep.room.memory.labs.center, id => Game.getObjectById(id));
+        
+        // labStatus: 0 finished, 1 running, 2 center feed, 3 outter withdraw 
+        // 0 finished: remove all minerals from lab
+        if(!creep.room.memory.labStatus) {
+            //creep.say(creep.room.memory.labStatus);
+            for(const lab of outterLabs) {
+                if(lab.mineralType && lab.store.getUsedCapacity(lab.mineralType) > 0) {
+                    labWithdraw(creep, lab);
+                    return;
+                }
+            }
+            for(const lab of centerLabs) {
+                if(lab.mineralType && lab.store.getUsedCapacity(lab.mineralType) > 0) {
+                    labWithdraw(creep, lab);
+                    return;
+                }
+            }
+        }
+        // 1 running: do nothing
+        else if(creep.room.memory.labStatus == 1) {
+            // do nothing.
+        }
+        // 2 center feed: 
+        else if(creep.room.memory.labStatus == 2) {
+            //creep.say(creep.room.memory.labStatus);
+            for (const i in centerLabs) {
+                let lab = centerLabs[i];
+                if(!lab || !lab.isActive()) return;
+                if(!lab.mineralType || lab.store[lab.mineralType] < 5) {
+                    let resourceType = reactionResources[task.resourceType][i];
+                    labTransfer(creep, lab, resourceType);
+                    return;
+                }
+            }
+        }
+        // 3 outter withdraw
+        else if(creep.room.memory.labStatus == 3) {
+            //creep.say(creep.room.memory.labStatus);
+            for(const lab of outterLabs) {
+                if(lab.mineralType && lab.store.getUsedCapacity(lab.mineralType) >= 2000) {
+                    labWithdraw(creep, lab);
+                    return;
+                }
+                else if(lab.mineralType && lab.mineralType !== task.resourceType) {
+                    labWithdraw(creep, lab);
+                    return;
+                }
+            }
+        }
+    },
+
+    feedBoostLabs: function(creep) {
+        const boostLab = creep.room.memory.labs.boostLab;
+        if(!boostLab) return false;
+
+        for(const labId in boostLab) {
+            const {resourceType, amount} = boostLab[labId];
+            const lab = Game.getObjectById(labId);
+            if(!lab || !lab.isActive()) {
+                delete boostLab[labId];
+                return false;
+            }
+
+            if(!lab.mineralType || (lab.mineralType === resourceType && lab.store[resourceType] < amount)) {
+                console.log(lab.store[resourceType], amount)
+                if(lab.store.getFreeCapacity(resourceType) === 0) continue;
+                labTransfer(creep, lab, resourceType);
+                return true;
+            }
+            else if(lab.mineralType !== resourceType){
+                // mineralType not correct
+                labWithdraw(creep, lab);
+                return true;
+            }
+            else {
+                continue;
+            }
+        }
+
+        return false;
     }
 };
 
 // ============================================= Functions =============================================
 
-// withdraw all resources from lab and send to lab
+// withdraw all resources from lab and send to storage
 var labWithdraw = function(creep, targetLab) {
     // transfer
     if(creep.memory.status) {

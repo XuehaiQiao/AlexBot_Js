@@ -17,6 +17,11 @@ module.exports = {
 
     /** @param {Creep} creep **/
     run: function(creep) {
+        if(creep.memory.boost && !creep.memory.boosted && creep.memory.boostInfo) {
+            creep.getBoosts(creep.memory.boostInfo);
+            return;
+        }
+
         // move to its target room if not in
         if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
             creep.moveToRoom(creep.memory.targetRoom);
@@ -68,8 +73,6 @@ module.exports = {
 
     // checks if the room needs to spawn a creep
     spawn: function(room) {
-        // var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == this.properties.type && creep.room.name == room.name);
-        // console.log(this.properties.type + ': ' + upgraders.length, room.name);
         let creepCount;
         if(global.roomCensus[room.name][this.properties.type]) creepCount = global.roomCensus[room.name][this.properties.type]
         else creepCount = 0;
@@ -111,6 +114,12 @@ module.exports = {
 
         let memory = {role: this.properties.type, status: 1, target: 0, base: room.name};
     
+        if(room.name === "W19S17") {
+            memory.boost = true;
+            memory.boosted = false;
+            memory.boostInfo = {GH2O: 15};
+        }
+
         return {name, body, memory};
     },
 

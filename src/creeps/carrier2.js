@@ -146,7 +146,7 @@ module.exports = {
         var stage = this.getStage(room);
 
         let creepCount;
-        if(global.roomCensus[room.name][this.properties.type]) creepCount = global.roomCensus[room.name][this.properties.type]
+        if(global.roomCensus[room.name] && global.roomCensus[room.name][this.properties.type] != null) creepCount = global.roomCensus[room.name][this.properties.type]
         else creepCount = 0;
 
         return creepCount < this.properties.stages[stage].number? true : false;

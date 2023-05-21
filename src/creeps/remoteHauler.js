@@ -39,6 +39,14 @@ module.exports = {
             // pick up near resources
             const nearResouce = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1);
             if (nearResouce.length > 0) creep.pickup(nearResouce[0]);
+            
+            // withdraw near rains
+            const nearRain = creep.pos.findInRange(FIND_RUINS, 1, {filter: ruin => ruin.store.getUsedCapacity() > 0});
+            if(nearRain.length > 0) {
+                let resourceType = _.find(Object.keys(nearRain[0].store), resourceType => nearRain[0].store[resourceType] > 0);
+                creep.withdraw(nearRain[0], resourceType);
+            }
+
             // tomstone
             const nearTomstone = creep.pos.findInRange(FIND_TOMBSTONES, 1, { filter: ts => ts.store.getUsedCapacity() > 0 });
             if (nearTomstone.length > 0) {
@@ -89,6 +97,12 @@ module.exports = {
             if (creep.memory.targetSource != null) creep.memory.targetSource = null;
             if (creep.memory.targetId != null) creep.memory.targetId = null;
 
+            // build near road and container
+            const myConstuct = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 2);
+            if (myConstuct.length > 0) {
+                if (creep.build(myConstuct[0]) == OK) return;
+            }
+
             // repair near road and container
             const needRepair = creep.pos.findInRange(FIND_STRUCTURES, 1, {
                 filter: struct => (
@@ -100,17 +114,11 @@ module.exports = {
                 creep.repair(needRepair[0]);
             }
 
-            // build near road and container
-            const myConstuct = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 2);
-            if (myConstuct.length > 0) {
-                if (creep.build(myConstuct[0]) == OK) return;
-            }
-
             // directly move to storage if can
             let baseRoom = Game.rooms[creep.memory.base]
             if (baseRoom) {
                 let target = baseRoom.storage;
-                if(target) {
+                if (target) {
                     let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
                     if (creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
                         creep.moveToNoCreep(target);
@@ -231,7 +239,17 @@ function findTargetSourceIndex(creep) {
         return 0;
     }
     else {
-        Memory.outSourceRooms[creep.room.name].targetSource = (res + 1) % Memory.outSourceRooms[creep.room.name].sourceNum;
+        let sourceNum = Memory.outSourceRooms[creep.room.name].sourceNum;
+        // asign a no hauler source
+        for(var i = 0; i < sourceNum; i++) {
+            let curIndex = (res + i) % sourceNum;
+            if(creep.room.find(FIND_MY_CREEPS, {filter: c => c.memory.targetSource === curIndex}).length === 0) {
+                Memory.outSourceRooms[creep.room.name].targetSource = (curIndex + 1) % sourceNum;
+                return curIndex;
+            }
+        }
+        
+        Memory.outSourceRooms[creep.room.name].targetSource = (res + 1) % sourceNum;
         return res;
     }
 }
@@ -239,42 +257,37 @@ function findTargetSourceIndex(creep) {
 function withdrawBySouce(creep) {
     let source = creep.room.find(FIND_SOURCES)[creep.memory.targetSource];
 
+    // find dropedResource
+    let dropedResources = source.pos.findInRange(FIND_DROPPED_RESOURCES, 3, {
+        filter: resource => (resource.amount > creep.store.getCapacity() / 2)
+    });
+    if (dropedResources.length) {
+        if (creep.pickup(dropedResources[0]) === ERR_NOT_IN_RANGE) {
+            creep.moveToNoCreepInRoom(dropedResources[0]);
+        }
+        return;
+    }
+
+    // find container
+    let containers = source.pos.findInRange(FIND_STRUCTURES, 2, {
+        filter: structure => (
+            structure.structureType === STRUCTURE_CONTAINER &&
+            structure.store.getUsedCapacity() >= creep.store.getFreeCapacity()
+        )
+    });
+    if (containers.length) {
+        let container = containers[0];
+        let resourceType = _.find(Object.keys(container.store), resource => container.store[resource] > 0);
+        if (creep.withdraw(container, resourceType) === ERR_NOT_IN_RANGE) {
+            creep.moveToNoCreepInRoom(container);
+        }
+        return;
+    }
 
     if (!creep.pos.inRangeTo(source.pos, 4)) {
         creep.moveToNoCreepInRoom(source);
     }
     else {
-        // find dropedResource
-        let dropedResources = source.pos.findInRange(FIND_DROPPED_RESOURCES, 3, {
-            filter: resource => (
-                resource.amount > Math.min(creep.store.getFreeCapacity(), creep.store.getCapacity() / 3)
-            )
-        });
-        if (dropedResources.length) {
-            let result = creep.pickup(dropedResources[0]);
-            if (result == ERR_NOT_IN_RANGE) {
-                creep.moveToNoCreepInRoom(dropedResources[0]);
-            }
-            return;
-        }
-
-        // find container
-        let containers = source.pos.findInRange(FIND_STRUCTURES, 2, {
-            filter: structure => (
-                structure.structureType == STRUCTURE_CONTAINER &&
-                structure.store.getUsedCapacity() >= creep.store.getFreeCapacity()
-            )
-        });
-        if (containers.length) {
-            let container = containers[0];
-            let resourceType = _.find(Object.keys(container.store), resource => container.store[resource] > 0);
-            let result = creep.withdraw(container, resourceType);
-            if (result == ERR_NOT_IN_RANGE) {
-                creep.moveToNoCreepInRoom(container);
-            }
-            return;
-        }
-
         creep.memory.rest = 10;
     }
 }

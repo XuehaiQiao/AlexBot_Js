@@ -29,6 +29,7 @@ let creepLogic = {
     wrecker:        require('./wrecker'),
     medic:          require('./medic'),
     scout:          require('./scout'),
+    rangeAtker:     require('./rangeAtker'),
     
 }
 

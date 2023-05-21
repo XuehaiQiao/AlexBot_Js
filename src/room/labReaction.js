@@ -16,25 +16,19 @@ module.exports = function(room) {
         return;
     }
     if(room.memory.labs.center.length != 2) return;
+    if(!room.memory.labs.boostLab) room.memory.labs.boostLab = {};
+
+    // For every 1000 ticks, double check if have need boost creeps
+    if(Game.time % 1000 === 686) {
+        let needBoostCreep = _.find(Game.creeps, creep => creep.memory.base === room.name && creep.memory.boost === true && creep.memory.boosted === false);
+        if(!needBoostCreep) {
+            room.memory.labs.boostLab = {};
+        }
+    }
 
     // For every 200 ticks, check & assign tasks if no tasks
     if(Game.time % 200 === 123 && room.memory.tasks.labTasks.length === 0) {
-        let shortage = 'NO Compond Shortage';
-        for (const compond in compondsRequirements) {
-            let targetAmount = compondsRequirements[compond][0];
-            let createdTasks = createLabTasks(room.storage, compond, targetAmount);
-            if(createdTasks.length > 0) {
-                room.memory.tasks.labTasks.push(...createdTasks);
-                break;
-            }
-            else if(createdTasks === false) {
-                shortage = compond;
-                break;
-            }
-        }
-
-        if(!Memory.resourceShortage) Memory.resourceShortage = {};
-        else Memory.resourceShortage[room.name] = shortage;
+        createTask(room);
     }
 
     // lab reaction
@@ -43,7 +37,7 @@ module.exports = function(room) {
 
 // create labTasks if there are enough resources in the storage (recursive dfs-POT)
 // return value: false/array
-var createLabTasks = function(storage, resourceType, targetAmount, resourceTotal = {}) {
+function createLabTasks(storage, resourceType, targetAmount, resourceTotal = {}) {
     if(!storage) return false;
 
     // amount of resourceType still needs
@@ -63,7 +57,7 @@ var createLabTasks = function(storage, resourceType, targetAmount, resourceTotal
     else {
         // task amount range 200-2000
         if(short > 2000) short = 2000;
-        else if(short < 200) short = 200;
+        else if(short < 1000) short = 1000;
 
         let taskList = [];
         for(const i in reactionResources[resourceType]) {
@@ -78,31 +72,29 @@ var createLabTasks = function(storage, resourceType, targetAmount, resourceTotal
 };
 
 
-var runLab = function(room) {
+function runLab(room) {
     let labTasks = room.memory.tasks.labTasks;
     if(!labTasks.length) {
         return;
     }
 
     let allLabs = room.find(FIND_MY_STRUCTURES, {filter: struct => struct.structureType == STRUCTURE_LAB});
-    let outterLabs =  _.filter(allLabs, lab => !room.memory.labs.center.includes(lab.id));
+    let outterLabs =  _.filter(allLabs, lab => lab.isActive() && !room.memory.labs.center.includes(lab.id) && !room.memory.labs.boostLab[lab.id] && lab.cooldown === 0);
     let centerLabs = _.map(room.memory.labs.center, id => Game.getObjectById(id));
 
 
 
     const task = room.memory.tasks.labTasks[0];
-
-    if(task.amount <= 0) {
-        room.memory.tasks.labTasks.shift();
-        room.memory.labStatus = 0;
-        return;
-    }
     
-    // labStatis: 0 finished, 1 running, 2 center feed, 3 outter withdraw 
+    // labStatis: 0 idle/finished, 1 running, 2 center feed, 3 outter withdraw
     // 0 finished
     if(!room.memory.labStatus) {
-        for(const i in allLabs) {
-            if(allLabs[i].mineralType) return;
+        // delete task from task queue only all labs are empty and task is finished.
+        for(const lab of centerLabs) {
+            if(lab.mineralType) return;
+        }
+        for(const lab of outterLabs) {
+            if(lab.mineralType) return;
         }
 
         if(task.amount <= 0) {
@@ -123,13 +115,18 @@ var runLab = function(room) {
             }
         }
         for(const i in outterLabs) {
-            if((outterLabs[i].mineralType && outterLabs[i].mineralType != task.resourceType) || task.amount <= 0) {
+            if(task.amount <= 0) {
                 room.memory.labStatus = 0;
                 return;
             }
 
+            if(outterLabs[i].mineralType && outterLabs[i].mineralType != task.resourceType) {
+                room.memory.labStatus = 3;
+                return;
+            }
+
             const result = outterLabs[i].runReaction(...centerLabs);
-            if(result == ERR_FULL) {
+            if(result === ERR_FULL || result === ERR_INVALID_ARGS) {
                 room.memory.labStatus = 3;
                 return;
             }
@@ -147,6 +144,11 @@ var runLab = function(room) {
     }
     // 2 center feed
     else if(room.memory.labStatus == 2) {
+        if(task.amount <= 0) {
+            room.memory.labStatus = 0;
+            return;
+        }
+        
         for (const i in centerLabs) {
             let lab = centerLabs[i];
             if(!lab.mineralType || lab.store[lab.mineralType] < 5) {
@@ -158,12 +160,30 @@ var runLab = function(room) {
     }
     // 3 outter withdraw 
     else if(room.memory.labStatus == 3) {
-        for (const i in outterLabs) {
-            if(outterLabs[i].store.getFreeCapacity(task.resourceType) < 5) {
-                return;
-            }
+        for (const lab of outterLabs) {
+            if(lab.mineralType && lab.mineralType !== task.resourceType) return;
+            if(lab.store.getFreeCapacity(task.resourceType) < 5) return;
         }
 
         room.memory.labStatus = 1;
     }
+}
+
+function createTask(room) {
+    let shortage = 'NO Compond Shortage';
+    for (const compond in compondsRequirements) {
+        let targetAmount = compondsRequirements[compond][0];
+        let createdTasks = createLabTasks(room.storage, compond, targetAmount);
+        if(createdTasks.length > 0) {
+            room.memory.tasks.labTasks.push(...createdTasks);
+            break;
+        }
+        else if(createdTasks === false) {
+            shortage = compond;
+            break;
+        }
+    }
+
+    if(!Memory.resourceShortage) Memory.resourceShortage = {};
+    else Memory.resourceShortage[room.name] = shortage;
 }

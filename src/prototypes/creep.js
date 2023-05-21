@@ -1,4 +1,5 @@
 const { roomInfo } = require("../config");
+const { boostCreep } = require("../structures/lab");
 
 Creep.prototype.sayHello = function sayHello(words="Hello") {
     this.say(words, true);
@@ -291,4 +292,66 @@ Creep.prototype.isStuck = function() {
 Creep.prototype.isAtEdge = function() {
     let pos = this.pos;
 	return pos.x == 0 || pos.y == 0 || pos.x == 49 || pos.y == 49;
+}
+
+Creep.prototype.generateBody = function(bodyDesign) {
+    let body = [];
+    for(const bodyType of bodyDesign) {
+        body.push(...new Array(bodyType[1]).fill(bodyType[0]));
+    }
+
+    return body;
+}
+
+Creep.prototype.getBoosts = function(boostInfo) {
+    // boostInfo = {resourceType: bodyPartCount, ...}
+
+    // check spawning
+    if(this.spawning) return;
+
+    console.log(1);
+
+    // check terminal
+    let room = Game.rooms[this.memory.base];
+    if(!room.terminal || !room.terminal.isActive()) {
+        this.memory.boost = false;
+        return;
+    }
+
+    console.log(2);
+
+    let boostLabs = room.memory.labs.boostLab;
+    // check lab & compund amount
+    for(const resourceType in boostInfo) {
+        let amount = boostInfo[resourceType] * 30;
+        let labId = _.find(Object.keys(boostLabs), labId => boostLabs[labId].resourceType === resourceType && boostLabs[labId].amount >= amount);
+        let lab = Game.getObjectById(labId);
+        if(!lab || !lab.isActive()) {
+            this.memory.boost = false;
+            return;
+        }
+    }
+
+    console.log(3);
+
+    // getBoost
+    for(const resourceType in boostInfo) {
+        if(this.memory[resourceType]) continue;
+
+        let lab = Game.getObjectById(_.find(Object.keys(boostLabs), labId => boostLabs[labId].resourceType === resourceType));
+        if(!lab || !lab.isActive()) {
+            this.memory.boost == false;
+            return;
+        }
+        
+        let result = boostCreep(lab, this, resourceType, boostInfo[resourceType]);
+
+        if (result === ERR_NOT_IN_RANGE) this.moveTo(lab);
+        else if(result === OK) this.memory[resourceType] = true;
+        return;
+    }
+
+    console.log(4);
+
+    this.memory.boosted = true;
 }

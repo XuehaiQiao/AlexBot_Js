@@ -48,6 +48,8 @@ module.exports = {
         }
         // status:0 withdraw
         else {
+            if(creep.ticksToLive === 1) return;
+            
             let storage = Game.getObjectById(creep.memory[STRUCTURE_STORAGE]);
 
             // link, terminal balance, ps, factory, nuke, taskQueue

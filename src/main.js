@@ -47,12 +47,13 @@ module.exports.loop = function () {
         roomLogic.labReaction(r);
         roomLogic.powerOperation(r);
         roomLogic.factorayLogic(r);
+        tools.myRoomPlanner(r.name, { render: true });
     });
     roomLogic.resourceBalancing(Game.myRooms);
     roomLogic.marketLogic();
     totalRoomCpu += Game.cpu.getUsed();
 
-    //tools.roomPlanner('sim', { render: true });
+    
     
     /**
      * =====================================

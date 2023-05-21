@@ -24,13 +24,13 @@ function planner_loop(roomName, opts = {}) {
 /**/if (opts.render) renderStructs(_this, minimalStructs); if (opts.step < ++s) return;
 /**/if (opts.render) renderMinimal(_this);
 
-    let labs = generateLabs(_this, structuresMatrix);
-    if (!labs) return;
-/**/if (opts.render) renderStructs(_this, labs); if (opts.step < ++s) return;
+//     let labs = generateLabs(_this, structuresMatrix);
+//     if (!labs) return;
+// /**/if (opts.render) renderStructs(_this, labs); if (opts.step < ++s) return;
 
-    let exts = generateExtensions(_this, structuresMatrix);
-    if (!exts) return;
-/**/if (opts.render) renderStructs(_this, exts); if (opts.step < ++s) return;
+//     let exts = generateExtensions(_this, structuresMatrix);
+//     if (!exts) return;
+// /**/if (opts.render) renderStructs(_this, exts); if (opts.step < ++s) return;
 };
 
 
@@ -39,9 +39,9 @@ function getAnchor(roomName) {
     let room = Game.rooms[roomName];
     if (!room) { console.log('no room'); return null; }
     let flags = room.find(FIND_FLAGS, { filter: { color: COLOR_RED } });
-    if (!flags.length) { 
+    if (!flags.length) {
         // console.log(`getAnchor: no (red) flag!`); 
-        return null; 
+        return null;
     }
     if (flags.length > 1) { console.log(`getAnchor: too many (red) flags!`); return null; }
     return flags[0].pos;
@@ -60,31 +60,36 @@ function generateMinimalBase(_this, structuresMatrix) {
 };
 
 function getMinimalBase() {
-    return [[- 2, -2, STRUCTURE_EXTENSION],
-    [-1, -2, STRUCTURE_EXTENSION],
-    [0, -2, STRUCTURE_SPAWN],
-    [1, -2, STRUCTURE_ROAD],
-    [2, -2, STRUCTURE_EXTENSION],
-    [-2, -1, STRUCTURE_ROAD],
-    //[-1, -1],
-    [0, -1, STRUCTURE_ROAD],
-    [1, -1, STRUCTURE_SPAWN],
-    [2, -1, STRUCTURE_EXTENSION],
-    [-2, 0, STRUCTURE_EXTENSION],
-    [-1, 0, STRUCTURE_ROAD],
-    //[0,0],
-    [1, 0, STRUCTURE_POWER_SPAWN],
-    [2, 0, STRUCTURE_SPAWN],
-    [-2, 1, STRUCTURE_ROAD],
-    //[-1, 1]
-    [0, 1, STRUCTURE_ROAD],
-    //[1, 1]
-    [2, 1, STRUCTURE_ROAD],
-    [-2, 2, STRUCTURE_LINK],
-    [-1, 2, STRUCTURE_STORAGE],
-    [0, 2, STRUCTURE_TERMINAL],
-    [1, 2, STRUCTURE_ROAD],
-    [2, 2, STRUCTURE_EXTENSION],
+    return [
+        //[-2, -2],
+        [-1, -2, STRUCTURE_ROAD],
+        //[0, -2],
+        [1, -2, STRUCTURE_ROAD],
+        //[2, -2],
+        [-2, -1, STRUCTURE_ROAD],
+        [-1, -1, STRUCTURE_FACTORY],
+        [0, -1, STRUCTURE_ROAD],
+        [1, -1, STRUCTURE_LINK],
+        [2, -1, STRUCTURE_ROAD],
+        //[-2, 0],
+        [-1, 0, STRUCTURE_TERMINAL],
+        //[0,0],
+        [1, 0, STRUCTURE_STORAGE],
+        //[2, 0],
+        [-2, 1, STRUCTURE_ROAD],
+        [-1, 1, STRUCTURE_NUKER],
+        [0, 1, STRUCTURE_ROAD],
+        [1, 1, STRUCTURE_POWER_SPAWN],
+        [2, 1, STRUCTURE_ROAD],
+        //[-2, 2],
+        [-1, 2, STRUCTURE_ROAD],
+        //[0, 2],
+        [1, 2, STRUCTURE_ROAD],
+        //[2, 2],
+        [0, 3, STRUCTURE_ROAD],
+        [0, -3, STRUCTURE_ROAD],
+        [3, 0, STRUCTURE_ROAD],
+        [-3, 0, STRUCTURE_ROAD],
     ];
 };
 
@@ -98,7 +103,7 @@ function renderStructs(_this, structs) {
 function renderMinimal(_this) {
     let x = _this.anchor.x;
     let y = _this.anchor.y;
-    let points = [[x - 2.4, y - 2.4], [x + 2.4, y - 2.4], [x + 2.4, y + 2.4], [x - 2.4, y + 2.4], [x - 2.4, y - 2.4]];
+    let points = [[x - 3.4, y], [x , y - 3.4], [x + 3.4, y], [x, y + 3.4], [x - 3.4, y]];
     _this.visual.poly(points, { stroke: '#ff4444', lineStyle: 'dashed' });
 }
 
