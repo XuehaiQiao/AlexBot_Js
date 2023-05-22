@@ -33,7 +33,25 @@ Game.spawns['Spawn1_W12S21'].spawnCreep([MOVE], 'scout' + Game.time, {memory: {r
 Game.spawns['Spawn3_W16S17'].spawnCreep([...new Array(25).fill(MOVE), ...new Array(19).fill(RANGED_ATTACK), ...new Array(6).fill(HEAL)], 'keeperAttacker' + Game.time, {memory: {role: 'keeperAttacker', base: 'W16S17', targetRoom: 'W16S16'}});
 
 // rangeAtker
-Game.spawns['Spawn3_W16S17'].spawnCreep([...new Array(5).fill(TOUGH), ...new Array(25).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(10).fill(HEAL)], 'rangeAtker' + Game.time, {memory: {role: 'rangeAtker', base: 'W16S17', targetRoom: 'W16S16', boost: true, boosted: false, boostInfo: {XLHO2: 10, XGHO2: 5, XKHO2: 10}}});
+Game.rooms['W18S15'].memory.tasks.spawnTasks.push({
+    name:'rangeAtker' + Game.time, 
+    body:[...new Array(5).fill(TOUGH), ...new Array(25).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(10).fill(HEAL)], 
+    memory: {role: 'rangeAtker', base: 'W18S15', targetRoom: 'W22S18', boost: true, boosted: false, boostInfo: {XLHO2: 10, XGHO2: 5, XKHO2: 10}}
+});
+
+// invaderAtker
+Game.rooms['W16S17'].memory.tasks.spawnTasks.push({
+    name:'invaderAttacker' + Game.time, 
+    body:[...new Array(2).fill(TOUGH), ...new Array(16).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(4).fill(HEAL)], 
+    memory: {
+        role: 'invaderAttacker', 
+        base: 'W16S17', 
+        targetRoom: 'W16S16',
+        boost: true,
+        boosted: false,
+        boostInfo: {XLHO2: 4, XGHO2: 2, XKHO2: 10}
+    }
+});
 
 // wrecker
 Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(25).fill(WORK), ...new Array(25).fill(MOVE)], 'wrecker' + Game.time, {memory: {role: 'wrecker', targetRoom: 'W17S14'}});

@@ -169,7 +169,7 @@ Creep.prototype.harvestEnergy = function harvestEnergy() {
     }
 
     if(!this.pos.inRangeTo(source.pos, 1)) {
-        this.moveTo(source, {reusePath: 10});
+        this.moveToNoCreepInRoom(source);
         result = ERR_NOT_IN_RANGE;
     }
     else {
@@ -303,24 +303,14 @@ Creep.prototype.generateBody = function(bodyDesign) {
     return body;
 }
 
-Creep.prototype.getBoosts = function(boostInfo) {
-    // boostInfo = {resourceType: bodyPartCount, ...}
-
+Creep.prototype.getBoosts = function() {
     // check spawning
     if(this.spawning) return;
 
-    console.log(1);
-
-    // check terminal
-    let room = Game.rooms[this.memory.base];
-    if(!room.terminal || !room.terminal.isActive()) {
-        this.memory.boost = false;
-        return;
-    }
-
-    console.log(2);
-
-    let boostLabs = room.memory.labs.boostLab;
+    // boostInfo = {resourceType: bodyPartCount, ...}
+    const boostInfo = this.memory.boostInfo;
+    const room = Game.rooms[this.memory.base];
+    const boostLabs = room.memory.labs.boostLab;
     // check lab & compund amount
     for(const resourceType in boostInfo) {
         let amount = boostInfo[resourceType] * 30;
@@ -336,18 +326,18 @@ Creep.prototype.getBoosts = function(boostInfo) {
 
     // getBoost
     for(const resourceType in boostInfo) {
-        if(this.memory[resourceType]) continue;
-
         let lab = Game.getObjectById(_.find(Object.keys(boostLabs), labId => boostLabs[labId].resourceType === resourceType));
         if(!lab || !lab.isActive()) {
-            this.memory.boost == false;
+            this.memory.boost = false;
             return;
         }
         
         let result = boostCreep(lab, this, resourceType, boostInfo[resourceType]);
 
         if (result === ERR_NOT_IN_RANGE) this.moveTo(lab);
-        else if(result === OK) this.memory[resourceType] = true;
+        else if(result === OK) {
+            delete boostInfo[resourceType];
+        }
         return;
     }
 

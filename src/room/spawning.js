@@ -3,6 +3,9 @@ const creepLogic = require("../creeps");
 // const creepTypes2 = ['carrier2', 'harvester2', 'upgrader2', 'builder2']; // 'mineralCarrier'
 
 function spawnCreeps(room) {
+    // check every 2 ticks
+    if(Game.time % 2 === 0) return;
+
     // return if no idle spawn
     var availableSpawns = room.find(FIND_MY_SPAWNS, {
         filter: function (spawn) {
@@ -66,8 +69,10 @@ function spawnCreeps(room) {
     if(spawnTasks.length) {
         // task = [{name, body, memory}, ...]
         let task = spawnTasks[0];
-        spawnCreepUsingSpawnData(task);
-        return;
+        if(spawnCreepUsingSpawnData(task) === OK) {
+            spawnTasks.shift();
+            return;
+        }
     }
 
     // ------------------------------ Out Sourcing Creeps ----------------------------------------------

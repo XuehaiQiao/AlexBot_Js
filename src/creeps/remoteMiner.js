@@ -3,11 +3,18 @@ const { drop } = require("lodash");
 // no repair logic yet, no added to creeps yet
 module.exports = {
     properties: {
-        role: "remoteMiner",
-        body: [...new Array(32).fill(WORK), CARRY, CARRY, ...new Array(16).fill(MOVE)] //cost: 3200+100+800 = $4100
+        role: 'remoteMiner',
+        body: [...new Array(32).fill(WORK), ...new Array(16).fill(MOVE)],
+        boostInfo: {UHO2: 32},
     },
     /** @param {Creep} creep **/
     run: function(creep) {
+        // boost if needed
+        if(creep.memory.boost && !creep.memory.boosted && creep.memory.boostInfo) {
+            creep.getBoosts();
+            return;
+        }
+
         // move to its target room if not in
         if (creep.moveToRoomAdv(creep.memory.targetRoom)) {
             return;
@@ -67,7 +74,13 @@ module.exports = {
     spawnData: function(room, outSourceRoomName) {
         let name = this.properties.role + Game.time;
         let body = this.properties.body;
-        let memory = {role: this.properties.role, status: 0, base: room.name, targetRoom: outSourceRoomName};
+        let memory = {
+            role: this.properties.role,
+            base: room.name, 
+            targetRoom: outSourceRoomName,
+            boost: true,
+            boostInfo: this.properties.boostInfo
+        };
 
         return {name, body, memory};
     },

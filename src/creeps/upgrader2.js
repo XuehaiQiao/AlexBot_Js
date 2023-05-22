@@ -18,7 +18,7 @@ module.exports = {
     /** @param {Creep} creep **/
     run: function(creep) {
         if(creep.memory.boost && !creep.memory.boosted && creep.memory.boostInfo) {
-            creep.getBoosts(creep.memory.boostInfo);
+            creep.getBoosts();
             return;
         }
 

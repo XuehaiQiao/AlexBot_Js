@@ -40,14 +40,12 @@ module.exports.loop = function () {
     // run room logic for each room in our empire
     _.forEach(Game.myRooms, r => {
         roomLogic.spawning(r);
-        roomLogic.repairing(r);
-        roomLogic.defending(r);
-        roomLogic.healing(r);
+        roomLogic.towerLogic(r);
         roomLogic.linkTransfer(r);
         roomLogic.labReaction(r);
         roomLogic.powerOperation(r);
         roomLogic.factorayLogic(r);
-        tools.myRoomPlanner(r.name, { render: true });
+        // tools.myRoomPlanner(r.name, { render: true });
     });
     roomLogic.resourceBalancing(Game.myRooms);
     roomLogic.marketLogic();

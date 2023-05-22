@@ -36,11 +36,11 @@ module.exports = {
             if (hostileCreep) {
                 let distance = creep.pos.getRangeTo(hostileCreep);
 
-                if (distance < 3) {
-                    // move away
+                if (distance <= 4) {
+                    creep.moveToRoomAdv(creep.memory.base);
                     return;
                 }
-                else if (distance <= 6) {
+                else if (distance <= 5) {
                     return;
                 }
             }

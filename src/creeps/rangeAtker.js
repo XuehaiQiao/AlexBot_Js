@@ -1,13 +1,15 @@
+const { T3_HEAL, T3_TOUGH, T3_RANGE_ATTACK } = require("../constants/boostName");
+
 module.exports = {
     properties: {
         role: 'rangeAtker',
         body: [...new Array(5).fill(TOUGH), ...new Array(25).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(10).fill(HEAL)],
-        boostInfo: {XLHO2: 10, XGHO2: 5, XKHO2: 10},
+        boostInfo: {[T3_HEAL]: 10, [T3_TOUGH]: 5, [T3_RANGE_ATTACK]: 10},
     },
     /** @param {Creep} creep **/
     run: function(creep) {
         if(creep.memory.boost && !creep.memory.boosted && creep.memory.boostInfo) {
-            creep.getBoosts(creep.memory.boostInfo);
+            creep.getBoosts();
             return;
         }
 

@@ -65,11 +65,11 @@ module.exports = {
                 if (hostileCreep) {
                     let distance = creep.pos.getRangeTo(hostileCreep);
 
-                    if (distance <= 3) {
-                        // move away
+                    if (distance <= 4) {
+                        creep.moveToRoomAdv(creep.memory.base);
                         return;
                     }
-                    else if (distance < 5) {
+                    else if (distance <= 5) {
                         return;
                     }
                 }
@@ -177,7 +177,7 @@ module.exports = {
             Memory.outSourceRooms[roomName].sourceNum = Game.rooms[roomName].find(FIND_SOURCES).length;
         }
 
-        let addednum = Memory.outSourceRooms[roomName].neutral === true ? 1 : 0;
+        let addednum = (global.roomCensus[roomName] && global.roomCensus[roomName]['remoteMiner']) ? 1 : 0;
         if (creepCount < sourceNum * this.properties.stages[this.getStage(room)].number + addednum) {
             return true;
         }
@@ -209,7 +209,7 @@ function findTarget(creep) {
     if (!targetQ || targetQ.length === 0) {
         let takenIds = _.map(creep.room.find(FIND_MY_CREEPS, { filter: creep => creep.role === 'remoteHauler' }), creep => creep.memory.targetId);
         let containers = creep.room.find(FIND_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_CONTAINER && !takenIds.includes(struct.id) && struct.store.getUsedCapacity() > creep.store.getCapacity() });
-        let dropedResources = creep.room.find(FIND_DROPPED_RESOURCES, { filter: resource => !takenIds.includes(resource.id) && resource.amount > creep.store.getCapacity() });
+        let dropedResources = creep.room.find(FIND_DROPPED_RESOURCES, { filter: resource => !takenIds.includes(resource.id) && resource.amount > creep.store.getCapacity()});
 
         let targets = [...containers, ...dropedResources]
         Memory.outSourceRooms[creep.room.name].haulerTargets = _.map(targets, target => { return { id: target.id, amount: (target.store ? target.store.getUsedCapacity() : target.amount) } });
@@ -218,12 +218,8 @@ function findTarget(creep) {
 
     while (targetQ.length > 0) {
         let { id, amount } = targetQ[targetQ.length - 1];
-        if (Game.getObjectById(id)) {
-            if (amount < creep.store.getCapacity()) {
-                targetQ.pop();
-                continue;
-            }
-            else Memory.outSourceRooms[creep.room.name].haulerTargets[targetQ.length - 1].amount -= creep.store.getFreeCapacity();
+        if (Game.getObjectById(id) && amount > creep.store.getFreeCapacity()) {
+            targetQ[targetQ.length - 1].amount -= creep.store.getFreeCapacity();
             return id;
         }
         else targetQ.pop();
@@ -298,7 +294,7 @@ function withdrawByTarget(creep) {
         creep.memory.targetId = null;
         return
     }
-    else if (target.store && target.store.getUsedCapacity() <= creep.store.getFreeCapacity() / 2) {
+    else if (target.store && target.store.getUsedCapacity() <= creep.store.getFreeCapacity()) {
         creep.memory.targetId = null;
     }
 

@@ -1,4 +1,6 @@
 module.exports = function() {
+    if(Game.time % 10 !== 10) return;
+    
     let w21s19 = Game.rooms['W21S19'];
     if(!w21s19 || !w21s19.terminal) return;
 

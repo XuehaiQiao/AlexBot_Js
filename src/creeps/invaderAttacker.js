@@ -1,11 +1,22 @@
 const { G } = require("../config/roomResourceConfig");
+const { T3_HEAL, T3_TOUGH, T3_RANGE_ATTACK } = require("../constants/boostName");
 
 module.exports = {
     properties: {
-        role: "invaderAttacker"
+        role: 'invaderAttacker',
+        option: {
+            boost: {body: [...new Array(2).fill(TOUGH), ...new Array(16).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(4).fill(HEAL)], number: 1},
+            nonBoost: {body: [...new Array(20).fill(MOVE), ...new Array(20).fill(RANGED_ATTACK), ...new Array(5).fill(MOVE), ...new Array(5).fill(HEAL)], number: 2},
+        },
+        boostInfo: {[T3_HEAL]: 4, [T3_TOUGH]: 2, [T3_RANGE_ATTACK]: 10},
     },
     /** @param {Creep} creep **/
     run: function(creep) {
+        if(creep.memory.boost && !creep.memory.boosted && creep.memory.boostInfo) {
+            creep.getBoosts();
+            return;
+        }
+
         //move to targetRoom if not in
         if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
             creep.moveToRoom(creep.memory.targetRoom);
@@ -50,7 +61,7 @@ module.exports = {
                 
             }
             else {
-                creep.suicide();
+                creep.memory.role = 'keeperAttacker';
             }
         }
     },
@@ -69,7 +80,7 @@ module.exports = {
         }
         else creepCount = 0;
 
-        if (creepCount < 2) {
+        if (creepCount < this.properties.option.boost.number) {
             return true;
         }
     },
@@ -77,8 +88,15 @@ module.exports = {
     // returns an object with the data to spawn a new creep
     spawnData: function(room, targetRoomName) {
         let name = this.properties.role + Game.time;
-        let body = [...new Array(20).fill(MOVE), ...new Array(20).fill(RANGED_ATTACK), ...new Array(5).fill(MOVE), ...new Array(5).fill(HEAL)]; // $5500
-        let memory = {role: this.properties.role, status: 0, base: room.name, targetRoom: targetRoomName};
+        let body = this.properties.option.boost.body;
+        let memory = {
+            role: this.properties.role, 
+            base: room.name, 
+            targetRoom: targetRoomName,
+            boost: true,
+            boosted: false,
+            boostInfo: this.properties.boostInfo
+        };
 
         return {name, body, memory};
     },
