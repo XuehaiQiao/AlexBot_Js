@@ -23,13 +23,13 @@ module.exports = function (room) {
     }
 
     // repair (no enemy)
-    const isNeedRepair = (struct) => {
+    function isNeedRepair(structure) {
         return (
-        (struct.structureType === STRUCTURE_WALL && struct.hits >= wall.getTargetHits(room) && struct.hits < wall.getIdealHits(room)) ||
-        (struct.structureType === STRUCTURE_RAMPART && struct.hits < 10000) ||
-        (struct.structureType === STRUCTURE_RAMPART && struct.hits >= rampart.getTargetHits(room) && struct.hits < rampart.getIdealHits(room)) ||
-        (struct.structureType === STRUCTURE_CONTAINER && struct.hitsMax - struct.hits >= 10000) ||
-        (struct.structureType !== STRUCTURE_WALL && struct.structureType !== STRUCTURE_RAMPART && struct.structureType !== STRUCTURE_CONTAINER && struct.hits <= struct.hitsMax))
+            (structure.structureType == STRUCTURE_WALL && structure.hits >= wall.getTargetHits(room) && structure.hits < wall.getIdealHits(room)) || 
+            (structure.structureType == STRUCTURE_RAMPART && structure.hits < 10000) ||
+            (structure.structureType == STRUCTURE_RAMPART && structure.hits >= rampart.getTargetHits(room) && structure.hits < rampart.getIdealHits(room)) || 
+            (structure.structureType != STRUCTURE_WALL && structure.structureType != STRUCTURE_RAMPART && structure.hits <= structure.hitsMax - 800)
+        )
     }
 
     if (!room.memory.needRepairStructures) room.memory.needRepairStructures = [];
@@ -41,11 +41,10 @@ module.exports = function (room) {
     let needRepairs = room.memory.needRepairStructures;
     if(!needRepairs.length) return
     let target = Game.getObjectById(needRepairs[needRepairs.length - 1]);
-    if(!target || !isNeedRepair(target)) {
-        needRepairs.pop();
-        return;
-    }
-
+    if(!target || !isNeedRepair(target)) needRepairs.pop();
+    
+    if(!needRepairs.length) return
+    target = Game.getObjectById(needRepairs[needRepairs.length - 1]);
     let tower = target.pos.findClosestByRange(towers);
     tower.repair(target);
 }

@@ -107,7 +107,7 @@ var coreWork = function(creep) {
     if(!controllerLink || !link || !storage) return false;
 
     // upgrade: from storage to managerLink
-    if(controllerLink.store[RESOURCE_ENERGY] < 100 && link.store[RESOURCE_ENERGY] < 700 && link.cooldown <= 3) {
+    if(controllerLink.store[RESOURCE_ENERGY] < 100 && link.store[RESOURCE_ENERGY] < 700 && link.cooldown <= 2) {
         creep.say('S2L');
         fromA2B(creep, storage, link, RESOURCE_ENERGY, Math.min(link.store.getFreeCapacity(RESOURCE_ENERGY), controllerLink.store.getFreeCapacity(RESOURCE_ENERGY)));
         return true;

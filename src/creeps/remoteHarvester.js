@@ -27,7 +27,7 @@ module.exports = {
                 if(keeperLair.ticksToSpawn <= 12) {
                     creep.memory.rest = 0;
                     if(creep.store[RESOURCE_ENERGY] > 0) creep.drop(RESOURCE_ENERGY);
-                    if(creep.pos.getRangeTo(source) < 8) creep.moveToRoomAdv(creep.memory.base);
+                    if(creep.pos.getRangeTo(keeperLair) <= 5) creep.moveToRoomAdv(creep.memory.base);
                     return;
                 }
             }

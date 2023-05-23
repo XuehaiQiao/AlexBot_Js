@@ -1179,7 +1179,7 @@ var coreWork = function(creep) {
     let link = Game.getObjectById(creep.memory[STRUCTURE_LINK]);
     let controllerLink = Game.getObjectById(creep.memory.controllerLink);
     if(!controllerLink || !link || !storage) return false;
-    if(controllerLink.store[RESOURCE_ENERGY] < 100 && link.store[RESOURCE_ENERGY] < 700 && link.cooldown <= 3) {
+    if(controllerLink.store[RESOURCE_ENERGY] < 100 && link.store[RESOURCE_ENERGY] < 700 && link.cooldown <= 2) {
         creep.say('S2L');
         fromA2B(creep, storage, link, RESOURCE_ENERGY, Math.min(link.store.getFreeCapacity(RESOURCE_ENERGY), controllerLink.store.getFreeCapacity(RESOURCE_ENERGY)));
         return true;
@@ -1962,7 +1962,7 @@ module.exports = {
                 if(keeperLair.ticksToSpawn <= 12) {
                     creep.memory.rest = 0;
                     if(creep.store[RESOURCE_ENERGY] > 0) creep.drop(RESOURCE_ENERGY);
-                    if(creep.pos.getRangeTo(source) < 8) creep.moveToRoomAdv(creep.memory.base);
+                    if(creep.pos.getRangeTo(keeperLair) <= 5) creep.moveToRoomAdv(creep.memory.base);
                     return;
                 }
             }
@@ -2129,9 +2129,9 @@ module.exports = {
             }
             const nearTomstone = creep.pos.findInRange(FIND_TOMBSTONES, 1, { filter: ts => ts.store.getUsedCapacity() > 0 });
             if (nearTomstone.length > 0) {
-                if (creep.store.getUsedCapacity() > creep.store.getCapacity() * 0.9) creep.memory.status = 1;
                 let resourceType = _.find(Object.keys(nearTomstone[0].store), resourceType => nearTomstone[0].store[resourceType] > 0);
-                creep.withdraw(nearTomstone[0], resourceType);
+                let result = creep.withdraw(nearTomstone[0], resourceType);
+                if (result === OK && nearTomstone[0].store[RESOURCE_ENERGY] > creep.store.getCapacity() * 0.9) creep.memory.status = 1;
                 return;
             }
             if (creep.moveToRoomAdv(creep.memory.targetRoom)) return;
@@ -2140,11 +2140,11 @@ module.exports = {
                 if (hostileCreep) {
                     let distance = creep.pos.getRangeTo(hostileCreep);
 
-                    if (distance <= 4) {
+                    if (distance <= 5) {
                         creep.moveToRoomAdv(creep.memory.base);
                         return;
                     }
-                    else if (distance <= 5) {
+                    else if (distance <= 6) {
                         return;
                     }
                 }
@@ -2335,7 +2335,7 @@ function withdrawBySouce(creep) {
         creep.moveToNoCreepInRoom(source);
     }
     else {
-        creep.memory.rest = 10;
+        if(!Memory.outSourceRooms[creep.memory.targetRoom].sourceKeeper) creep.memory.rest = 15;
     }
 }
 
@@ -2764,7 +2764,7 @@ const { drop } = __require(45,24);
 module.exports = {
     properties: {
         role: 'remoteMiner',
-        body: [...new Array(32).fill(WORK), ...new Array(16).fill(MOVE)],
+        body: [...new Array(32).fill(WORK), CARRY, CARRY, ...new Array(16).fill(MOVE)],
         boostInfo: {UHO2: 32},
     },
     /** @param {Creep} creep **/
@@ -3220,7 +3220,8 @@ function spawnCreeps(room) {
     if(!room.memory.tasks.spawnTasks) room.memory.tasks.spawnTasks = [];
     let spawnTasks = room.memory.tasks.spawnTasks;
     if(spawnTasks.length) {
-        let task = spawnTasks[0];
+        const task = spawnTasks[0];
+        task.name += Game.time;
         if(spawnCreepUsingSpawnData(task) === OK) {
             spawnTasks.shift();
             return;
@@ -3368,13 +3369,11 @@ function updateLinkInfo(room) {
                 return;
             }
         })
-        if(link.pos.inRangeTo(room.controller.pos, 3)) {
+        if(link.pos.inRangeTo(room.controller.pos, 2)) {
             linkInfo.controllerLink = link.id;
         }
     });
     room.memory.linkCompleteness = (linkInfo.sourceLinks.length === sources.length && linkInfo.managerLink) ? true : false;
-
-    console.log('room link memory updated');
 };
 return module.exports;
 }
@@ -3460,48 +3459,59 @@ const { reactionResources } = __require(46,33);
 const { compondsRequirements } = __require(43,33);
 
 
-module.exports = function(room) {
-    if(!room) return;
-    if(room.controller.level < 6) return;
-    if(!room.memory.tasks) room.memory.tasks = {};
-    if(!room.memory.tasks.labTasks) room.memory.tasks.labTasks = [];
-    if(!room.storage) return;
-    if(!room.memory.labs) room.memory.labs = {};
-    if(!room.memory.labs.center) {
+module.exports = function (room) {
+    if (!room) return;
+    if (room.controller.level < 6) return;
+    if (!room.memory.tasks) room.memory.tasks = {};
+    if (!room.memory.tasks.labTasks) room.memory.tasks.labTasks = [];
+    if (!room.storage) return;
+    if (!room.memory.labs) room.memory.labs = {};
+    if (!room.memory.labs.center) {
         room.memory.labs.center = [];
         return;
     }
-    if(room.memory.labs.center.length != 2) return;
-    if(!room.memory.labs.boostLab) room.memory.labs.boostLab = {};
-    if(Game.time % 1000 === 686) {
+    if (room.memory.labs.center.length != 2) return;
+    if (!room.memory.labs.boostLab) room.memory.labs.boostLab = {};
+    if (Game.time % 1000 === 686) {
         let needBoostCreep = _.find(Game.creeps, creep => creep.memory.base === room.name && creep.memory.boost === true && creep.memory.boosted === false);
-        if(!needBoostCreep) {
+        if (!needBoostCreep) {
             room.memory.labs.boostLab = {};
         }
     }
-    if(Game.time % 200 === 123 && room.memory.tasks.labTasks.length === 0) {
-        createTask(room);
+    if (Game.time % 200 === 123 && room.memory.tasks.labTasks.length === 0) {
+        if (!room.memory.compondLevel) {
+            let compoundIsShort = createTask(room, 0);
+            if (!compoundIsShort) room.memory.compondLevel = 1;
+        }
+        else if (room.memory.compondLevel === 1) {
+            let compoundIsShort = createTask(room, 1);
+            if (!compoundIsShort) room.memory.compondLevel = 2;
+        }
+    }
+    if (Game.time % 3000 === 123 && room.memory.compondLevel === 2 && room.memory.tasks.labTasks.length === 0) {
+        let compoundIsShort = createTask(room, 0);
+        if (compoundIsShort) room.memory.compondLevel = 0;
     }
     runLab(room);
 };
 function createLabTasks(storage, resourceType, targetAmount, resourceTotal = {}) {
-    if(!storage) return false;
-    let short = (resourceTotal[resourceType]? resourceTotal[resourceType] : 0) + targetAmount - storage.store[resourceType];
-    if(short <= 0) {
-        if(resourceTotal[resourceType]) resourceTotal[resourceType] += targetAmount;
+    if (!storage) return false;
+    let short = (resourceTotal[resourceType] ? resourceTotal[resourceType] : 0) + targetAmount - storage.store[resourceType];
+    if (short <= 0) {
+        if (resourceTotal[resourceType]) resourceTotal[resourceType] += targetAmount;
         else resourceTotal[resourceType] = targetAmount;
 
         return [];
     }
-    else if(!reactionResources[resourceType]) {
+    else if (!reactionResources[resourceType]) {
         return false;
     }
     else {
-        if(short > 2000) short = 2000;
-        else if(short < 1000) short = 1000;
+        if (short > 2000) short = 2000;
+        else if (short < 1000) short = 1000;
 
         let taskList = [];
-        for(const i in reactionResources[resourceType]) {
+        for (const i in reactionResources[resourceType]) {
             let reactant = reactionResources[resourceType][i];
             let subTasks = createLabTasks(storage, reactant, short, resourceTotal);
             if (subTasks === false) return false;
@@ -3515,26 +3525,26 @@ function createLabTasks(storage, resourceType, targetAmount, resourceTotal = {})
 
 function runLab(room) {
     let labTasks = room.memory.tasks.labTasks;
-    if(!labTasks.length) {
+    if (!labTasks.length) {
         return;
     }
 
-    let allLabs = room.find(FIND_MY_STRUCTURES, {filter: struct => struct.structureType == STRUCTURE_LAB});
-    let outterLabs =  _.filter(allLabs, lab => lab.isActive() && !room.memory.labs.center.includes(lab.id) && !room.memory.labs.boostLab[lab.id] && lab.cooldown === 0);
+    let allLabs = room.find(FIND_MY_STRUCTURES, { filter: struct => struct.structureType == STRUCTURE_LAB });
+    let outterLabs = _.filter(allLabs, lab => lab.isActive() && !room.memory.labs.center.includes(lab.id) && !room.memory.labs.boostLab[lab.id] && lab.cooldown === 0);
     let centerLabs = _.map(room.memory.labs.center, id => Game.getObjectById(id));
 
 
 
     const task = room.memory.tasks.labTasks[0];
-    if(!room.memory.labStatus) {
-        for(const lab of centerLabs) {
-            if(lab.mineralType) return;
+    if (!room.memory.labStatus) {
+        for (const lab of centerLabs) {
+            if (lab.mineralType) return;
         }
-        for(const lab of outterLabs) {
-            if(lab.mineralType) return;
+        for (const lab of outterLabs) {
+            if (lab.mineralType) return;
         }
 
-        if(task.amount <= 0) {
+        if (task.amount <= 0) {
             room.memory.tasks.labTasks.shift();
             return;
         }
@@ -3542,82 +3552,87 @@ function runLab(room) {
             room.memory.labStatus = 1;
         }
     }
-    else if(room.memory.labStatus == 1) {
-        for(const i in centerLabs) {
-            if(centerLabs[i].mineralType && centerLabs[i].mineralType != reactionResources[task.resourceType][i]) {
+    else if (room.memory.labStatus == 1) {
+        for (const i in centerLabs) {
+            if (centerLabs[i].mineralType && centerLabs[i].mineralType != reactionResources[task.resourceType][i]) {
                 room.memory.labStatus = 0;
                 return;
             }
         }
-        for(const i in outterLabs) {
-            if(task.amount <= 0) {
+        for (const i in outterLabs) {
+            if (task.amount <= 0) {
                 room.memory.labStatus = 0;
                 return;
             }
 
-            if(outterLabs[i].mineralType && outterLabs[i].mineralType != task.resourceType) {
+            if (outterLabs[i].mineralType && outterLabs[i].mineralType != task.resourceType) {
                 room.memory.labStatus = 3;
                 return;
             }
 
             const result = outterLabs[i].runReaction(...centerLabs);
-            if(result === ERR_FULL || result === ERR_INVALID_ARGS) {
+            if (result === ERR_FULL || result === ERR_INVALID_ARGS) {
                 room.memory.labStatus = 3;
                 return;
             }
-            else if(result == ERR_NOT_ENOUGH_RESOURCES) {
+            else if (result == ERR_NOT_ENOUGH_RESOURCES) {
                 room.memory.labStatus = 2;
                 return;
             }
-            else if(result == OK) {
+            else if (result == OK) {
                 task.amount -= 5;
             }
             else {
             }
         }
     }
-    else if(room.memory.labStatus == 2) {
-        if(task.amount <= 0) {
+    else if (room.memory.labStatus == 2) {
+        if (task.amount <= 0) {
             room.memory.labStatus = 0;
             return;
         }
-        
+
         for (const i in centerLabs) {
             let lab = centerLabs[i];
-            if(!lab.mineralType || lab.store[lab.mineralType] < 5) {
+            if (!lab.mineralType || lab.store[lab.mineralType] < 5) {
                 return;
             }
         }
 
         room.memory.labStatus = 1;
     }
-    else if(room.memory.labStatus == 3) {
+    else if (room.memory.labStatus == 3) {
         for (const lab of outterLabs) {
-            if(lab.mineralType && lab.mineralType !== task.resourceType) return;
-            if(lab.store.getFreeCapacity(task.resourceType) < 5) return;
+            if (lab.mineralType && lab.mineralType !== task.resourceType) return;
+            if (lab.store.getFreeCapacity(task.resourceType) < 5) return;
         }
 
         room.memory.labStatus = 1;
     }
 }
 
-function createTask(room) {
-    let shortage = 'NO Compond Shortage';
+function createTask(room, amountIndex) {
+    let shortage = 'NO Compound Shortage';
+    let res = false;
     for (const compond in compondsRequirements) {
-        let targetAmount = compondsRequirements[compond][0];
+        let targetAmount = compondsRequirements[compond][amountIndex];
         let createdTasks = createLabTasks(room.storage, compond, targetAmount);
-        if(createdTasks.length > 0) {
+        if (createdTasks.length > 0) {
             room.memory.tasks.labTasks.push(...createdTasks);
+            res = true;
             break;
         }
-        else if(createdTasks === false) {
+        else if (createdTasks === false) {
             shortage = compond;
+            res = true;
             break;
         }
     }
 
-    if(!Memory.resourceShortage) Memory.resourceShortage = {};
+    if (!Memory.resourceShortage) Memory.resourceShortage = {};
     else Memory.resourceShortage[room.name] = shortage;
+
+    return res;
 }
 return module.exports;
 }
@@ -3770,13 +3785,13 @@ module.exports = function (room) {
         })
         return;
     }
-    const isNeedRepair = (struct) => {
+    function isNeedRepair(structure) {
         return (
-        (struct.structureType === STRUCTURE_WALL && struct.hits >= wall.getTargetHits(room) && struct.hits < wall.getIdealHits(room)) ||
-        (struct.structureType === STRUCTURE_RAMPART && struct.hits < 10000) ||
-        (struct.structureType === STRUCTURE_RAMPART && struct.hits >= rampart.getTargetHits(room) && struct.hits < rampart.getIdealHits(room)) ||
-        (struct.structureType === STRUCTURE_CONTAINER && struct.hitsMax - struct.hits >= 10000) ||
-        (struct.structureType !== STRUCTURE_WALL && struct.structureType !== STRUCTURE_RAMPART && struct.structureType !== STRUCTURE_CONTAINER && struct.hits <= struct.hitsMax))
+            (structure.structureType == STRUCTURE_WALL && structure.hits >= wall.getTargetHits(room) && structure.hits < wall.getIdealHits(room)) || 
+            (structure.structureType == STRUCTURE_RAMPART && structure.hits < 10000) ||
+            (structure.structureType == STRUCTURE_RAMPART && structure.hits >= rampart.getTargetHits(room) && structure.hits < rampart.getIdealHits(room)) || 
+            (structure.structureType != STRUCTURE_WALL && structure.structureType != STRUCTURE_RAMPART && structure.hits <= structure.hitsMax - 800)
+        )
     }
 
     if (!room.memory.needRepairStructures) room.memory.needRepairStructures = [];
@@ -3788,11 +3803,10 @@ module.exports = function (room) {
     let needRepairs = room.memory.needRepairStructures;
     if(!needRepairs.length) return
     let target = Game.getObjectById(needRepairs[needRepairs.length - 1]);
-    if(!target || !isNeedRepair(target)) {
-        needRepairs.pop();
-        return;
-    }
-
+    if(!target || !isNeedRepair(target)) needRepairs.pop();
+    
+    if(!needRepairs.length) return
+    target = Game.getObjectById(needRepairs[needRepairs.length - 1]);
     let tower = target.pos.findClosestByRange(towers);
     tower.repair(target);
 }
@@ -18293,25 +18307,25 @@ return module.exports;
 __modules[52] = function(module, exports) {
 // order based on creation priority
 module.exports = {
-    XUH2O: [5000, 20000], // attack
-    XLH2O: [5000, 20000],  // repair & build
-    XKH2O: [5000, 10000],  // carry
-    XZHO2: [5000, 10000], // move
+    XUH2O: [5000, 12000], // attack
+    XLH2O: [5000, 12000],  // repair & build
+    XKH2O: [5000, 12000],  // carry
+    XZHO2: [5000, 12000], // move
     
-    XGH2O: [5000, 20000],  // upgradeController
+    XGH2O: [5000, 12000],  // upgradeController
     
-    XKHO2: [5000, 20000], // ranged_attack
-    XLHO2: [5000, 20000],  // heal
-    XZH2O: [5000, 10000],  // dismantle
-    XGHO2: [5000, 10000], // tough
+    XKHO2: [5000, 12000], // ranged_attack
+    XLHO2: [5000, 12000],  // heal
+    XZH2O: [5000, 12000],  // dismantle
+    XGHO2: [5000, 12000], // tough
 
-    XUHO2: [5000, 10000], // harvest
+    XUHO2: [5000, 12000], // harvest
 
-    G: [5000, 10000],
-    OH: [5000, 10000],
+    G: [5000, 12000],
+    OH: [5000, 12000],
 
-    GH2O: [5000, 10000], // +80% upgrade
-    UHO2: [5000, 10000], // +400% harvest
+    GH2O: [5000, 12000], // +80% upgrade
+    UHO2: [5000, 12000], // +400% harvest
 }
 return module.exports;
 }

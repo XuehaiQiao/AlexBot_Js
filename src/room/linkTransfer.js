@@ -83,13 +83,11 @@ function updateLinkInfo(room) {
         })
 
         // controllerLink
-        if(link.pos.inRangeTo(room.controller.pos, 3)) {
+        if(link.pos.inRangeTo(room.controller.pos, 2)) {
             linkInfo.controllerLink = link.id;
         }
     });
 
     //check source, manager links completeness
     room.memory.linkCompleteness = (linkInfo.sourceLinks.length === sources.length && linkInfo.managerLink) ? true : false;
-
-    console.log('room link memory updated');
 };

@@ -50,9 +50,9 @@ module.exports = {
             // tomstone
             const nearTomstone = creep.pos.findInRange(FIND_TOMBSTONES, 1, { filter: ts => ts.store.getUsedCapacity() > 0 });
             if (nearTomstone.length > 0) {
-                if (creep.store.getUsedCapacity() > creep.store.getCapacity() * 0.9) creep.memory.status = 1;
                 let resourceType = _.find(Object.keys(nearTomstone[0].store), resourceType => nearTomstone[0].store[resourceType] > 0);
-                creep.withdraw(nearTomstone[0], resourceType);
+                let result = creep.withdraw(nearTomstone[0], resourceType);
+                if (result === OK && nearTomstone[0].store[RESOURCE_ENERGY] > creep.store.getCapacity() * 0.9) creep.memory.status = 1;
                 return;
             }
 
@@ -65,11 +65,11 @@ module.exports = {
                 if (hostileCreep) {
                     let distance = creep.pos.getRangeTo(hostileCreep);
 
-                    if (distance <= 4) {
+                    if (distance <= 5) {
                         creep.moveToRoomAdv(creep.memory.base);
                         return;
                     }
-                    else if (distance <= 5) {
+                    else if (distance <= 6) {
                         return;
                     }
                 }
@@ -284,7 +284,7 @@ function withdrawBySouce(creep) {
         creep.moveToNoCreepInRoom(source);
     }
     else {
-        creep.memory.rest = 10;
+        if(!Memory.outSourceRooms[creep.memory.targetRoom].sourceKeeper) creep.memory.rest = 15;
     }
 }
 

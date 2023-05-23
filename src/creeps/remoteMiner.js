@@ -4,7 +4,7 @@ const { drop } = require("lodash");
 module.exports = {
     properties: {
         role: 'remoteMiner',
-        body: [...new Array(32).fill(WORK), ...new Array(16).fill(MOVE)],
+        body: [...new Array(32).fill(WORK), CARRY, CARRY, ...new Array(16).fill(MOVE)],
         boostInfo: {UHO2: 32},
     },
     /** @param {Creep} creep **/
