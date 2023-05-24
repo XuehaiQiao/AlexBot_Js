@@ -3,6 +3,9 @@ const creepLogic = require("../creeps");
 // const creepTypes2 = ['carrier2', 'harvester2', 'upgrader2', 'builder2']; // 'mineralCarrier'
 
 function spawnCreeps(room) {
+    if(room.name === 'W12S21' && Game.time % 1500 === 0) {
+        Game.rooms['W12S21'].memory.tasks.spawnTasks.push({name: 'scout', body: [MOVE], memory: {role: 'scout', targetPos: {x:42, y:35, roomName:'W10S20'}}});
+    }
     // check every 2 ticks
     if(Game.time % 2 === 0) return;
 
@@ -69,7 +72,7 @@ function spawnCreeps(room) {
     if(spawnTasks.length) {
         // task = [{name, body, memory}, ...]
         const task = spawnTasks[0];
-        task.name += Game.time;
+        task.name += Game.time % 10000;
         if(spawnCreepUsingSpawnData(task) === OK) {
             spawnTasks.shift();
             return;
@@ -90,10 +93,9 @@ function spawnCreeps(room) {
         for (const roomName of room.memory.outSourceRooms) {
             const outSourceRoomMemory = Memory.outSourceRooms[roomName];
 
+            let invaderCore = _.find(Game.rooms[roomName].find(FIND_HOSTILE_STRUCTURES), struct => struct.structureType == STRUCTURE_INVADER_CORE);
             if (Game.rooms[roomName] && !outSourceRoomMemory.neutral) {
-                var hostileCreeps = Game.rooms[roomName].find(FIND_HOSTILE_CREEPS);
-                var invaderCore = _.find(Game.rooms[roomName].find(FIND_HOSTILE_STRUCTURES), struct => struct.structureType == STRUCTURE_INVADER_CORE);
-
+                let hostileCreeps = Game.rooms[roomName].find(FIND_HOSTILE_CREEPS);
                 if (hostileCreeps.length > 0) {
                     // create defender
                     let creepSpawnData = creepLogic.defender.spawn(room, roomName) && creepLogic.defender.spawnData(room, roomName);
@@ -112,13 +114,15 @@ function spawnCreeps(room) {
                 }
             }
 
-            if (outSourceRoomMemory.neutral === true && outSourceRoomMemory.invaderCoreLevel === 1) {
-                console.log('rangeAtker');
-                // create rangeAtker
-                let creepSpawnData = creepLogic.rangeAtker.spawn(room, roomName) && creepLogic.rangeAtker.spawnData(room, roomName);
-                if (creepSpawnData) {
-                    spawnCreepUsingSpawnData(creepSpawnData);
-                    return;
+            // create invader attacker in neutral room
+            if (outSourceRoomMemory.neutral === true && invaderCore && (invaderCore.ticksToDeploy < 250 || invaderCore.ticksToDeploy === undefined)) {
+                if(invaderCore.level <= 2) {
+                    // create rangeAtker
+                    let creepSpawnData = creepLogic.rangeAtker.spawn(room, roomName) && creepLogic.rangeAtker.spawnData(room, roomName, {invader: true});
+                    if (creepSpawnData) {
+                        spawnCreepUsingSpawnData(creepSpawnData);
+                        return;
+                    }
                 }
             }
         }

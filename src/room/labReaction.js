@@ -39,8 +39,8 @@ module.exports = function (room) {
     }
 
     // If all compounds reached AbundantLine, check shortage every 3000 ticks
-    if (Game.time % 3000 === 123 && room.memory.compondLevel === 2 && room.memory.tasks.labTasks.length === 0) {
-        let compoundIsShort = createTask(room, 0);
+    if (Game.time % 5000 === 123 && room.memory.compondLevel === 2 && room.memory.tasks.labTasks.length === 0) {
+        let compoundIsShort = createTask(room, 1);
         if (compoundIsShort) room.memory.compondLevel = 0;
     }
 
@@ -94,7 +94,7 @@ function runLab(room) {
     }
 
     let allLabs = room.find(FIND_MY_STRUCTURES, { filter: struct => struct.structureType == STRUCTURE_LAB });
-    let outterLabs = _.filter(allLabs, lab => lab.isActive() && !room.memory.labs.center.includes(lab.id) && !room.memory.labs.boostLab[lab.id] && lab.cooldown === 0);
+    let outterLabs = _.filter(allLabs, lab => lab.isActive() && !room.memory.labs.center.includes(lab.id) && !room.memory.labs.boostLab[lab.id]);
     let centerLabs = _.map(room.memory.labs.center, id => Game.getObjectById(id));
 
 

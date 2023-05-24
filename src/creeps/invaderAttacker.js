@@ -73,6 +73,10 @@ module.exports = {
         if(room.energyCapacityAvailable < 5600) return false;
         if(!Game.rooms[targetRoomName]) return false;
         if(Game.rooms[targetRoomName].find(FIND_HOSTILE_CREEPS, {filter: c => c.owner.username === 'Invader'}).length === 0) return false;
+        
+        // if have invader core in room, not spawn
+        let targetRoom = Game.rooms[targetRoomName];
+        if(targetRoom.find(FIND_HOSTILE_STRUCTURES, {filter: struct => struct.structureType === STRUCTURE_INVADER_CORE}).length > 0) return false;
 
         let creepCount;
         if(global.roomCensus[targetRoomName] && global.roomCensus[targetRoomName][this.properties.role]) {

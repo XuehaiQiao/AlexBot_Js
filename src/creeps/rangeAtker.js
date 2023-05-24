@@ -22,7 +22,13 @@ module.exports = {
         let hostile;
         if (creep.memory.target) {
             hostile = Game.getObjectById(creep.memory.target);
-        } 
+        }
+        if(!hostile && creep.memory.invader) {
+            hostile = _.find(creep.room.find(FIND_HOSTILE_STRUCTURES), struct => struct.structureType == STRUCTURE_INVADER_CORE);
+            if(!hostile && Memory.outSourceRooms[creep.memory.targetRoom]) {
+                Memory.outSourceRooms[creep.memory.targetRoom].invaderCoreLevel = -1;
+            }
+        }
         if(!hostile) {
             hostile = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
         } 
@@ -76,6 +82,9 @@ module.exports = {
             memory.boosted = false;
             if(opt.boostInfo) memory.boostInfo = opt.boostInfo;
             else memory.boostInfo = this.properties.boostInfo;
+        }
+        if(opt.invader) {
+            memory.invader = true;
         }
 
         return {name, body, memory};

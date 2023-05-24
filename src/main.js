@@ -6,7 +6,6 @@ require('./prototypes');
 module.exports.loop = function () {
     console.log("---------- " + Game.shard.name + ", Start Tick: " + Game.time + " ----------");
 
-    //Memory.outSourceRooms['W16S13'] = {base: 'W15S13', sourceNum: 2};
     if (Game.cpu.bucket < 20) {
         console.log('CPU bucket is low, skip this tick..');
         return;
@@ -74,7 +73,7 @@ module.exports.loop = function () {
     totalCreepCpu += Game.cpu.getUsed();
     
 
-    if (Game.cpu.bucket === 10000) {
+    if (Game.shard.name === 'shard2' && Game.cpu.bucket === 10000) {
         Game.cpu.generatePixel();
     }
 

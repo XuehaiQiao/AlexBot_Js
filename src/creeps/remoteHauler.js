@@ -161,13 +161,14 @@ module.exports = {
 
     // checks if the room needs to spawn a creep
     spawn: function (room, roomName) {
-        // check if need spawn
+        // current num
         let creepCount;
         if (global.roomCensus[roomName] && global.roomCensus[roomName][this.properties.role]) {
             creepCount = global.roomCensus[roomName][this.properties.role]
         }
         else creepCount = 0;
 
+        // -------------- need to add in other places --------------------------- start
         let sourceNum = 1;
         if (!Memory.outSourceRooms[roomName]) Memory.outSourceRooms[roomName] = {};
         if (Memory.outSourceRooms[roomName].sourceNum != undefined) {
@@ -176,8 +177,18 @@ module.exports = {
         else if (Game.rooms[roomName]) {
             Memory.outSourceRooms[roomName].sourceNum = Game.rooms[roomName].find(FIND_SOURCES).length;
         }
+        // -------------- need to add in other places --------------------------- end
 
-        let addednum = (global.roomCensus[roomName] && global.roomCensus[roomName]['remoteMiner']) ? 1 : 0;
+        // addition hauler if needed
+        let addednum = 0;
+        if((global.roomCensus[roomName] && global.roomCensus[roomName]['remoteMiner'])) {
+            addednum += 1;
+        }
+        if(Memory.outSourceRooms[roomName] && Memory.outSourceRooms[roomName].addHauler) {
+            addednum += Memory.outSourceRooms[roomName].addHauler;
+        }
+
+        // check if need spawn
         if (creepCount < sourceNum * this.properties.stages[this.getStage(room)].number + addednum) {
             return true;
         }

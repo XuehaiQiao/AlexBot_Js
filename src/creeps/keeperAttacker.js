@@ -14,7 +14,7 @@ module.exports = {
         
         let targetKeeper = Game.getObjectById(creep.memory.enemyId);
         if(!targetKeeper) {
-            targetKeeper = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+            targetKeeper = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {filter: creep => creep.owner.username === 'Source Keeper'});
             if(targetKeeper) creep.memory.enemyId = targetKeeper.id;
         }
         //find nearest keeper creep, attack.
@@ -53,7 +53,10 @@ module.exports = {
 
         let creepCount;
         if(global.roomCensus[targetRoomName] && global.roomCensus[targetRoomName][this.properties.role]) {
-            creepCount = global.roomCensus[targetRoomName][this.properties.role]
+            creepCount = global.roomCensus[targetRoomName][this.properties.role];
+            if(global.roomCensus[targetRoomName]['invaderAttacker']) {
+                creepCount += global.roomCensus[targetRoomName]['invaderAttacker'];
+            }
         }
         else creepCount = 0;
 

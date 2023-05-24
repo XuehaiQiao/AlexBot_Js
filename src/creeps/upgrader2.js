@@ -113,12 +113,9 @@ module.exports = {
         else body = this.properties.stages[stage].bodyParts;
 
         let memory = {role: this.properties.type, status: 1, target: 0, base: room.name};
-    
-        if(room.name === "W19S17") {
-            memory.boost = true;
-            memory.boosted = false;
-            memory.boostInfo = {GH2O: 15};
-        }
+        memory.boost = true;
+        memory.boosted = false;
+        memory.boostInfo = {GH: 15};
 
         return {name, body, memory};
     },

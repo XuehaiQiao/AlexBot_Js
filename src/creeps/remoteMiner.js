@@ -158,7 +158,7 @@ function keeperLairLogic(creep, mineral) {
                 let resourceType = _.find(Object.keys(creep.store), rt => creep.store[rt] > 0);
                 creep.drop(resourceType);
             }
-            if(creep.pos.getRangeTo(keeperLair) < 8) creep.moveToRoomAdv(creep.memory.base);
+            if(creep.pos.getRangeTo(keeperLair) <= 4) creep.moveToRoomAdv(creep.memory.base);
             return true;
         }
 
@@ -168,6 +168,7 @@ function keeperLairLogic(creep, mineral) {
 
             if (distance < 3) {
                 // move away
+                creep.moveToRoomAdv(creep.memory.base);
                 return true;
             }
             else if (distance <= 6) {

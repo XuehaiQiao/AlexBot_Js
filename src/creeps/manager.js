@@ -1,4 +1,5 @@
 const { roomInfo, roomResourceConfig } = require("../config");
+const { commodities } = require("../constants");
 /*
     manager manage: link, storage, terminal, factory, power spawn, nuke.
     logic:
@@ -34,10 +35,10 @@ module.exports = {
             let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
             let target = Game.getObjectById(creep.memory.target);
 
-            if(target && creep.transfer(target, resourceType) == OK) {
+            if(target && creep.transfer(target, resourceType) === OK) {
                 return;
             }
-            else if(creep.room.storage && creep.transfer(creep.room.storage, resourceType) == OK) { 
+            else if(creep.room.storage && creep.transfer(creep.room.storage, resourceType) === OK) { 
                 return;
             }
             else {
@@ -49,29 +50,20 @@ module.exports = {
         // status:0 withdraw
         else {
             if(creep.ticksToLive === 1) return;
-            
-            let storage = Game.getObjectById(creep.memory[STRUCTURE_STORAGE]);
 
             // link, terminal balance, ps, factory, nuke, taskQueue
-            let managerResponsibilities = [
+            let managerWorks = [
                 coreWork,
                 terminalBalance,
                 feedPowerSpawn,
                 factoryWork,
                 doTask,
+                commodity2Terminal,
             ]
 
-            for(i in managerResponsibilities) {
-                if(managerResponsibilities[i](creep)) return;
+            for(i in managerWorks) {
+                if(managerWorks[i](creep)) return;
             }
-
-            
-            // if(coreWork(creep)) return;
-            // else if(terminalBalance(creep)) return;
-            // else if(feedPowerSpawn(creep)) return;
-            // else {
-            //     doTask(creep);
-            // }
         }
     },
 
@@ -100,7 +92,7 @@ module.exports = {
 // ========================================================= Work Types ======================================================================================
 
 // link to storage & storage to controllerLink
-var coreWork = function(creep) {
+function coreWork(creep) {
     let storage = Game.getObjectById(creep.memory[STRUCTURE_STORAGE]);
     let link = Game.getObjectById(creep.memory[STRUCTURE_LINK]);
     let controllerLink = Game.getObjectById(creep.memory.controllerLink);
@@ -122,7 +114,7 @@ var coreWork = function(creep) {
     return false
 };
 
-var terminalBalance = function(creep) {
+function terminalBalance(creep) {
     let storage = Game.getObjectById(creep.memory[STRUCTURE_STORAGE]);
     let terminal = Game.getObjectById(creep.memory[STRUCTURE_TERMINAL]);
     if(!terminal || !storage) return false;
@@ -146,7 +138,7 @@ var terminalBalance = function(creep) {
     return false;
 };
 
-var feedPowerSpawn = function(creep) {
+function feedPowerSpawn(creep) {
     let storage = Game.getObjectById(creep.memory[STRUCTURE_STORAGE]);
     let powerSpawn = Game.getObjectById(creep.memory[STRUCTURE_POWER_SPAWN]);
     if(!powerSpawn || !storage) return false;
@@ -166,7 +158,7 @@ var feedPowerSpawn = function(creep) {
     return false;
 };
 
-var factoryWork = function(creep) {
+function factoryWork(creep) {
     let storage = Game.getObjectById(creep.memory[STRUCTURE_STORAGE]);
     let factory = Game.getObjectById(creep.memory[STRUCTURE_FACTORY]);
     if(!factory || !storage) return false;
@@ -180,7 +172,7 @@ var factoryWork = function(creep) {
     return false;
 }
 
-var doTask = function(creep) {
+function doTask(creep) {
     if(!creep.room.memory.tasks) creep.room.memory.tasks = {};
     if(!creep.room.memory.tasks.managerTasks) creep.room.memory.tasks.managerTasks = [];
     let managerTasks = creep.room.memory.tasks.managerTasks;
@@ -210,6 +202,23 @@ var doTask = function(creep) {
     return false;
 };
 
+function commodity2Terminal(creep) {
+    // if(Game.time % 10 !== 0) return false;
+
+    let storage = Game.getObjectById(creep.memory[STRUCTURE_FACTORY]);
+    let terminal = Game.getObjectById(creep.memory[STRUCTURE_TERMINAL]);
+    if(!terminal || !storage) return false;
+
+    for(const com of commodities) {
+        if(storage.store[com] > 0) {
+            creep.say('COM2T');
+            fromA2B(creep, storage, terminal, com);
+            return true;
+        }
+    }
+
+    return false;
+}
 // ========================================================= Util Functions ======================================================================================
 
 var fromA2B = function(creep, fromStruct, toStruct, resourceType, amount = null) {

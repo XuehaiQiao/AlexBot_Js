@@ -29,12 +29,12 @@ Game.spawns['Spawn2_W18S15'].spawnCreep([...new Array(10).fill(CARRY), ...new Ar
 // transporter spawn
 Game.spawns['Spawn2_W18S15'].spawnCreep([...new Array(25).fill(CARRY), ...new Array(25).fill(MOVE)], 'transporter' + Game.time, {memory: {role: 'transporter', base: 'W17S14', targetRoom: 'W18S15'}});
 Game.spawns['Spawn2_W21S19'].spawnCreep([...new Array(25).fill(CARRY), ...new Array(25).fill(MOVE)], 'transporter' + Game.time, {memory: {role: 'transporter', base: 'W21S19', targetRoom: 'W20S21', workType: 1}});
+Game.rooms['W16S17'].memory.tasks.spawnTasks.push({name: 't', body:[...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], memory: {role: 'transporter', base: 'W16S17', targetRoom: 'W16S16', workType: 2}});
 // defender
 Game.spawns['Spawn2_W18S15'].spawnCreep([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], 'defender' + Game.time, {memory: {role: 'defender', targetRoom: 'W17S14'}});
 
 // scout
-Game.spawns['Spawn1_W12S21'].spawnCreep([MOVE], 'scout' + Game.time, {memory: {role: 'scout', targetPos: {x:42, y:35, roomName:'W10S20'}}});
-
+Game.rooms['W12S21'].memory.tasks.spawnTasks.push({name: 'scout', body: [MOVE], memory: {role: 'scout', targetPos: {x:42, y:35, roomName:'W10S20'}}});
 // keeperAttacker
 Game.spawns['Spawn3_W16S17'].spawnCreep([...new Array(25).fill(MOVE), ...new Array(19).fill(RANGED_ATTACK), ...new Array(6).fill(HEAL)], 'keeperAttacker' + Game.time, {memory: {role: 'keeperAttacker', base: 'W16S17', targetRoom: 'W16S16'}});
 
@@ -118,14 +118,14 @@ JSON.stringify(obj);
 // create task
 Game.rooms['W18S15'].memory.tasks.managerTasks.push({from: STRUCTURE_FACTORY, to: STRUCTURE_STORAGE, resourceType: 'X', volume: 40000});
 Game.rooms['W21S19'].memory.tasks.managerTasks.push({from: STRUCTURE_STORAGE, to: STRUCTURE_TERMINAL, resourceType: RESOURCE_ALLOY, volume: 90000});
-Game.rooms['W18S15'].memory.tasks.managerTasks.push({from: STRUCTURE_TERMINAL, to: STRUCTURE_FACTORY, resourceType: RESOURCE_PURIFIER, volume: 8000});
+Game.rooms['W12S21'].memory.tasks.managerTasks.push({from: STRUCTURE_STORAGE, to: STRUCTURE_NUKER, resourceType: 'G', volume: 5000});
 // create reaction task
 Game.rooms.W19S17.memory.tasks.labTasks.push({resourceType: 'OH', amount: 3000});
 
 
 // orders
-Game.rooms['W18S15'].terminal.send('X', 4000, 'W16S17', 'X');
-Game.rooms['W18S15'].terminal.send('XLHO2', 1000, 'W16S17', 'XLHO2');
+Game.rooms['W13S15'].terminal.send('X', 2000, 'W16S17', 'X');
+Game.rooms['W19S17'].terminal.send('XGHO2', 2000, 'W13S15', 'XGHO2');
 
 Game.market.deal('645bfc8403ae10376b827734', 4000, "W21S19");
 // purifier
@@ -135,10 +135,10 @@ Game.market.cancelOrder('644046f346d8195c5404a845');
 
 Game.market.createOrder({
     type: ORDER_BUY,
-    resourceType: RESOURCE_PURIFIER,
-    price: 180,
-    totalAmount: 16000,
-    roomName: "W18S15"   
+    resourceType: RESOURCE_ENERGY,
+    price: 8.37,
+    totalAmount: 400000,
+    roomName: "W12S21"   
 });
 
 
