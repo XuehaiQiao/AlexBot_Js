@@ -4,7 +4,7 @@ module.exports = {
     properties: {
         type: 'upgrader2',
         stages: {
-            1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, CARRY, MOVE], number: 1},
+            1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, MOVE], number: 1},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, CARRY, CARRY, MOVE, MOVE], number: 3},
             3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, CARRY, CARRY, MOVE, MOVE, WORK, WORK, CARRY, CARRY, MOVE, MOVE], number: 3},
             4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(6).fill(WORK), ...new Array(6).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
@@ -113,9 +113,6 @@ module.exports = {
         else body = this.properties.stages[stage].bodyParts;
 
         let memory = {role: this.properties.type, status: 1, target: 0, base: room.name};
-        memory.boost = true;
-        memory.boosted = false;
-        memory.boostInfo = {GH: 15};
 
         return {name, body, memory};
     },

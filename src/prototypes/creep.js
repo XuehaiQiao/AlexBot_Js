@@ -155,8 +155,8 @@ Creep.prototype.harvestEnergy = function harvestEnergy() {
     // add targetRoom option, to create harvest path before enter the target room.
     let source;
     let result;
-    if (this.memory.target != undefined) {
-        source = this.room.find(FIND_SOURCES)[this.memory.target];
+    if (this.memory.target) {
+        source = Game.getObjectById(this.memory.target);
     }
     else {
         this.say('!target')
@@ -310,6 +310,7 @@ Creep.prototype.getBoosts = function() {
     // boostInfo = {resourceType: bodyPartCount, ...}
     const boostInfo = this.memory.boostInfo;
     const room = Game.rooms[this.memory.base];
+    if(!room.memory.labs || !room.memory.labs.boostLab) return;
     const boostLabs = room.memory.labs.boostLab;
     // check lab & compund amount
     for(const resourceType in boostInfo) {
@@ -321,8 +322,6 @@ Creep.prototype.getBoosts = function() {
             return;
         }
     }
-
-    console.log(3);
 
     // getBoost
     for(const resourceType in boostInfo) {

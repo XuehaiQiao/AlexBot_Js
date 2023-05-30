@@ -3,11 +3,6 @@ const creepLogic = require("../creeps");
 // const creepTypes2 = ['carrier2', 'harvester2', 'upgrader2', 'builder2']; // 'mineralCarrier'
 
 function spawnCreeps(room) {
-    if(room.name === 'W12S21' && Game.time % 1500 === 0) {
-        Game.rooms['W12S21'].memory.tasks.spawnTasks.push({name: 'scout', body: [MOVE], memory: {role: 'scout', targetPos: {x:42, y:35, roomName:'W10S20'}}});
-    }
-    // check every 2 ticks
-    if(Game.time % 2 === 0) return;
 
     // return if no idle spawn
     var availableSpawns = room.find(FIND_MY_SPAWNS, {
