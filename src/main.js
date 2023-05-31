@@ -1,5 +1,6 @@
 const creepLogic = require('./creeps');
 const roomLogic = require('./room');
+const test = require('./test');
 const tools = require('./tools');
 require('./prototypes');
 
@@ -10,6 +11,8 @@ module.exports.loop = function () {
         console.log('CPU bucket is low, skip this tick..');
         return;
     }
+
+    test.sandbox.startOfTheTick();
 
     /**
      * ====================================
@@ -38,6 +41,7 @@ module.exports.loop = function () {
     roomLogic.roomCensus();
     // run room logic for each room in our empire
     _.forEach(Game.myRooms, r => {
+        roomLogic.roomInit(r);
         roomLogic.spawning(r);
         roomLogic.towerLogic(r);
         roomLogic.linkTransfer(r);
@@ -89,5 +93,8 @@ module.exports.loop = function () {
     console.log('total room cpu: ', totalRoomCpu);
     console.log('total creep cpu: ', totalCreepCpu);
     console.log('CPU bucket: ', Game.cpu.bucket);
+
+    test.sandbox.endOfTheTick();
+
     console.log("---------- End Tick, No Errors ----------");
 }

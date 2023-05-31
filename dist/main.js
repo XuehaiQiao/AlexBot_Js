@@ -53,8 +53,9 @@ function __getDirname(path) {
 __modules[0] = function(module, exports) {
 const creepLogic = __require(1,0);
 const roomLogic = __require(2,0);
-const tools = __require(3,0);
-__require(4,0);
+const test = __require(3,0);
+const tools = __require(4,0);
+__require(5,0);
 
 module.exports.loop = function () {
     console.log("---------- " + Game.shard.name + ", Start Tick: " + Game.time + " ----------");
@@ -63,6 +64,8 @@ module.exports.loop = function () {
         console.log('CPU bucket is low, skip this tick..');
         return;
     }
+
+    test.sandbox.startOfTheTick();
 
     /**
      * ====================================
@@ -86,6 +89,7 @@ module.exports.loop = function () {
     let totalRoomCpu = -Game.cpu.getUsed();
     roomLogic.roomCensus();
     _.forEach(Game.myRooms, r => {
+        roomLogic.roomInit(r);
         roomLogic.spawning(r);
         roomLogic.towerLogic(r);
         roomLogic.linkTransfer(r);
@@ -129,6 +133,9 @@ module.exports.loop = function () {
     console.log('total room cpu: ', totalRoomCpu);
     console.log('total creep cpu: ', totalCreepCpu);
     console.log('CPU bucket: ', Game.cpu.bucket);
+
+    test.sandbox.endOfTheTick();
+
     console.log("---------- End Tick, No Errors ----------");
 }
 return module.exports;
@@ -137,30 +144,30 @@ return module.exports;
 /********** Start module 1: D:\screeps\AlexBot_Js\src\creeps\index.js **********/
 __modules[1] = function(module, exports) {
 let creepLogic = {
-    harvester:      __require(5,1),
-    carrier:        __require(6,1),
-    upgrader:       __require(7,1),
-    builder:        __require(8,1),
-    harvester2:     __require(9,1),
-    carrier2:       __require(10,1),
-    upgrader2:      __require(11,1),
-    builder2:       __require(12,1),
-    manager:        __require(13,1),
-    miner:          __require(14,1),
-    mineralCarrier: __require(15,1),
-    claimer:        __require(16,1),
-    outSourcer:     __require(17,1),
-    remoteHarvester:__require(18,1),
-    remoteHauler:   __require(19,1),
-    keeperAttacker: __require(20,1),
-    invaderAttacker:__require(21,1),
-    transporter:    __require(22,1),
-    defender:       __require(23,1),
-    remoteMiner:    __require(24,1),
-    wrecker:        __require(25,1),
-    medic:          __require(26,1),
-    scout:          __require(27,1),
-    rangeAtker:     __require(28,1),
+    harvester:      __require(6,1),
+    carrier:        __require(7,1),
+    upgrader:       __require(8,1),
+    builder:        __require(9,1),
+    harvester2:     __require(10,1),
+    carrier2:       __require(11,1),
+    upgrader2:      __require(12,1),
+    builder2:       __require(13,1),
+    manager:        __require(14,1),
+    miner:          __require(15,1),
+    mineralCarrier: __require(16,1),
+    claimer:        __require(17,1),
+    outSourcer:     __require(18,1),
+    remoteHarvester:__require(19,1),
+    remoteHauler:   __require(20,1),
+    keeperAttacker: __require(21,1),
+    invaderAttacker:__require(22,1),
+    transporter:    __require(23,1),
+    defender:       __require(24,1),
+    remoteMiner:    __require(25,1),
+    wrecker:        __require(26,1),
+    medic:          __require(27,1),
+    scout:          __require(28,1),
+    rangeAtker:     __require(29,1),
     
 }
 
@@ -171,43 +178,54 @@ return module.exports;
 /********** Start module 2: D:\screeps\AlexBot_Js\src\room\index.js **********/
 __modules[2] = function(module, exports) {
 const roomLogic = {
-    spawning:           __require(29,2),
-    linkTransfer:       __require(30,2),
-    roomCensus:         __require(31,2),
-    exportStats:        __require(32,2),
-    labReaction:        __require(33,2),
-    resourceBalancing:  __require(34,2),
-    powerOperation:     __require(35,2),
-    factorayLogic:      __require(36,2),
-    marketLogic :       __require(37,2),
-    towerLogic:         __require(38,2),
+    spawning:           __require(30,2),
+    linkTransfer:       __require(31,2),
+    roomCensus:         __require(32,2),
+    exportStats:        __require(33,2),
+    labReaction:        __require(34,2),
+    resourceBalancing:  __require(35,2),
+    powerOperation:     __require(36,2),
+    factorayLogic:      __require(37,2),
+    marketLogic :       __require(38,2),
+    towerLogic:         __require(39,2),
+    roomInit:           __require(40,2),
 }
 
 module.exports = roomLogic;
 return module.exports;
 }
 /********** End of module 2: D:\screeps\AlexBot_Js\src\room\index.js **********/
-/********** Start module 3: D:\screeps\AlexBot_Js\src\tools\index.js **********/
+/********** Start module 3: D:\screeps\AlexBot_Js\src\test\index.js **********/
 __modules[3] = function(module, exports) {
+const test = {
+    sandbox: __require(41,3),
+}
+
+module.exports = test;
+return module.exports;
+}
+/********** End of module 3: D:\screeps\AlexBot_Js\src\test\index.js **********/
+/********** Start module 4: D:\screeps\AlexBot_Js\src\tools\index.js **********/
+__modules[4] = function(module, exports) {
 let tools = {
-    roomPlanner:  __require(39,3),
-    myRoomPlanner:  __require(40,3),
+    roomPlanner:  __require(42,4),
+    myRoomPlanner:  __require(43,4),
 }
 
 module.exports = tools;
 return module.exports;
 }
-/********** End of module 3: D:\screeps\AlexBot_Js\src\tools\index.js **********/
-/********** Start module 4: D:\screeps\AlexBot_Js\src\prototypes\index.js **********/
-__modules[4] = function(module, exports) {
-__require(41,4);
-__require(42,4);
+/********** End of module 4: D:\screeps\AlexBot_Js\src\tools\index.js **********/
+/********** Start module 5: D:\screeps\AlexBot_Js\src\prototypes\index.js **********/
+__modules[5] = function(module, exports) {
+__require(44,5);
+__require(45,5);
 return module.exports;
 }
-/********** End of module 4: D:\screeps\AlexBot_Js\src\prototypes\index.js **********/
-/********** Start module 5: D:\screeps\AlexBot_Js\src\creeps\harvester.js **********/
-__modules[5] = function(module, exports) {
-const { roomInfo } = __require(43,5);
+/********** End of module 5: D:\screeps\AlexBot_Js\src\prototypes\index.js **********/
+/********** Start module 6: D:\screeps\AlexBot_Js\src\creeps\harvester.js **********/
+__modules[6] = function(module, exports) {
+const { roomInfo } = __require(46,6);
 
 module.exports = {
         properties: {
@@ -322,9 +340,9 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 5: D:\screeps\AlexBot_Js\src\creeps\harvester.js **********/
-/********** Start module 6: D:\screeps\AlexBot_Js\src\creeps\carrier.js **********/
-__modules[6] = function(module, exports) {
+/********** End of module 6: D:\screeps\AlexBot_Js\src\creeps\harvester.js **********/
+/********** Start module 7: D:\screeps\AlexBot_Js\src\creeps\carrier.js **********/
+__modules[7] = function(module, exports) {
 module.exports = {
     properties: {
         type: 'carrier'
@@ -410,9 +428,9 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 6: D:\screeps\AlexBot_Js\src\creeps\carrier.js **********/
-/********** Start module 7: D:\screeps\AlexBot_Js\src\creeps\upgrader.js **********/
-__modules[7] = function(module, exports) {
+/********** End of module 7: D:\screeps\AlexBot_Js\src\creeps\carrier.js **********/
+/********** Start module 8: D:\screeps\AlexBot_Js\src\creeps\upgrader.js **********/
+__modules[8] = function(module, exports) {
 module.exports = {
     properties: {
         stages: {
@@ -502,11 +520,11 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 7: D:\screeps\AlexBot_Js\src\creeps\upgrader.js **********/
-/********** Start module 8: D:\screeps\AlexBot_Js\src\creeps\builder.js **********/
-__modules[8] = function(module, exports) {
-const { roomInfo } = __require(43,8);
-const structureLogic = __require(44,8);
+/********** End of module 8: D:\screeps\AlexBot_Js\src\creeps\upgrader.js **********/
+/********** Start module 9: D:\screeps\AlexBot_Js\src\creeps\builder.js **********/
+__modules[9] = function(module, exports) {
+const { roomInfo } = __require(46,9);
+const structureLogic = __require(47,9);
 
 module.exports = {
     properties: {
@@ -627,9 +645,9 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 8: D:\screeps\AlexBot_Js\src\creeps\builder.js **********/
-/********** Start module 9: D:\screeps\AlexBot_Js\src\creeps\harvester2.js **********/
-__modules[9] = function(module, exports) {
+/********** End of module 9: D:\screeps\AlexBot_Js\src\creeps\builder.js **********/
+/********** Start module 10: D:\screeps\AlexBot_Js\src\creeps\harvester2.js **********/
+__modules[10] = function(module, exports) {
 module.exports = {
     properties: {
         role: 'harvester2',
@@ -716,9 +734,9 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 9: D:\screeps\AlexBot_Js\src\creeps\harvester2.js **********/
-/********** Start module 10: D:\screeps\AlexBot_Js\src\creeps\carrier2.js **********/
-__modules[10] = function(module, exports) {
+/********** End of module 10: D:\screeps\AlexBot_Js\src\creeps\harvester2.js **********/
+/********** Start module 11: D:\screeps\AlexBot_Js\src\creeps\carrier2.js **********/
+__modules[11] = function(module, exports) {
 module.exports = {
     properties: {
         type: 'carrier2',
@@ -861,10 +879,10 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 10: D:\screeps\AlexBot_Js\src\creeps\carrier2.js **********/
-/********** Start module 11: D:\screeps\AlexBot_Js\src\creeps\upgrader2.js **********/
-__modules[11] = function(module, exports) {
-const { roomInfo } = __require(43,11);
+/********** End of module 11: D:\screeps\AlexBot_Js\src\creeps\carrier2.js **********/
+/********** Start module 12: D:\screeps\AlexBot_Js\src\creeps\upgrader2.js **********/
+__modules[12] = function(module, exports) {
+const { roomInfo } = __require(46,12);
 
 module.exports = {
     properties: {
@@ -971,11 +989,11 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 11: D:\screeps\AlexBot_Js\src\creeps\upgrader2.js **********/
-/********** Start module 12: D:\screeps\AlexBot_Js\src\creeps\builder2.js **********/
-__modules[12] = function(module, exports) {
-const structureLogic = __require(44,12);
-const { roomInfo } = __require(43,12);
+/********** End of module 12: D:\screeps\AlexBot_Js\src\creeps\upgrader2.js **********/
+/********** Start module 13: D:\screeps\AlexBot_Js\src\creeps\builder2.js **********/
+__modules[13] = function(module, exports) {
+const structureLogic = __require(47,13);
+const { roomInfo } = __require(46,13);
 
 module.exports = {
     properties: {
@@ -1098,11 +1116,11 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 12: D:\screeps\AlexBot_Js\src\creeps\builder2.js **********/
-/********** Start module 13: D:\screeps\AlexBot_Js\src\creeps\manager.js **********/
-__modules[13] = function(module, exports) {
-const { roomInfo, roomResourceConfig } = __require(43,13);
-const { commodities } = __require(45,13);
+/********** End of module 13: D:\screeps\AlexBot_Js\src\creeps\builder2.js **********/
+/********** Start module 14: D:\screeps\AlexBot_Js\src\creeps\manager.js **********/
+__modules[14] = function(module, exports) {
+const { roomInfo, roomResourceConfig } = __require(46,14);
+const { commodities } = __require(48,14);
 /*
     manager manage: link, storage, terminal, factory, power spawn, nuke.
     logic:
@@ -1335,9 +1353,9 @@ var updateMemory = function(creep) {
 };
 return module.exports;
 }
-/********** End of module 13: D:\screeps\AlexBot_Js\src\creeps\manager.js **********/
-/********** Start module 14: D:\screeps\AlexBot_Js\src\creeps\miner.js **********/
-__modules[14] = function(module, exports) {
+/********** End of module 14: D:\screeps\AlexBot_Js\src\creeps\manager.js **********/
+/********** Start module 15: D:\screeps\AlexBot_Js\src\creeps\miner.js **********/
+__modules[15] = function(module, exports) {
 
 module.exports = {
     properties: {
@@ -1449,11 +1467,11 @@ var noContainerLogic = function(creep, mine) {
 };
 return module.exports;
 }
-/********** End of module 14: D:\screeps\AlexBot_Js\src\creeps\miner.js **********/
-/********** Start module 15: D:\screeps\AlexBot_Js\src\creeps\mineralCarrier.js **********/
-__modules[15] = function(module, exports) {
-const { min } = __require(46,15);
-const { reactionResources } = __require(45,15);
+/********** End of module 15: D:\screeps\AlexBot_Js\src\creeps\miner.js **********/
+/********** Start module 16: D:\screeps\AlexBot_Js\src\creeps\mineralCarrier.js **********/
+__modules[16] = function(module, exports) {
+const { min } = __require(49,16);
+const { reactionResources } = __require(48,16);
 
 module.exports = {
     properties: {
@@ -1746,9 +1764,9 @@ var mineralContainerWithdraw = function(creep) {
 }
 return module.exports;
 }
-/********** End of module 15: D:\screeps\AlexBot_Js\src\creeps\mineralCarrier.js **********/
-/********** Start module 16: D:\screeps\AlexBot_Js\src\creeps\claimer.js **********/
-__modules[16] = function(module, exports) {
+/********** End of module 16: D:\screeps\AlexBot_Js\src\creeps\mineralCarrier.js **********/
+/********** Start module 17: D:\screeps\AlexBot_Js\src\creeps\claimer.js **********/
+__modules[17] = function(module, exports) {
 module.exports = {
     properties: {
         role: "claimer",
@@ -1837,10 +1855,10 @@ module.exports = {
 }
 return module.exports;
 }
-/********** End of module 16: D:\screeps\AlexBot_Js\src\creeps\claimer.js **********/
-/********** Start module 17: D:\screeps\AlexBot_Js\src\creeps\outSourcer.js **********/
-__modules[17] = function(module, exports) {
-const { roomInfo } = __require(43,17);
+/********** End of module 17: D:\screeps\AlexBot_Js\src\creeps\claimer.js **********/
+/********** Start module 18: D:\screeps\AlexBot_Js\src\creeps\outSourcer.js **********/
+__modules[18] = function(module, exports) {
+const { roomInfo } = __require(46,18);
 
 /*
 outSourcer1 - first generation out sourcer
@@ -1951,9 +1969,9 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 17: D:\screeps\AlexBot_Js\src\creeps\outSourcer.js **********/
-/********** Start module 18: D:\screeps\AlexBot_Js\src\creeps\remoteHarvester.js **********/
-__modules[18] = function(module, exports) {
+/********** End of module 18: D:\screeps\AlexBot_Js\src\creeps\outSourcer.js **********/
+/********** Start module 19: D:\screeps\AlexBot_Js\src\creeps\remoteHarvester.js **********/
+__modules[19] = function(module, exports) {
 module.exports = {
     properties: {
         role: "remoteHarvester",
@@ -2102,10 +2120,10 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 18: D:\screeps\AlexBot_Js\src\creeps\remoteHarvester.js **********/
-/********** Start module 19: D:\screeps\AlexBot_Js\src\creeps\remoteHauler.js **********/
-__modules[19] = function(module, exports) {
-const { roomInfo } = __require(43,19);
+/********** End of module 19: D:\screeps\AlexBot_Js\src\creeps\remoteHarvester.js **********/
+/********** Start module 20: D:\screeps\AlexBot_Js\src\creeps\remoteHauler.js **********/
+__modules[20] = function(module, exports) {
+const { roomInfo } = __require(46,20);
 
 /*
     NOT FINISHED
@@ -2386,9 +2404,9 @@ function withdrawByTarget(creep) {
 }
 return module.exports;
 }
-/********** End of module 19: D:\screeps\AlexBot_Js\src\creeps\remoteHauler.js **********/
-/********** Start module 20: D:\screeps\AlexBot_Js\src\creeps\keeperAttacker.js **********/
-__modules[20] = function(module, exports) {
+/********** End of module 20: D:\screeps\AlexBot_Js\src\creeps\remoteHauler.js **********/
+/********** Start module 21: D:\screeps\AlexBot_Js\src\creeps\keeperAttacker.js **********/
+__modules[21] = function(module, exports) {
 // todo
 
 module.exports = {
@@ -2460,11 +2478,11 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 20: D:\screeps\AlexBot_Js\src\creeps\keeperAttacker.js **********/
-/********** Start module 21: D:\screeps\AlexBot_Js\src\creeps\invaderAttacker.js **********/
-__modules[21] = function(module, exports) {
-const { G } = __require(47,21);
-const { T3_HEAL, T3_TOUGH, T3_RANGE_ATTACK } = __require(48,21);
+/********** End of module 21: D:\screeps\AlexBot_Js\src\creeps\keeperAttacker.js **********/
+/********** Start module 22: D:\screeps\AlexBot_Js\src\creeps\invaderAttacker.js **********/
+__modules[22] = function(module, exports) {
+const { G } = __require(50,22);
+const { T3_HEAL, T3_TOUGH, T3_RANGE_ATTACK } = __require(51,22);
 
 module.exports = {
     properties: {
@@ -2562,9 +2580,9 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 21: D:\screeps\AlexBot_Js\src\creeps\invaderAttacker.js **********/
-/********** Start module 22: D:\screeps\AlexBot_Js\src\creeps\transporter.js **********/
-__modules[22] = function(module, exports) {
+/********** End of module 22: D:\screeps\AlexBot_Js\src\creeps\invaderAttacker.js **********/
+/********** Start module 23: D:\screeps\AlexBot_Js\src\creeps\transporter.js **********/
+__modules[23] = function(module, exports) {
 module.exports = {
     properties: {
         type: 'transporter',
@@ -2783,9 +2801,9 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 22: D:\screeps\AlexBot_Js\src\creeps\transporter.js **********/
-/********** Start module 23: D:\screeps\AlexBot_Js\src\creeps\defender.js **********/
-__modules[23] = function(module, exports) {
+/********** End of module 23: D:\screeps\AlexBot_Js\src\creeps\transporter.js **********/
+/********** Start module 24: D:\screeps\AlexBot_Js\src\creeps\defender.js **********/
+__modules[24] = function(module, exports) {
 module.exports = {
     properties: {
         role: "defender",
@@ -2856,10 +2874,10 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 23: D:\screeps\AlexBot_Js\src\creeps\defender.js **********/
-/********** Start module 24: D:\screeps\AlexBot_Js\src\creeps\remoteMiner.js **********/
-__modules[24] = function(module, exports) {
-const { drop } = __require(46,24);
+/********** End of module 24: D:\screeps\AlexBot_Js\src\creeps\defender.js **********/
+/********** Start module 25: D:\screeps\AlexBot_Js\src\creeps\remoteMiner.js **********/
+__modules[25] = function(module, exports) {
+const { drop } = __require(49,25);
 module.exports = {
     properties: {
         role: 'remoteMiner',
@@ -3029,9 +3047,9 @@ function keeperLairLogic(creep, mineral) {
 }
 return module.exports;
 }
-/********** End of module 24: D:\screeps\AlexBot_Js\src\creeps\remoteMiner.js **********/
-/********** Start module 25: D:\screeps\AlexBot_Js\src\creeps\wrecker.js **********/
-__modules[25] = function(module, exports) {
+/********** End of module 25: D:\screeps\AlexBot_Js\src\creeps\remoteMiner.js **********/
+/********** Start module 26: D:\screeps\AlexBot_Js\src\creeps\wrecker.js **********/
+__modules[26] = function(module, exports) {
 module.exports = {
     properties: {
         role: "wrecker"
@@ -3082,9 +3100,9 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 25: D:\screeps\AlexBot_Js\src\creeps\wrecker.js **********/
-/********** Start module 26: D:\screeps\AlexBot_Js\src\creeps\medic.js **********/
-__modules[26] = function(module, exports) {
+/********** End of module 26: D:\screeps\AlexBot_Js\src\creeps\wrecker.js **********/
+/********** Start module 27: D:\screeps\AlexBot_Js\src\creeps\medic.js **********/
+__modules[27] = function(module, exports) {
 module.exports = {
     properties: {
         role: "medic"
@@ -3142,52 +3160,76 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 26: D:\screeps\AlexBot_Js\src\creeps\medic.js **********/
-/********** Start module 27: D:\screeps\AlexBot_Js\src\creeps\scout.js **********/
-__modules[27] = function(module, exports) {
+/********** End of module 27: D:\screeps\AlexBot_Js\src\creeps\medic.js **********/
+/********** Start module 28: D:\screeps\AlexBot_Js\src\creeps\scout.js **********/
+__modules[28] = function(module, exports) {
 module.exports = {
     properties: {
         role: "scout"
     },
     /** @param {Creep} creep **/
-    run: function(creep) {
-        if(creep.memory.targetPos) {
+    run: function (creep) {
+        if (creep.memory.targetPos) {
             let targetPos = creep.memory.targetPos;
-            creep.moveTo(new RoomPosition(targetPos.x, targetPos.y, targetPos.roomName), {reusePath: 50});
+            creep.moveTo(new RoomPosition(targetPos.x, targetPos.y, targetPos.roomName), { reusePath: 50 });
             return;
         }
-        if (creep.moveToRoomAdv(creep.memory.targetRoom)) {
+        if(creep.memory.explorer) {
+            this.explorerLogic(creep);
             return;
         }
-        
-        if(creep.memory.target) {
+        let targetRoomName = creep.memory.targetRoom
+        if (creep.moveToRoomAdv(targetRoomName)) {
+            return;
+        }
+
+        if (creep.memory.target) {
             let target = Game.getObjectById(creep.memory.target);
-            if(target) creep.moveTo(creep.memory.target, {reusePath: 50});
+            if (target) creep.moveTo(creep.memory.target, { reusePath: 50 });
 
             return;
         }
     },
-    spawn: function(room) {
+
+    explorerLogic: function(creep) {
+        console.log(JSON.stringify(creep.room.memory.roomInfo));
+
+        let targetRoomName;
+        if (creep.memory.targetRooms && creep.memory.targetRooms.length) {
+            targetRoomName = creep.memory.targetRooms[0];
+        }
+        else creep.suicide();
+
+        if (creep.moveToRoomAdv(targetRoomName)) {
+            return;
+        }
+
+        creep.memory.targetRooms.shift();
+        if(!creep.room.memory.roomInfo) {
+            creep.room.memory.roomInfo = roomUtil.getRoomInfo(creep.room);
+        }
+    },
+    spawn: function (room) {
         var thisTypeCreeps = _.filter(Game.creeps, (creep) => creep.memory.role == this.properties.role && creep.room.name == room.name);
         console.log(this.properties.role + ': ' + thisTypeCreeps.length, room.name);
         if (thisTypeCreeps.length < 1) {
             return true;
         }
     },
-    spawnData: function(room, targetRoomName) {
+    spawnData: function (room, targetRoomName) {
         let name = this.properties.role + Game.time;
         let body = [WORK, CARRY, MOVE];
-        let memory = {role: this.properties.role, status: 0, base: room.name, targetRoom: targetRoomName};
+        let memory = { role: this.properties.role, status: 0, base: room.name, targetRoom: targetRoomName };
 
-        return {name, body, memory};
+        return { name, body, memory };
     },
 };
 return module.exports;
 }
-/********** End of module 27: D:\screeps\AlexBot_Js\src\creeps\scout.js **********/
-/********** Start module 28: D:\screeps\AlexBot_Js\src\creeps\rangeAtker.js **********/
-__modules[28] = function(module, exports) {
-const { T3_HEAL, T3_TOUGH, T3_RANGE_ATTACK } = __require(48,28);
+/********** End of module 28: D:\screeps\AlexBot_Js\src\creeps\scout.js **********/
+/********** Start module 29: D:\screeps\AlexBot_Js\src\creeps\rangeAtker.js **********/
+__modules[29] = function(module, exports) {
+const { T3_HEAL, T3_TOUGH, T3_RANGE_ATTACK } = __require(51,29);
 
 module.exports = {
     properties: {
@@ -3273,11 +3315,11 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 28: D:\screeps\AlexBot_Js\src\creeps\rangeAtker.js **********/
-/********** Start module 29: D:\screeps\AlexBot_Js\src\room\spawning.js **********/
-__modules[29] = function(module, exports) {
-const { roomInfo } = __require(43,29);
-const creepLogic = __require(1,29);
+/********** End of module 29: D:\screeps\AlexBot_Js\src\creeps\rangeAtker.js **********/
+/********** Start module 30: D:\screeps\AlexBot_Js\src\room\spawning.js **********/
+__modules[30] = function(module, exports) {
+const { roomInfo } = __require(46,30);
+const creepLogic = __require(1,30);
 
 function spawnCreeps(room) {
     var availableSpawns = room.find(FIND_MY_SPAWNS, {
@@ -3329,7 +3371,10 @@ function spawnCreeps(room) {
     let spawnTasks = room.memory.tasks.spawnTasks;
     if(spawnTasks.length) {
         const task = spawnTasks[0];
+        
         task.name += Game.time % 10000;
+        task.memory.base = room.name;
+
         if(spawnCreepUsingSpawnData(task) === OK) {
             spawnTasks.shift();
             return;
@@ -3400,10 +3445,10 @@ function spawnCreeps(room) {
 module.exports = spawnCreeps;
 return module.exports;
 }
-/********** End of module 29: D:\screeps\AlexBot_Js\src\room\spawning.js **********/
-/********** Start module 30: D:\screeps\AlexBot_Js\src\room\linkTransfer.js **********/
-__modules[30] = function(module, exports) {
-const { roomInfo } = __require(43,30);
+/********** End of module 30: D:\screeps\AlexBot_Js\src\room\spawning.js **********/
+/********** Start module 31: D:\screeps\AlexBot_Js\src\room\linkTransfer.js **********/
+__modules[31] = function(module, exports) {
+const { roomInfo } = __require(46,31);
 
 module.exports = function(room) {
     if (roomInfo[room.name] == undefined || roomInfo[room.name].managerPos == undefined) {
@@ -3484,9 +3529,9 @@ function updateLinkInfo(room) {
 };
 return module.exports;
 }
-/********** End of module 30: D:\screeps\AlexBot_Js\src\room\linkTransfer.js **********/
-/********** Start module 31: D:\screeps\AlexBot_Js\src\room\roomCensus.js **********/
-__modules[31] = function(module, exports) {
+/********** End of module 31: D:\screeps\AlexBot_Js\src\room\linkTransfer.js **********/
+/********** Start module 32: D:\screeps\AlexBot_Js\src\room\roomCensus.js **********/
+__modules[32] = function(module, exports) {
 module.exports = function() {
     global.roomCensus = {};
     _.forEach(Game.creeps, creep => {
@@ -3521,9 +3566,9 @@ function addInCensusObj(creep, roomName, role) {
 }
 return module.exports;
 }
-/********** End of module 31: D:\screeps\AlexBot_Js\src\room\roomCensus.js **********/
-/********** Start module 32: D:\screeps\AlexBot_Js\src\room\exportStats.js **********/
-__modules[32] = function(module, exports) {
+/********** End of module 32: D:\screeps\AlexBot_Js\src\room\roomCensus.js **********/
+/********** Start module 33: D:\screeps\AlexBot_Js\src\room\exportStats.js **********/
+__modules[33] = function(module, exports) {
 // Call this function at the end of your main loop
 function exportStats() {
     Memory.stats = {
@@ -3558,12 +3603,12 @@ function exportStats() {
 module.exports = exportStats;
 return module.exports;
 }
-/********** End of module 32: D:\screeps\AlexBot_Js\src\room\exportStats.js **********/
-/********** Start module 33: D:\screeps\AlexBot_Js\src\room\labReaction.js **********/
-__modules[33] = function(module, exports) {
-const { transferTask, LabTask } = __require(49,33);
-const { reactionResources } = __require(45,33);
-const { compondsRequirements } = __require(43,33);
+/********** End of module 33: D:\screeps\AlexBot_Js\src\room\exportStats.js **********/
+/********** Start module 34: D:\screeps\AlexBot_Js\src\room\labReaction.js **********/
+__modules[34] = function(module, exports) {
+const { transferTask, LabTask } = __require(52,34);
+const { reactionResources } = __require(48,34);
+const { compondsRequirements } = __require(46,34);
 
 
 module.exports = function (room) {
@@ -3743,10 +3788,10 @@ function createTask(room, amountIndex) {
 }
 return module.exports;
 }
-/********** End of module 33: D:\screeps\AlexBot_Js\src\room\labReaction.js **********/
-/********** Start module 34: D:\screeps\AlexBot_Js\src\room\resourceBalancing.js **********/
-__modules[34] = function(module, exports) {
-const { roomResourceConfig } = __require(43,34);
+/********** End of module 34: D:\screeps\AlexBot_Js\src\room\labReaction.js **********/
+/********** Start module 35: D:\screeps\AlexBot_Js\src\room\resourceBalancing.js **********/
+__modules[35] = function(module, exports) {
+const { roomResourceConfig } = __require(46,35);
 
 module.exports = function(myRooms) {
     if(Game.time % 200 == 45) {
@@ -3798,9 +3843,9 @@ module.exports = function(myRooms) {
 };
 return module.exports;
 }
-/********** End of module 34: D:\screeps\AlexBot_Js\src\room\resourceBalancing.js **********/
-/********** Start module 35: D:\screeps\AlexBot_Js\src\room\powerOperation.js **********/
-__modules[35] = function(module, exports) {
+/********** End of module 35: D:\screeps\AlexBot_Js\src\room\resourceBalancing.js **********/
+/********** Start module 36: D:\screeps\AlexBot_Js\src\room\powerOperation.js **********/
+__modules[36] = function(module, exports) {
 module.exports = function(room) {
 
     if(room.controller.level == 8) {
@@ -3818,9 +3863,9 @@ module.exports = function(room) {
 };
 return module.exports;
 }
-/********** End of module 35: D:\screeps\AlexBot_Js\src\room\powerOperation.js **********/
-/********** Start module 36: D:\screeps\AlexBot_Js\src\room\factorayLogic.js **********/
-__modules[36] = function(module, exports) {
+/********** End of module 36: D:\screeps\AlexBot_Js\src\room\powerOperation.js **********/
+/********** Start module 37: D:\screeps\AlexBot_Js\src\room\factorayLogic.js **********/
+__modules[37] = function(module, exports) {
 module.exports = function(room) {
     if(room.level < 7) return;
     let factory = _.find(room.find(FIND_MY_STRUCTURES), struct => struct.structureType === STRUCTURE_FACTORY);
@@ -3831,9 +3876,9 @@ module.exports = function(room) {
 }
 return module.exports;
 }
-/********** End of module 36: D:\screeps\AlexBot_Js\src\room\factorayLogic.js **********/
-/********** Start module 37: D:\screeps\AlexBot_Js\src\room\marketLogic.js **********/
-__modules[37] = function(module, exports) {
+/********** End of module 37: D:\screeps\AlexBot_Js\src\room\factorayLogic.js **********/
+/********** Start module 38: D:\screeps\AlexBot_Js\src\room\marketLogic.js **********/
+__modules[38] = function(module, exports) {
 module.exports = function() {
     if(Game.time % 10 !== 10) return;
     
@@ -3870,10 +3915,10 @@ module.exports = function() {
 }
 return module.exports;
 }
-/********** End of module 37: D:\screeps\AlexBot_Js\src\room\marketLogic.js **********/
-/********** Start module 38: D:\screeps\AlexBot_Js\src\room\towerLogic.js **********/
-__modules[38] = function(module, exports) {
-const { wall, rampart } = __require(44,38);
+/********** End of module 38: D:\screeps\AlexBot_Js\src\room\marketLogic.js **********/
+/********** Start module 39: D:\screeps\AlexBot_Js\src\room\towerLogic.js **********/
+__modules[39] = function(module, exports) {
+const { wall, rampart } = __require(47,39);
 
 module.exports = function (room) {
     const towers = room.find(FIND_MY_STRUCTURES, {filter: struct => struct.structureType == STRUCTURE_TOWER && struct.store[RESOURCE_ENERGY] >= 10});
@@ -3919,9 +3964,77 @@ module.exports = function (room) {
 }
 return module.exports;
 }
-/********** End of module 38: D:\screeps\AlexBot_Js\src\room\towerLogic.js **********/
-/********** Start module 39: D:\screeps\AlexBot_Js\src\tools\roomPlanner.js **********/
-__modules[39] = function(module, exports) {
+/********** End of module 39: D:\screeps\AlexBot_Js\src\room\towerLogic.js **********/
+/********** Start module 40: D:\screeps\AlexBot_Js\src\room\roomInit.js **********/
+__modules[40] = function(module, exports) {
+const { roomUtil } = __require(53,40);
+const ifInit = true;
+function roomInit(room) {
+    if(!ifInit) return;
+    if(!room || room.memory.init === false) return;
+    if(!room.controller || room.controller.level === 0 || !room.controller.my) return;
+    room.memory = {
+        outSourceRooms: [],
+        needRepairStructures: [],
+        linkInfo: {
+            sourceLinks: [],
+            controllerLink: null,
+            managerLink: null
+        },
+        linkCompleteness: false,
+        tasks: {
+            labTasks: [],
+            terminalTasks: [],
+            managerTasks: [],
+            spawnTasks: []
+        },
+        labs: {
+            center: [],
+            boostLab: {},
+            labStatus: 0,
+        },
+    }
+    room.memory.roomInfo = roomUtil.getRoomInfo(room);
+    room.memory.tasks.spawnTasks.push({
+        name: 'explorer', 
+        body: [MOVE], 
+        memory: {
+            role: 'scout',
+            targetRooms: roomUtil.getRoomsInRange(room.name, 3),
+            explorer: true
+        }
+    });
+    
+    
+
+
+
+    room.memory.init = false;
+}
+
+module.exports = roomInit;
+return module.exports;
+}
+/********** End of module 40: D:\screeps\AlexBot_Js\src\room\roomInit.js **********/
+/********** Start module 41: D:\screeps\AlexBot_Js\src\test\sandbox.js **********/
+__modules[41] = function(module, exports) {
+const { roomUtil } = __require(53,41);
+
+const sandbox = {
+    startOfTheTick: function() {
+    },
+
+    endOfTheTick: function() {
+        
+    },
+}
+
+module.exports = sandbox;
+return module.exports;
+}
+/********** End of module 41: D:\screeps\AlexBot_Js\src\test\sandbox.js **********/
+/********** Start module 42: D:\screeps\AlexBot_Js\src\tools\roomPlanner.js **********/
+__modules[42] = function(module, exports) {
 
 function planner_loop(roomName, opts = {}) {
     let _this = {};
@@ -4788,9 +4901,9 @@ function relPoly(x, y, poly) {
 module.exports = planner_loop;
 return module.exports;
 }
-/********** End of module 39: D:\screeps\AlexBot_Js\src\tools\roomPlanner.js **********/
-/********** Start module 40: D:\screeps\AlexBot_Js\src\tools\myRoomPlanner.js **********/
-__modules[40] = function(module, exports) {
+/********** End of module 42: D:\screeps\AlexBot_Js\src\tools\roomPlanner.js **********/
+/********** Start module 43: D:\screeps\AlexBot_Js\src\tools\myRoomPlanner.js **********/
+__modules[43] = function(module, exports) {
 
 function planner_loop(roomName, opts = {}) {
     let _this = {};
@@ -5649,11 +5762,11 @@ function relPoly(x, y, poly) {
 module.exports = planner_loop;
 return module.exports;
 }
-/********** End of module 40: D:\screeps\AlexBot_Js\src\tools\myRoomPlanner.js **********/
-/********** Start module 41: D:\screeps\AlexBot_Js\src\prototypes\creep.js **********/
-__modules[41] = function(module, exports) {
-const { roomInfo } = __require(43,41);
-const { boostCreep } = __require(50,41);
+/********** End of module 43: D:\screeps\AlexBot_Js\src\tools\myRoomPlanner.js **********/
+/********** Start module 44: D:\screeps\AlexBot_Js\src\prototypes\creep.js **********/
+__modules[44] = function(module, exports) {
+const { roomInfo } = __require(46,44);
+const { boostCreep } = __require(54,44);
 
 Creep.prototype.sayHello = function sayHello(words="Hello") {
     this.say(words, true);
@@ -5953,9 +6066,9 @@ Creep.prototype.getBoosts = function() {
 }
 return module.exports;
 }
-/********** End of module 41: D:\screeps\AlexBot_Js\src\prototypes\creep.js **********/
-/********** Start module 42: D:\screeps\AlexBot_Js\src\prototypes\room.js **********/
-__modules[42] = function(module, exports) {
+/********** End of module 44: D:\screeps\AlexBot_Js\src\prototypes\creep.js **********/
+/********** Start module 45: D:\screeps\AlexBot_Js\src\prototypes\room.js **********/
+__modules[45] = function(module, exports) {
 Room.prototype.addTransferTask = function(task) {
     if(!this.memory.tasks) this.memory.tasks = {};
     if(!this.memory.tasks.transferTask) this.memory.tasks.transferTask = [];
@@ -6024,46 +6137,47 @@ Room.prototype.reduceFromBoostLab = function(labId, resourceType, amount) {
 }
 return module.exports;
 }
-/********** End of module 42: D:\screeps\AlexBot_Js\src\prototypes\room.js **********/
-/********** Start module 43: D:\screeps\AlexBot_Js\src\config\index.js **********/
-__modules[43] = function(module, exports) {
+/********** End of module 45: D:\screeps\AlexBot_Js\src\prototypes\room.js **********/
+/********** Start module 46: D:\screeps\AlexBot_Js\src\config\index.js **********/
+__modules[46] = function(module, exports) {
 const config = {
-    roomInfo:               __require(51,43),
-    roomResourceConfig:     __require(47,43),
-    compondsRequirements:   __require(52,43),
+    roomInfo:               __require(55,46),
+    roomResourceConfig:     __require(50,46),
+    compondsRequirements:   __require(56,46),
 }
 
 module.exports = config;
 return module.exports;
 }
-/********** End of module 43: D:\screeps\AlexBot_Js\src\config\index.js **********/
-/********** Start module 44: D:\screeps\AlexBot_Js\src\structures\index.js **********/
-__modules[44] = function(module, exports) {
+/********** End of module 46: D:\screeps\AlexBot_Js\src\config\index.js **********/
+/********** Start module 47: D:\screeps\AlexBot_Js\src\structures\index.js **********/
+__modules[47] = function(module, exports) {
 let structureLogic = {
-    rampart:  __require(53,44),
-    wall:     __require(54,44),
-    lab:      __require(50,44),
+    rampart:  __require(57,47),
+    wall:     __require(58,47),
+    lab:      __require(54,47),
 }
 
 module.exports = structureLogic;
 return module.exports;
 }
-/********** End of module 44: D:\screeps\AlexBot_Js\src\structures\index.js **********/
-/********** Start module 45: D:\screeps\AlexBot_Js\src\constants\index.js **********/
-__modules[45] = function(module, exports) {
+/********** End of module 47: D:\screeps\AlexBot_Js\src\structures\index.js **********/
+/********** Start module 48: D:\screeps\AlexBot_Js\src\constants\index.js **********/
+__modules[48] = function(module, exports) {
 let constants = {
-    reactionResources:  __require(55,45),
-    creepRoles:         __require(56,45),
-    boostName:          __require(48,45),
-    commodities:        __require(57,45),
+    reactionResources:  __require(59,48),
+    creepRoles:         __require(60,48),
+    boostName:          __require(51,48),
+    commodities:        __require(61,48),
+    roomTypes:          __require(62,48),
 }
 
 module.exports = constants;
 return module.exports;
 }
-/********** End of module 45: D:\screeps\AlexBot_Js\src\constants\index.js **********/
-/********** Start module 46: D:\screeps\AlexBot_Js\node_modules\lodash\index.js **********/
-__modules[46] = function(module, exports) {
+/********** End of module 48: D:\screeps\AlexBot_Js\src\constants\index.js **********/
+/********** Start module 49: D:\screeps\AlexBot_Js\node_modules\lodash\index.js **********/
+__modules[49] = function(module, exports) {
 /**
  * @license
  * lodash 3.10.1 (Custom Build) <https://lodash.com/>
@@ -18251,9 +18365,9 @@ __modules[46] = function(module, exports) {
 
 return module.exports;
 }
-/********** End of module 46: D:\screeps\AlexBot_Js\node_modules\lodash\index.js **********/
-/********** Start module 47: D:\screeps\AlexBot_Js\src\config\roomResourceConfig.js **********/
-__modules[47] = function(module, exports) {
+/********** End of module 49: D:\screeps\AlexBot_Js\node_modules\lodash\index.js **********/
+/********** Start module 50: D:\screeps\AlexBot_Js\src\config\roomResourceConfig.js **********/
+__modules[50] = function(module, exports) {
 // resourceType: {terminal: amount, storage: [ShortageLine, AbundantLine, ExceededLine]}
 module.exports = {
     energy: {terminal: 50000, storage: [200000, 500000, 600000]},
@@ -18284,9 +18398,9 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 47: D:\screeps\AlexBot_Js\src\config\roomResourceConfig.js **********/
-/********** Start module 48: D:\screeps\AlexBot_Js\src\constants\boostName.js **********/
-__modules[48] = function(module, exports) {
+/********** End of module 50: D:\screeps\AlexBot_Js\src\config\roomResourceConfig.js **********/
+/********** Start module 51: D:\screeps\AlexBot_Js\src\constants\boostName.js **********/
+__modules[51] = function(module, exports) {
 // order based on creation priority
 module.exports = {
     T3_ATTACK: 'XUH2O', // x4
@@ -18306,9 +18420,9 @@ module.exports = {
 }
 return module.exports;
 }
-/********** End of module 48: D:\screeps\AlexBot_Js\src\constants\boostName.js **********/
-/********** Start module 49: D:\screeps\AlexBot_Js\src\models\taskModels.js **********/
-__modules[49] = function(module, exports) {
+/********** End of module 51: D:\screeps\AlexBot_Js\src\constants\boostName.js **********/
+/********** Start module 52: D:\screeps\AlexBot_Js\src\models\taskModels.js **********/
+__modules[52] = function(module, exports) {
 var ManagerTask = function(from, to, resourceType, amount, priority = 0) {
     return {
         from: from,
@@ -18339,9 +18453,19 @@ var transferTask = function(withdrawTarget, transferTarget, resourceType, amount
 module.exports = {ManagerTask, TowerRepairTask, LabTask, transferTask};
 return module.exports;
 }
-/********** End of module 49: D:\screeps\AlexBot_Js\src\models\taskModels.js **********/
-/********** Start module 50: D:\screeps\AlexBot_Js\src\structures\lab.js **********/
-__modules[50] = function(module, exports) {
+/********** End of module 52: D:\screeps\AlexBot_Js\src\models\taskModels.js **********/
+/********** Start module 53: D:\screeps\AlexBot_Js\src\util\index.js **********/
+__modules[53] = function(module, exports) {
+const util = {
+    roomUtil: __require(63,53),
+}
+
+module.exports = util;
+return module.exports;
+}
+/********** End of module 53: D:\screeps\AlexBot_Js\src\util\index.js **********/
+/********** Start module 54: D:\screeps\AlexBot_Js\src\structures\lab.js **********/
+__modules[54] = function(module, exports) {
 module.exports = {
     boostCreep: function(lab, creep, resourceType, bodyPartCount) {
         if(!lab.store[resourceType] || lab.store[resourceType] < bodyPartCount * 30) return ERR_NOT_ENOUGH_RESOURCES;
@@ -18358,9 +18482,9 @@ module.exports = {
 }
 return module.exports;
 }
-/********** End of module 50: D:\screeps\AlexBot_Js\src\structures\lab.js **********/
-/********** Start module 51: D:\screeps\AlexBot_Js\src\config\roomConfig.js **********/
-__modules[51] = function(module, exports) {
+/********** End of module 54: D:\screeps\AlexBot_Js\src\structures\lab.js **********/
+/********** Start module 55: D:\screeps\AlexBot_Js\src\config\roomConfig.js **********/
+__modules[55] = function(module, exports) {
 module.exports = {
     W19S17: {
         restPos: new RoomPosition(24, 9, "W19S17"),
@@ -18409,9 +18533,9 @@ module.exports = {
 }
 return module.exports;
 }
-/********** End of module 51: D:\screeps\AlexBot_Js\src\config\roomConfig.js **********/
-/********** Start module 52: D:\screeps\AlexBot_Js\src\config\labProductConfig.js **********/
-__modules[52] = function(module, exports) {
+/********** End of module 55: D:\screeps\AlexBot_Js\src\config\roomConfig.js **********/
+/********** Start module 56: D:\screeps\AlexBot_Js\src\config\labProductConfig.js **********/
+__modules[56] = function(module, exports) {
 // order based on creation priority
 module.exports = {
     XUH2O: [5000, 12000], // attack
@@ -18436,9 +18560,9 @@ module.exports = {
 }
 return module.exports;
 }
-/********** End of module 52: D:\screeps\AlexBot_Js\src\config\labProductConfig.js **********/
-/********** Start module 53: D:\screeps\AlexBot_Js\src\structures\rampart.js **********/
-__modules[53] = function(module, exports) {
+/********** End of module 56: D:\screeps\AlexBot_Js\src\config\labProductConfig.js **********/
+/********** Start module 57: D:\screeps\AlexBot_Js\src\structures\rampart.js **********/
+__modules[57] = function(module, exports) {
 var rampart = {
     targetHits: {
         0: 0,
@@ -18464,9 +18588,9 @@ var rampart = {
 module.exports = rampart;
 return module.exports;
 }
-/********** End of module 53: D:\screeps\AlexBot_Js\src\structures\rampart.js **********/
-/********** Start module 54: D:\screeps\AlexBot_Js\src\structures\wall.js **********/
-__modules[54] = function(module, exports) {
+/********** End of module 57: D:\screeps\AlexBot_Js\src\structures\rampart.js **********/
+/********** Start module 58: D:\screeps\AlexBot_Js\src\structures\wall.js **********/
+__modules[58] = function(module, exports) {
 var wall = {
     targetHits: {
         0: 0,
@@ -18492,9 +18616,9 @@ var wall = {
 module.exports = wall;
 return module.exports;
 }
-/********** End of module 54: D:\screeps\AlexBot_Js\src\structures\wall.js **********/
-/********** Start module 55: D:\screeps\AlexBot_Js\src\constants\reactionResources.js **********/
-__modules[55] = function(module, exports) {
+/********** End of module 58: D:\screeps\AlexBot_Js\src\structures\wall.js **********/
+/********** Start module 59: D:\screeps\AlexBot_Js\src\constants\reactionResources.js **********/
+__modules[59] = function(module, exports) {
 module.exports = {
     OH: [ 'H', 'O' ],
     LH: [ 'H', 'L' ],
@@ -18533,9 +18657,9 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 55: D:\screeps\AlexBot_Js\src\constants\reactionResources.js **********/
-/********** Start module 56: D:\screeps\AlexBot_Js\src\constants\creepRoles.js **********/
-__modules[56] = function(module, exports) {
+/********** End of module 59: D:\screeps\AlexBot_Js\src\constants\reactionResources.js **********/
+/********** Start module 60: D:\screeps\AlexBot_Js\src\constants\creepRoles.js **********/
+__modules[60] = function(module, exports) {
 const roles = {
     HARVESTER:      'harvester2',
     CARRIER:        'carrier2',
@@ -18560,9 +18684,9 @@ const roles = {
 module.exports = roles;
 return module.exports;
 }
-/********** End of module 56: D:\screeps\AlexBot_Js\src\constants\creepRoles.js **********/
-/********** Start module 57: D:\screeps\AlexBot_Js\src\constants\commodities.js **********/
-__modules[57] = function(module, exports) {
+/********** End of module 60: D:\screeps\AlexBot_Js\src\constants\creepRoles.js **********/
+/********** Start module 61: D:\screeps\AlexBot_Js\src\constants\commodities.js **********/
+__modules[61] = function(module, exports) {
 module.exports = [
     RESOURCE_COMPOSITE,
     RESOURCE_CRYSTAL,
@@ -18598,7 +18722,129 @@ module.exports = [
 ]
 return module.exports;
 }
-/********** End of module 57: D:\screeps\AlexBot_Js\src\constants\commodities.js **********/
+/********** End of module 61: D:\screeps\AlexBot_Js\src\constants\commodities.js **********/
+/********** Start module 62: D:\screeps\AlexBot_Js\src\constants\roomTypes.js **********/
+__modules[62] = function(module, exports) {
+const roomTypes = {
+    HIGHWAY: 0,
+    NORMAL: 1,
+    KEEPER: 2,
+    CENTER: 3
+}
+
+module.exports = roomTypes;
+return module.exports;
+}
+/********** End of module 62: D:\screeps\AlexBot_Js\src\constants\roomTypes.js **********/
+/********** Start module 63: D:\screeps\AlexBot_Js\src\util\roomUtil.js **********/
+__modules[63] = function(module, exports) {
+const { roomTypes } = __require(48,63);
+
+roomUtil = {
+    getRoomCoord: function (roomName) {
+        if (roomName.includes('N')) {
+            return roomName.substring(1).split('N').map(pos => Number(pos));
+        } else {
+            return roomName.substring(1).split('S').map(pos => Number(pos));
+        }
+    },
+
+    getRoomType: function (roomName) {
+        const roomPos = this.getRoomCoord(roomName);
+        if (roomPos[0] % 10 === 0 || roomPos[1] % 10 === 0) return roomTypes.HIGHWAY;
+        else if (roomPos[0] % 10 === 5 || roomPos[1] % 10 === 5) return roomTypes.CENTER;
+        else if (
+            (roomPos[0] % 10 === 4 || roomPos[0] % 10 === 6) &&
+            (roomPos[1] % 10 === 4 || roomPos[1] % 10 === 6)
+        ) return roomTypes.KEEPER;
+        else return roomTypes.NORMAL;
+    },
+    getRoomsInRange: function (roomName, range, curret = null) {
+        if (!range) return [];
+
+        if (!curret) curret = [roomName];
+        _.forEach(Game.map.describeExits(roomName), rN => {
+            if (!curret.includes(rN) && this.getRoomType(rN) !== roomTypes.KEEPER) {
+                curret.push(rN);
+                this.getRoomsInRange(rN, range - 1, curret);
+            }
+        })
+
+        return curret;
+    },
+
+    getRoomsInRangeBFS: function (roomName, range) {
+        const inRangeRooms = [roomName];
+        let p = 0;
+
+        while (range > 0) {
+            let roomCount = inRangeRooms.length - p;
+            for (let i = 0; i < roomCount; i++) {
+                const neerRooms = Game.map.describeExits(inRangeRooms[p++]);
+                _.forEach(neerRooms, rN => {
+                    if (!inRangeRooms.includes(rN)) {
+                        inRangeRooms.push(rN);
+                    }
+                })
+            }
+            range -= 1;
+        }
+
+        return inRangeRooms;
+    },
+
+    getRoomInfo: function (room) {
+        if (!room) return;
+        
+        const roomInfo = {};
+        roomInfo.roomType = this.getRoomType(room.name);
+        roomInfo.sourceInfo = room.find(FIND_SOURCES).map(source => {
+            return {
+                pos: source.pos,
+                space: this.getPosAccessSpace(room, source.pos)
+            };
+        });
+        if (roomInfo.roomType !== roomTypes.HIGHWAY) {
+            let mineral = room.find(FIND_MINERALS)[0];
+            roomInfo.mineralPos = mineral.pos;
+            roomInfo.mineralType = mineral.mineralType;
+        }
+
+        return roomInfo;
+    },
+
+    getPosAccessSpace: function (room, pos) {
+        if (!room || !pos) return null;
+
+        let res = 0;
+
+        let directions = [
+            [1, 1],
+            [1, 0],
+            [1, -1],
+            [0, 1],
+            [0, -1],
+            [-1, 1],
+            [-1, 0],
+            [-1, -1],
+        ]
+
+        let terrain = new Room.Terrain(room.name);
+        for (const d of directions) {
+            if(terrain.get(pos.x + d[0], pos.y + d[1]) !== TERRAIN_MASK_WALL) {
+                res += 1;
+            }
+        }
+
+        return res;
+
+    }
+};
+
+module.exports = roomUtil;
+return module.exports;
+}
+/********** End of module 63: D:\screeps\AlexBot_Js\src\util\roomUtil.js **********/
 /********** Footer **********/
 if(typeof module === "object")
 	module.exports = __require(0);

@@ -1,4 +1,12 @@
 # AlexBot_Js
+
+## Season5
+
+- auto create remote harvesting rooms
+- optimized room logic for respawn
+
+
+
 AlexBot is an automation bot for game `Screeps`, written in JavaScripts
 
 This project uses Atanner's **[screeps-starter](https://github.com/AydenRennaker/screeps-starter)** template.

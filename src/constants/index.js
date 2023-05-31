@@ -3,6 +3,7 @@ let constants = {
     creepRoles:         require('./creepRoles'),
     boostName:          require('./boostName'),
     commodities:        require('./commodities'),
+    roomTypes:          require('./roomTypes'),
 }
 
 module.exports = constants;

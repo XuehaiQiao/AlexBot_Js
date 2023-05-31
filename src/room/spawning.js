@@ -67,7 +67,10 @@ function spawnCreeps(room) {
     if(spawnTasks.length) {
         // task = [{name, body, memory}, ...]
         const task = spawnTasks[0];
+        
         task.name += Game.time % 10000;
+        task.memory.base = room.name;
+
         if(spawnCreepUsingSpawnData(task) === OK) {
             spawnTasks.shift();
             return;
