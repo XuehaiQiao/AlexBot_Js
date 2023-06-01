@@ -1,3 +1,4 @@
+const { roomInfo } = require("../config");
 const { roomUtil } = require("../util");
 const ifInit = true;
 
@@ -7,7 +8,13 @@ function roomInit(room) {
     if(!room || room.memory.init === false) return;
     if(!room.controller || room.controller.level === 0 || !room.controller.my) return;
 
-    //set up memory
+    //set up Memory
+    if(!Memory.outSourceRooms) Memory.outSourceRooms = {};
+    if(!Memory.resourceShortage) Memory.resourceShortage = {};
+    
+
+
+    //set up room memory
     room.memory = {
         outSourceRooms: [],
         needRepairStructures: [],
@@ -30,6 +37,8 @@ function roomInit(room) {
         },
     }
 
+    const targetRooms = roomUtil.getRoomsInRange(room.name, 3);
+
     // set roomInfo
     room.memory.roomInfo = roomUtil.getRoomInfo(room);
     // assign scout
@@ -38,13 +47,18 @@ function roomInit(room) {
         body: [MOVE], 
         memory: {
             role: 'scout',
-            targetRooms: roomUtil.getRoomsInRange(room.name, 3),
+            targetRooms: targetRooms,
             explorer: true
         }
     });
     
-    
-
+    // create basic structs
+    if(roomInfo[room.name].storagePos) {
+        room.createConstructionSite(roomInfo[room.name].storagePos, STRUCTURE_CONTAINER);
+    }
+    else if(roomInfo[room.name].roomPlan) {
+        // todo
+    }
 
 
     room.memory.init = false;

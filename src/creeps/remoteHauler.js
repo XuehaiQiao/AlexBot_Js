@@ -117,8 +117,15 @@ module.exports = {
             // directly move to storage if can
             let baseRoom = Game.rooms[creep.memory.base]
             if (baseRoom) {
-                let target = baseRoom.storage;
-                if (target) {
+                let target = baseRoom.getStorage();
+                if (!target || target.store.getFreeCapacity() === 0) {
+                    if (creep.pos.inRangeTo(creep.room.controller.pos, 4)) {
+                        let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
+                        creep.drop(resourceType);
+                    }
+                    else creep.moveToNoCreepInRoom(creep.room.controller);
+                }
+                else if(!creep.pos.inRangeTo(target, 1)) {
                     let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
                     if (creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
                         creep.moveToNoCreep(target);

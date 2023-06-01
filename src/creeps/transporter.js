@@ -129,7 +129,7 @@ module.exports = {
             }
 
             if (!storage) {
-                if (creep.pos.inRangeTo(creep.room.controller.pos, 2)) {
+                if (creep.pos.inRangeTo(creep.room.controller.pos, 3)) {
                     creep.drop(RESOURCE_ENERGY);
                 }
                 else creep.moveToNoCreepInRoom(creep.room.controller);

@@ -26,7 +26,7 @@ roomUtil = {
 
         if (!curret) curret = [roomName];
         _.forEach(Game.map.describeExits(roomName), rN => {
-            if (!curret.includes(rN) && this.getRoomType(rN) !== roomTypes.KEEPER) {
+            if (!curret.includes(rN) && this.getRoomType(rN) === roomTypes.NORMAL) {
                 curret.push(rN);
                 this.getRoomsInRange(rN, range - 1, curret);
             }

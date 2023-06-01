@@ -12,7 +12,7 @@ module.exports = {
         }
 
         // explorer
-        if(creep.memory.explorer) {
+        if (creep.memory.explorer) {
             this.explorerLogic(creep);
             return;
         }
@@ -32,9 +32,7 @@ module.exports = {
         }
     },
 
-    explorerLogic: function(creep) {
-        console.log(JSON.stringify(creep.room.memory.roomInfo));
-
+    explorerLogic: function (creep) {
         let targetRoomName;
         if (creep.memory.targetRooms && creep.memory.targetRooms.length) {
             targetRoomName = creep.memory.targetRooms[0];
@@ -45,10 +43,21 @@ module.exports = {
             return;
         }
 
-        creep.memory.targetRooms.shift();
-        if(!creep.room.memory.roomInfo) {
-            creep.room.memory.roomInfo = roomUtil.getRoomInfo(creep.room);
+
+
+        const newRoomInfo = roomUtil.getRoomInfo(creep.room);
+        if (!creep.room.memory.roomInfo) {
+            creep.room.memory.roomInfo = newRoomInfo;
         }
+
+        if (!creep.room.find(FIND_HOSTILE_STRUCTURES).length) {
+            if (!Memory.outSourceRooms[creep.room.name]) {
+                Memory.outSourceRooms[creep.room.name] = { sourceNum: newRoomInfo.sourceInfo.length };
+            }
+        }
+
+        // remove current room after searched logic
+        creep.memory.targetRooms.shift();
     },
 
     // checks if the room needs to spawn a creep

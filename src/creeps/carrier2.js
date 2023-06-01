@@ -1,8 +1,10 @@
+const { roomInfo } = require("../config");
+
 module.exports = {
     properties: {
         type: 'carrier2',
         stages: {
-            1: {maxEnergyCapacity: 300, bodyParts:[CARRY, MOVE, CARRY, MOVE], number: 2},
+            1: {maxEnergyCapacity: 300, bodyParts:[CARRY, MOVE, CARRY, MOVE], number: 4},
             2: {maxEnergyCapacity: 550, bodyParts:[CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2},
             3: {maxEnergyCapacity: 800, bodyParts:[CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2},
             4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(16).fill(CARRY), ...new Array(8).fill(MOVE)], number: 2},
@@ -45,27 +47,38 @@ module.exports = {
 
     // from [drop, container] to [storage]
     toStorage: function(creep) {
-        // console.log("in toStorage", creep.id)
+        creep.say('storage')
         var storage = creep.room.storage;
         
         // if no storage, change target to containers that near controller
         if(!storage) {
-            let containers = creep.room.find(FIND_STRUCTURES, {filter: struct => (
-                struct.structureType == STRUCTURE_CONTAINER &&
-                struct.pos.inRangeTo(creep.room.controller.pos, 3) &&
-                struct.store.getFreeCapacity() > 0
-            )});
+            let containers = creep.room.find(FIND_STRUCTURES, {filter: struct => struct.structureType == STRUCTURE_CONTAINER});
+            
             if(containers.length) {
-                storage = containers[0];
-            }
+                if(roomInfo[creep.room.name] && roomInfo[creep.room.name].storagePos) {
+                    storage = _.find(containers, con => (
+                        con.pos.isEqualTo(roomInfo[creep.room.name].storagePos) &&
+                        con.store.getFreeCapacity() > 0
+                    ));
+                }
+
+                if(!storage) {
+                    storage = _.find(containers, con => (
+                        con.pos.inRangeTo(creep.room.controller.pos, 3) &&
+                        con.store.getFreeCapacity() > 0
+                    ));
+                }
+            };
+
+            
+            // let a = creep.room.find(FIND_STRUCTURES, {filter: struct => (
+            //     struct.structureType == STRUCTURE_CONTAINER &&
+            //     struct.pos.inRangeTo(creep.room.controller.pos, 3) &&
+            //     struct.store.getFreeCapacity() > 0
+            // )});
         }
 
-        if (!storage || storage.store.getFreeCapacity() == 0) {
-            // go rest
-            creep.toResPos(10);
-        }
-
-        // harvest
+        // withdraw/pickup
         if(creep.memory.status == 0) {
             if(!creep.collectEnergy()) {
                 creep.toResPos();
@@ -74,7 +87,13 @@ module.exports = {
         }
         // transfer
         else {
-            if(creep.transfer(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+            if (!storage || storage.store.getFreeCapacity() === 0) {
+                if (creep.pos.inRangeTo(creep.room.controller.pos, 4)) {
+                    creep.drop(RESOURCE_ENERGY);
+                }
+                else creep.moveToNoCreepInRoom(creep.room.controller);
+            }
+            else if(creep.transfer(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveToNoCreepInRoom(storage);
             }
             return;

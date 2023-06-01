@@ -69,6 +69,8 @@ module.exports = {
 
     // checks if the room needs to spawn a creep
     spawn: function(room) {
+        if(!room.terminal) return false;
+
         // 1 manager
         let creepCount;
         if(global.roomCensus[room.name][this.properties.role]) creepCount = global.roomCensus[room.name][this.properties.role]

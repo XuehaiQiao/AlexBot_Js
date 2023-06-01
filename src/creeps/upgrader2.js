@@ -29,12 +29,13 @@ module.exports = {
         }
         
         // check if have manager or not to decide what logic to use (set status and logics under status)
-        if(roomInfo[creep.room.name] && roomInfo[creep.room.name].managerPos) {
-            this.managerLogic(creep);
-        }
-        else {
-            this.noManagerLogic(creep);
-        }
+        if(
+            creep.room.memory.linkInfo.controllerLink && 
+            creep.room.memory.linkInfo.managerLink &&
+            roomInfo[creep.room.name] &&
+            roomInfo[creep.room.name].managerPos
+        ) this.managerLogic(creep);
+        else  this.noManagerLogic(creep);
     },
 
     managerLogic: function(creep) {
@@ -67,7 +68,11 @@ module.exports = {
         }
         // harvest
         else {
-            creep.takeEnergyFromClosest();
+            if(!creep.takeEnergyNeerController()) {
+                if(!creep.pos.inRangeTo(creep.room.controller, 4)) {
+                    creep.moveTo(creep.room.controller);
+                }
+            }
         }
     },
 
@@ -109,7 +114,12 @@ module.exports = {
         
         // if storage low, create tiny creep, if have managerPos, create small carry creep.
         if(storage && storage.store[RESOURCE_ENERGY] < 50000) body = [WORK, CARRY, CARRY, MOVE];
-        else if(roomInfo[room.name] && roomInfo[room.name].managerPos) body = this.properties.stages[stage].mBodyParts;
+        else if(
+            room.memory.linkInfo.controllerLink && 
+            room.memory.linkInfo.managerLink &&
+            roomInfo[room.name] &&
+            roomInfo[room.name].managerPos
+        ) body = this.properties.stages[stage].mBodyParts;
         else body = this.properties.stages[stage].bodyParts;
 
         let memory = {role: this.properties.type, status: 1, target: 0, base: room.name};

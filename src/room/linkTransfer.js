@@ -1,7 +1,7 @@
 const { roomInfo } = require("../config");
 
 module.exports = function(room) {
-    if (roomInfo[room.name] == undefined || roomInfo[room.name].managerPos == undefined) {
+    if (!roomInfo[room.name] || !roomInfo[room.name].managerPos) {
         return;
     }
 
