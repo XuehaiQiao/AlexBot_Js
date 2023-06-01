@@ -67,9 +67,9 @@ module.exports = {
 
         let sourceTarget;
         let sources = room.find(FIND_SOURCES);
-        for(const source of sources) {
-            if (targetCount[source.id] >= this.properties.stages[stage].number) continue;
-            sourceTarget = source.id;
+        for(const index in sources) {
+            if (targetCount[index] >= this.properties.stages[stage].number) continue;
+            sourceTarget = index;
             break;
         }
 
