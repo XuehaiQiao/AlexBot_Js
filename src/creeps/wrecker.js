@@ -13,6 +13,7 @@ module.exports = {
         let hostileStruct;
         if (creep.memory.target) {
             hostileStruct = Game.getObjectById(creep.memory.target);
+            if(!hostileStruct) creep.memory.target = null;
         } else {
             hostileStruct = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES);
         }
@@ -22,9 +23,8 @@ module.exports = {
         }
 
         if (hostileStruct) {
-            creep.say(creep.dismantle(hostileStruct));
             if(creep.dismantle(hostileStruct) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(hostileStruct, {visualizePathStyle: {stroke: '#ff0000'}});
+                creep.moveToNoCreepInRoom(hostileStruct);
             }
             return;
         }

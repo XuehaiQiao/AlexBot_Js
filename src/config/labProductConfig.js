@@ -6,6 +6,8 @@ module.exports = {
     XKHO2: [5000, 12000], // ranged_attack
     XLHO2: [5000, 12000],  // heal
     XGHO2: [5000, 12000], // tough
+
+    UHO2: [5000, 12000], // +400% harvest
     
     XKH2O: [5000, 12000],  // carry
     XZHO2: [5000, 12000], // move
@@ -16,7 +18,6 @@ module.exports = {
     G: [5000, 12000],
 
     GH: [5000, 12000], // +50% upgrade
-    UO: [5000, 12000], // +200% harvest
 
-    OH: [5000, 12000],
+    OH: [5000, 12000], // backup for further reaction
 }

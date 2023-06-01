@@ -1,6 +1,4 @@
 module.exports = function() {
-    if(Game.time % 10 !== 10) return;
-    
     let w21s19 = Game.rooms['W21S19'];
     if(!w21s19 || !w21s19.terminal) return;
 
@@ -14,12 +12,11 @@ module.exports = function() {
     let orders = Game.market.getAllOrders({type: ORDER_BUY, resourceType: RESOURCE_ALLOY});
     if(orders.length === 0) {
         return;
-        console.log("No order exist");
     }
 
     orders.sort((o1, o2) => (o2.price - o1.price));
 
-    if(orders[0].price > 2450) {
+    if(orders[0].price >= 2300) {
         let result = Game.market.deal(orders[0].id, alloyAmount, "W21S19");
         if(result === OK) {
             console.log("Alloy sold " + orders[0].amount);

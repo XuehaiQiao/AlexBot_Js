@@ -101,7 +101,7 @@ var noContainerLogic = function(creep, mine) {
     if(creep.memory.status) {
         let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
         if(creep.transfer(creep.room.storage, resourceType) == ERR_NOT_IN_RANGE) {
-            creep.moveTo(creep.room.storage);
+            creep.moveToNoCreepInRoom(creep.room.storage);
         }
     }
     // harvest

@@ -27,6 +27,13 @@ module.exports = {
             creep.moveToRoom(creep.memory.targetRoom);
             return;
         }
+
+        if(creep.memory.boosted && creep.ticksToLive <= 50) {
+            if(creep.unBoost()) {
+                creep.drop(RESOURCE_ENERGY);
+                return;
+            }
+        }
         
         // check if have manager or not to decide what logic to use (set status and logics under status)
         if(roomInfo[creep.room.name] && roomInfo[creep.room.name].managerPos) {
@@ -113,9 +120,9 @@ module.exports = {
         else body = this.properties.stages[stage].bodyParts;
 
         let memory = {role: this.properties.type, status: 1, target: 0, base: room.name};
-        memory.boost = true;
-        memory.boosted = false;
-        memory.boostInfo = {GH: 15};
+        // memory.boost = true;
+        // memory.boosted = false;
+        // memory.boostInfo = {GH: 15};
 
         return {name, body, memory};
     },

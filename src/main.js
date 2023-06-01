@@ -1,9 +1,18 @@
 const creepLogic = require('./creeps');
 const roomLogic = require('./room');
 const tools = require('./tools');
+const { event } = require("./util");
 require('./prototypes');
 
 module.exports.loop = function () {
+    if(Game.shard.name === 'shard2') {
+        if (Game.cpu.bucket === 10000) {
+            Game.cpu.generatePixel();
+        }
+
+        return;
+    }
+    
     console.log("---------- " + Game.shard.name + ", Start Tick: " + Game.time + " ----------");
 
     if (Game.cpu.bucket < 20) {
@@ -13,9 +22,13 @@ module.exports.loop = function () {
 
     /**
      * ====================================
-     *            MEMORY FREE
+     *       MEMORY FREE, INIT
      * ====================================
      */
+
+    // reset event every tick
+    event.init();
+    
     // free up memory if creep no longer exists
     for(var name in Memory.creeps) {
         if(!Game.creeps[name]) {
@@ -71,11 +84,6 @@ module.exports.loop = function () {
     }
 
     totalCreepCpu += Game.cpu.getUsed();
-    
-
-    if (Game.shard.name === 'shard2' && Game.cpu.bucket === 10000) {
-        Game.cpu.generatePixel();
-    }
 
     /**
      * ====================================

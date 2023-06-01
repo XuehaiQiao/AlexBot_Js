@@ -1,5 +1,8 @@
+const { event } = require("../util");
+
 module.exports = function() {
     // reset the global object
+    const lastRoomCensus = global.roomCensus;
     global.roomCensus = {};
 
     // census
@@ -12,13 +15,21 @@ module.exports = function() {
         // if creep has targetRoom, count into the targetRoom creeps
         if(creep.memory.targetRoom) {
             let roomName = creep.memory.targetRoom;
-            addInCensusObj(creep, roomName, role);
+            addInCensusObj(roomName, role);
         }
         else if(creep.memory.base) {
             let roomName = creep.memory.base;
-            addInCensusObj(creep, roomName, role);
+            addInCensusObj(roomName, role);
         }
-    })
+    });
+
+    for (const roomName in lastRoomCensus) {
+        let isSame = _.isEqual(lastRoomCensus[roomName], global.roomCensus[roomName]);
+        if(!isSame) {
+            console.log(roomName + ' creep changed');
+            event.roomCreepDying(roomName);
+        }
+    }
 
     // print out creep for each room
     _.forEach(_.keys(global.roomCensus), roomName => {
@@ -26,7 +37,7 @@ module.exports = function() {
     })
 }
 
-function addInCensusObj(creep, roomName, role) {
+function addInCensusObj(roomName, role) {
     if(global.roomCensus[roomName] == undefined) {
         global.roomCensus[roomName] = {};
     }

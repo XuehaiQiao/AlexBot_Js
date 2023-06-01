@@ -203,7 +203,7 @@ function doTask(creep) {
 };
 
 function commodity2Terminal(creep) {
-    // if(Game.time % 10 !== 0) return false;
+    if(Game.time % 100 !== 0) return false;
 
     let storage = Game.getObjectById(creep.memory[STRUCTURE_FACTORY]);
     let terminal = Game.getObjectById(creep.memory[STRUCTURE_TERMINAL]);

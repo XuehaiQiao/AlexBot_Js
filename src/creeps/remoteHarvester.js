@@ -37,6 +37,7 @@ module.exports = {
                 let distance = creep.pos.getRangeTo(hostileCreep);
 
                 if (distance <= 4) {
+                    if(creep.store[RESOURCE_ENERGY] > 0) creep.drop(RESOURCE_ENERGY);
                     creep.moveToRoomAdv(creep.memory.base);
                     return;
                 }

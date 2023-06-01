@@ -2,7 +2,8 @@
 
 module.exports = {
     properties: {
-        role: 'keeperAttacker'
+        role: 'keeperAttacker',
+        body: [...new Array(25).fill(MOVE), ...new Array(19).fill(ATTACK), ...new Array(6).fill(HEAL)], // $4270
     },
     /** @param {Creep} creep **/
     run: function(creep) {
@@ -10,6 +11,16 @@ module.exports = {
         if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
             creep.moveToRoom(creep.memory.targetRoom);
             return;
+        }
+
+        // check high level invader core
+        const invaderCore = creep.room.find(FIND_HOSTILE_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_INVADER_CORE});
+        if(invaderCore.level >= 3) {
+            console.log('invaderCore!')
+            if (invaderCore.ticksToDeploy < 1500 || invaderCore.ticksToDeploy === undefined) {
+                let roomMemory = Memory.outSourceRooms[creep.room.name];
+                if(roomMemory) roomMemory.invaderCore = {level: invaderCore.level, endTime: Game.time + 70000 + invaderCore.ticksToDeploy};
+            }
         }
         
         let targetKeeper = Game.getObjectById(creep.memory.enemyId);
@@ -22,7 +33,7 @@ module.exports = {
             if(targetKeeper.owner.username === 'Source Keeper' || creep.pos.getRangeTo(targetKeeper) > 1) {
                 if(creep.hits < creep.hitsMax) creep.heal(creep);
             }
-            creep.moveTo(targetKeeper);
+            creep.moveToNoCreepInRoom(targetKeeper);
             creep.say(creep.attack(targetKeeper));
             creep.rangedAttack(targetKeeper);
         }
@@ -68,7 +79,7 @@ module.exports = {
     // returns an object with the data to spawn a new creep
     spawnData: function(room, targetRoomName) {
         let name = this.properties.role + Game.time;
-        let body = [...new Array(25).fill(MOVE), ...new Array(19).fill(ATTACK), ...new Array(6).fill(HEAL)]; // $4270
+        let body = this.properties.body;
         let memory = {role: this.properties.role, status: 0, base: room.name, targetRoom: targetRoomName};
 
         return {name, body, memory};

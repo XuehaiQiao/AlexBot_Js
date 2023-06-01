@@ -5,7 +5,7 @@ module.exports = {
     properties: {
         role: 'remoteMiner',
         body: [...new Array(32).fill(WORK), CARRY, CARRY, ...new Array(16).fill(MOVE)],
-        boostInfo: {UHO2: 32},
+        boostInfo: {UO: 32},
     },
     /** @param {Creep} creep **/
     run: function(creep) {
@@ -51,11 +51,11 @@ module.exports = {
     // checks if the room needs to spawn a creep (logic differ from others)
     spawn: function(room, roomName) {
         if(room.energyCapacityAvailable < 5600) return false;
-        if(!Memory.outSourceRooms[roomName] || Memory.outSourceRooms[roomName].neutral !== true) return false;
         
         if(!Game.rooms[roomName]) return false;
         mine = Game.rooms[roomName].find(FIND_MINERALS)[0];
         if(mine.mineralAmount === 0) return false;
+        
         if(room.storage && room.storage.store[mine.resourceType] > 80000) return false;
 
         // check if need spawn

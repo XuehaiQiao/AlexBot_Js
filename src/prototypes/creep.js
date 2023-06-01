@@ -1,4 +1,5 @@
 const { roomInfo } = require("../config");
+const { L } = require("../config/roomResourceConfig");
 const { boostCreep } = require("../structures/lab");
 
 Creep.prototype.sayHello = function sayHello(words="Hello") {
@@ -322,8 +323,6 @@ Creep.prototype.getBoosts = function() {
         }
     }
 
-    console.log(3);
-
     // getBoost
     for(const resourceType in boostInfo) {
         let lab = Game.getObjectById(_.find(Object.keys(boostLabs), labId => boostLabs[labId].resourceType === resourceType));
@@ -333,7 +332,6 @@ Creep.prototype.getBoosts = function() {
         }
         
         let result = boostCreep(lab, this, resourceType, boostInfo[resourceType]);
-
         if (result === ERR_NOT_IN_RANGE) this.moveTo(lab);
         else if(result === OK) {
             delete boostInfo[resourceType];
@@ -341,7 +339,84 @@ Creep.prototype.getBoosts = function() {
         return;
     }
 
-    console.log(4);
-
     this.memory.boosted = true;
+}
+
+Creep.prototype.unBoost = function() {
+    let labContainer = Game.getObjectById(this.room.memory.labContainer);
+    if(!labContainer) {
+        let lab = this.room.find(FIND_MY_STRUCTURES, {filter: struct => struct.structureType === STRUCTURE_LAB})[0];
+        if(lab) {
+            let labContainer = lab.pos.findInRange(FIND_STRUCTURES, 3, {filter: struct => struct.structureType === STRUCTURE_CONTAINER})[0];
+            if(labContainer) this.room.memory.labContainer = labContainer.id;
+        }
+
+        return false;
+    }
+    else {
+        if(this.memory.unboosted === true) {
+            this.suicide();
+            return true;
+        }
+
+        if(this.pos.isEqualTo(labContainer)) {
+            let nearLabs = this.pos.findInRange(FIND_MY_STRUCTURES, 1, {filter: struct => struct.structureType === STRUCTURE_LAB && struct.cooldown <= this.ticksToLive});
+            if(nearLabs.length) {
+                nearLabs.sort((a, b) => a.cooldown - b.cooldown);
+                if(nearLabs[0].unboostCreep(this) === OK) this.memory.unboosted = true;
+            }
+            else this.suicide();
+        }
+        else {
+            this.moveToNoCreepInRoom(labContainer);
+        }
+
+        return true;
+    }
+}
+
+Creep.prototype.fleeFrom = function(target) {
+    let targetPos;
+    if(!target) return false;
+    if(!target.pos) targetPos = target;
+    else targetPos = target.pos;
+
+
+    this.say('flee');
+
+    const xDis = this.pos.x - targetPos.x;
+    const yDis = this.pos.y - targetPos.y;
+    
+    if(xDis > 0) {
+        if(yDis > 0) {
+            this.move(BOTTOM_RIGHT);
+        }
+        else if(yDis === 0) {
+            this.move(RIGHT);
+        }
+        else {
+            this.move(TOP_RIGHT);
+        }
+    }
+    else if(xDis === 0) {
+        if(yDis > 0) {
+            this.move(BOTTOM);
+        }
+        else {
+            this.move(TOP);
+        }
+    }
+    else {
+        if(yDis > 0) {
+            this.move(BOTTOM_LEFT);
+        }
+        else if(yDis === 0) {
+            this.move(RIGHT);
+        }
+        else {
+            this.move(TOP_LEFT);
+        }
+    }
+
+    return true;
 }

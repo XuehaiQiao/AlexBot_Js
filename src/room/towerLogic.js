@@ -14,7 +14,6 @@ module.exports = function (room) {
     // defending
     let enemies = room.find(FIND_HOSTILE_CREEPS);
     if (enemies.length) {
-        console.log(room, "Found Enemies!");
         _.forEach(towers, tower => {
             let target = tower.pos.findClosestByRange(enemies);
             tower.attack(target);
