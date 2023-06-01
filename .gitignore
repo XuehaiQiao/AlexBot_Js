@@ -1,4 +1,6 @@
-# .gitignore 
+# .gitignore
+dist/main.js
+
 node_modules
 Gruntfile.js
-reminder
+reminder.js
