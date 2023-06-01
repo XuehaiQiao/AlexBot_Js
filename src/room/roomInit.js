@@ -15,27 +15,30 @@ function roomInit(room) {
 
 
     //set up room memory
-    room.memory = {
-        outSourceRooms: [],
-        needRepairStructures: [],
-        linkInfo: {
-            sourceLinks: [],
-            controllerLink: null,
-            managerLink: null
-        },
-        linkCompleteness: false,
-        tasks: {
-            labTasks: [],
-            terminalTasks: [],
-            managerTasks: [],
-            spawnTasks: []
-        },
-        labs: {
-            center: [],
-            boostLab: {},
-            labStatus: 0,
-        },
+    if(room.memory.init == null) {
+        room.memory = {
+            outSourceRooms: [],
+            needRepairStructures: [],
+            linkInfo: {
+                sourceLinks: [],
+                controllerLink: null,
+                managerLink: null
+            },
+            linkCompleteness: false,
+            tasks: {
+                labTasks: [],
+                terminalTasks: [],
+                managerTasks: [],
+                spawnTasks: []
+            },
+            labs: {
+                center: [],
+                boostLab: {},
+                labStatus: 0,
+            },
+        }
     }
+
 
     const targetRooms = roomUtil.getRoomsInRange(room.name, 3);
 

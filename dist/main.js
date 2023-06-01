@@ -685,12 +685,25 @@ module.exports = {
         if(global.roomCensus[room.name][this.properties.role]) creepCount = global.roomCensus[room.name][this.properties.role]
         else creepCount = 0;
 
-        if (creepCount < sourceCount * this.properties.stages[stage].number) {
+        let totalNeeds;
+        const rInfo = room.memory.roomInfo;
+        if(rInfo) {
+            for(const sourceObj of rInfo.sourceInfo) {
+                totalNeeds += Math.min(this.properties.stages[stage].number, sourceObj.space);
+            }
+        }
+        else {
+            totalNeeds = sourceCount * this.properties.stages[stage].number
+        }
+
+        if (creepCount < totalNeeds) {
             return true;
         }
     },
     spawnData: function(room) {
         const stage = this.getStage(room);
+        const rInfo = room.memory.roomInfo;
+
         const name = this.properties.role + Game.time; 
         const body = this.properties.stages[stage].bodyParts;
 
@@ -710,7 +723,13 @@ module.exports = {
         let sourceTarget;
         let sources = room.find(FIND_SOURCES);
         for(const index in sources) {
-            if (targetCount[index] >= this.properties.stages[stage].number) continue;
+            let creepNeed;
+            if(rInfo) {
+                creepNeed = Math.min(this.properties.stages[stage].number, rInfo.sourceInfo[index].space);
+            }
+            else creepNeed = this.properties.stages[stage].number;
+
+            if (targetCount[index] >= creepNeed) continue;
             sourceTarget = index;
             break;
         }
@@ -776,7 +795,6 @@ module.exports = {
         }
     },
     toStorage: function(creep) {
-        creep.say('storage')
         var storage = creep.room.storage;
         if(!storage) {
             let containers = creep.room.find(FIND_STRUCTURES, {filter: struct => struct.structureType == STRUCTURE_CONTAINER});
@@ -985,7 +1003,7 @@ module.exports = {
         let name = this.properties.type + Game.time;
         let body;
         let storage = room.storage;
-        if(storage && storage.store[RESOURCE_ENERGY] < 50000) body = [WORK, CARRY, CARRY, MOVE];
+        if(storage && storage.store[RESOURCE_ENERGY] < 10000) body = [WORK, CARRY, CARRY, MOVE];
         else if(
             room.memory.linkInfo.controllerLink && 
             room.memory.linkInfo.managerLink &&
@@ -1023,7 +1041,7 @@ module.exports = {
     properties: {
         type: "builder2",
         stages: {
-            1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, MOVE], number: 3},
+            1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, MOVE], number: 5},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, CARRY, MOVE, WORK, CARRY, MOVE], number: 3},
             3: {maxEnergyCapacity: 800, bodyParts:[WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE], number: 1},
             4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(6).fill(WORK), ...new Array(6).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
@@ -2083,6 +2101,7 @@ module.exports = {
 
     },
     spawn: function (room, roomName) {
+        const stage = this.getStage(room);
         let creepCount;
         if (global.roomCensus[roomName] && global.roomCensus[roomName][this.properties.role]) {
             creepCount = global.roomCensus[roomName][this.properties.role]
@@ -2098,31 +2117,61 @@ module.exports = {
             Memory.outSourceRooms[roomName].sourceNum = Game.rooms[roomName].find(FIND_SOURCES).length;
         }
 
-        if (creepCount < sourceNum * this.properties.stages[this.getStage(room)].number) {
+        let totalNeeds;
+        const rInfo = Memory.rooms[roomName].memory.roomInfo;
+        if(rInfo) {
+            for(const sourceObj of rInfo.sourceInfo) {
+                totalNeeds += Math.min(this.properties.stages[stage].number, sourceObj.space);
+            }
+        }
+        else {
+            totalNeeds = sourceNum * this.properties.stages[stage].number
+        }
+
+        if (creepCount < totalNeeds) {
             return true;
         }
     },
     spawnData: function (room, outSourceRoomName) {
-
+        const stage = this.getStage(room);
+        const rInfo = room.memory.roomInfo;
 
         let name = this.properties.role + Game.time;
         let body = this.properties.stages[this.getStage(room)].bodyParts;
 
         const existingThisTypeCreeps = _.filter(Game.creeps, creep => (
-            creep.memory.role == this.properties.role &&
-            creep.memory.targetRoom == outSourceRoomName &&
+            creep.memory.role == this.properties.role && 
+            creep.memory.base == room.name &&
             !(creep.ticksToLive < creep.body.length * 3)
         ));
-        var existingTargets = _.map(existingThisTypeCreeps, creep => creep.memory.target)
+        
+        let targetCount = {}
+        existingThisTypeCreeps.forEach((creep) => {
+            let targetId = creep.memory.target;
+            if(targetCount[targetId]) targetCount[targetId] += 1;
+            else targetCount[targetId] = 1;
+        });
 
         let sourceCount = 1;
         if (Memory.outSourceRooms[outSourceRoomName]) {
             sourceCount = Memory.outSourceRooms[outSourceRoomName].sourceNum;
         }
-        var sourceTarget;
-        for (var i = 0; i < sourceCount; i++) {
-            if (!existingTargets.includes(i)) {
-                sourceTarget = i;
+
+        let sourceTarget;
+        if(rInfo) {
+            let sources = room.find(FIND_SOURCES);
+            for(const index in sources) {
+                let creepNeed = Math.min(this.properties.stages[stage].number, rInfo.sourceInfo[index].space);
+                if (targetCount[index] >= creepNeed) continue;
+                sourceTarget = index;
+                break;
+            }
+        }
+        else {
+            for (var i = 0; i < sourceCount; i++) {
+                let creepNeed = this.properties.stages[stage].number;
+                if (targetCount[index] >= creepNeed) continue;
+                sourceTarget = index;
                 break;
             }
         }
@@ -4058,27 +4107,30 @@ function roomInit(room) {
     if(!room.controller || room.controller.level === 0 || !room.controller.my) return;
     if(!Memory.outSourceRooms) Memory.outSourceRooms = {};
     if(!Memory.resourceShortage) Memory.resourceShortage = {};
-    room.memory = {
-        outSourceRooms: [],
-        needRepairStructures: [],
-        linkInfo: {
-            sourceLinks: [],
-            controllerLink: null,
-            managerLink: null
-        },
-        linkCompleteness: false,
-        tasks: {
-            labTasks: [],
-            terminalTasks: [],
-            managerTasks: [],
-            spawnTasks: []
-        },
-        labs: {
-            center: [],
-            boostLab: {},
-            labStatus: 0,
-        },
+    if(room.memory.init == null) {
+        room.memory = {
+            outSourceRooms: [],
+            needRepairStructures: [],
+            linkInfo: {
+                sourceLinks: [],
+                controllerLink: null,
+                managerLink: null
+            },
+            linkCompleteness: false,
+            tasks: {
+                labTasks: [],
+                terminalTasks: [],
+                managerTasks: [],
+                spawnTasks: []
+            },
+            labs: {
+                center: [],
+                boostLab: {},
+                labStatus: 0,
+            },
+        }
     }
+
 
     const targetRooms = roomUtil.getRoomsInRange(room.name, 3);
     room.memory.roomInfo = roomUtil.getRoomInfo(room);
@@ -5986,7 +6038,7 @@ Creep.prototype.collectEnergy = function collectEnergy(changeStatus = false) {
 Creep.prototype.harvestEnergy = function harvestEnergy() {
     let source;
     let result;
-    if (this.memory.target) {
+    if (this.memory.target != null) {
         source = this.room.find(FIND_SOURCES)[this.memory.target];
     }
     else {
@@ -18646,10 +18698,10 @@ return module.exports;
 /********** Start module 55: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/config/roomConfig.js **********/
 __modules[55] = function(module, exports) {
 module.exports = {
-    W8N3: {
-        restPos: new RoomPosition(22, 30, "W8N3"),
-        managerPos: new RoomPosition(25, 35, "W8N3"),
-        storagePos: new RoomPosition(26, 35, "W8N3"),
+    E16S2: {
+        restPos: new RoomPosition(27, 29, "E16S2"),
+        managerPos: new RoomPosition(25, 33, "E16S2"),
+        storagePos: new RoomPosition(24, 32, "E16S2"),
     },
 }
 return module.exports;
@@ -18873,7 +18925,7 @@ roomUtil = {
     getRoomType: function (roomName) {
         const roomPos = this.getRoomCoord(roomName);
         if (roomPos[0] % 10 === 0 || roomPos[1] % 10 === 0) return roomTypes.HIGHWAY;
-        else if (roomPos[0] % 10 === 5 || roomPos[1] % 10 === 5) return roomTypes.CENTER;
+        else if (roomPos[0] % 10 === 5 && roomPos[1] % 10 === 5) return roomTypes.CENTER;
         else if (
             (roomPos[0] % 10 === 4 || roomPos[0] % 10 === 6) &&
             (roomPos[1] % 10 === 4 || roomPos[1] % 10 === 6)

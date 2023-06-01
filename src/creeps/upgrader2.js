@@ -113,7 +113,7 @@ module.exports = {
         let storage = room.storage;
         
         // if storage low, create tiny creep, if have managerPos, create small carry creep.
-        if(storage && storage.store[RESOURCE_ENERGY] < 50000) body = [WORK, CARRY, CARRY, MOVE];
+        if(storage && storage.store[RESOURCE_ENERGY] < 10000) body = [WORK, CARRY, CARRY, MOVE];
         else if(
             room.memory.linkInfo.controllerLink && 
             room.memory.linkInfo.managerLink &&

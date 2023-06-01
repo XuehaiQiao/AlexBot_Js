@@ -41,7 +41,18 @@ module.exports = {
         if(global.roomCensus[room.name][this.properties.role]) creepCount = global.roomCensus[room.name][this.properties.role]
         else creepCount = 0;
 
-        if (creepCount < sourceCount * this.properties.stages[stage].number) {
+        let totalNeeds;
+        const rInfo = room.memory.roomInfo;
+        if(rInfo) {
+            for(const sourceObj of rInfo.sourceInfo) {
+                totalNeeds += Math.min(this.properties.stages[stage].number, sourceObj.space);
+            }
+        }
+        else {
+            totalNeeds = sourceCount * this.properties.stages[stage].number
+        }
+
+        if (creepCount < totalNeeds) {
             return true;
         }
     },
@@ -49,6 +60,8 @@ module.exports = {
     // returns an object with the data to spawn a new creep
     spawnData: function(room) {
         const stage = this.getStage(room);
+        const rInfo = room.memory.roomInfo;
+
         const name = this.properties.role + Game.time; 
         const body = this.properties.stages[stage].bodyParts;
 
@@ -68,7 +81,13 @@ module.exports = {
         let sourceTarget;
         let sources = room.find(FIND_SOURCES);
         for(const index in sources) {
-            if (targetCount[index] >= this.properties.stages[stage].number) continue;
+            let creepNeed;
+            if(rInfo) {
+                creepNeed = Math.min(this.properties.stages[stage].number, rInfo.sourceInfo[index].space);
+            }
+            else creepNeed = this.properties.stages[stage].number;
+
+            if (targetCount[index] >= creepNeed) continue;
             sourceTarget = index;
             break;
         }

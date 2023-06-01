@@ -161,7 +161,7 @@ Creep.prototype.harvestEnergy = function harvestEnergy() {
     // add targetRoom option, to create harvest path before enter the target room.
     let source;
     let result;
-    if (this.memory.target) {
+    if (this.memory.target != null) {
         source = this.room.find(FIND_SOURCES)[this.memory.target];
     }
     else {

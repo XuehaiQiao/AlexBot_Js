@@ -47,7 +47,6 @@ module.exports = {
 
     // from [drop, container] to [storage]
     toStorage: function(creep) {
-        creep.say('storage')
         var storage = creep.room.storage;
         
         // if no storage, change target to containers that near controller

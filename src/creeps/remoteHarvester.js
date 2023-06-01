@@ -94,7 +94,7 @@ module.exports = {
 
     // checks if the room needs to spawn a creep (logic differ from others)
     spawn: function (room, roomName) {
-        // const thisTypeCreeps = _.filter(Game.creeps, (creep) => creep.memory.role == this.properties.role && creep.memory.targetRoom == roomName);
+        const stage = this.getStage(room);
 
         // check if need spawn
         let creepCount;
@@ -112,33 +112,63 @@ module.exports = {
             Memory.outSourceRooms[roomName].sourceNum = Game.rooms[roomName].find(FIND_SOURCES).length;
         }
 
-        if (creepCount < sourceNum * this.properties.stages[this.getStage(room)].number) {
+        let totalNeeds;
+        const rInfo = Memory.rooms[roomName].memory.roomInfo;
+        if(rInfo) {
+            for(const sourceObj of rInfo.sourceInfo) {
+                totalNeeds += Math.min(this.properties.stages[stage].number, sourceObj.space);
+            }
+        }
+        else {
+            totalNeeds = sourceNum * this.properties.stages[stage].number
+        }
+
+        if (creepCount < totalNeeds) {
             return true;
         }
     },
 
     // returns an object with the data to spawn a new creep
     spawnData: function (room, outSourceRoomName) {
-
+        const stage = this.getStage(room);
+        const rInfo = room.memory.roomInfo;
 
         let name = this.properties.role + Game.time;
         let body = this.properties.stages[this.getStage(room)].bodyParts;
 
         const existingThisTypeCreeps = _.filter(Game.creeps, creep => (
-            creep.memory.role == this.properties.role &&
-            creep.memory.targetRoom == outSourceRoomName &&
+            creep.memory.role == this.properties.role && 
+            creep.memory.base == room.name &&
             !(creep.ticksToLive < creep.body.length * 3)
         ));
-        var existingTargets = _.map(existingThisTypeCreeps, creep => creep.memory.target)
+        
+        let targetCount = {}
+        existingThisTypeCreeps.forEach((creep) => {
+            let targetId = creep.memory.target;
+            if(targetCount[targetId]) targetCount[targetId] += 1;
+            else targetCount[targetId] = 1;
+        });
 
         let sourceCount = 1;
         if (Memory.outSourceRooms[outSourceRoomName]) {
             sourceCount = Memory.outSourceRooms[outSourceRoomName].sourceNum;
         }
-        var sourceTarget;
-        for (var i = 0; i < sourceCount; i++) {
-            if (!existingTargets.includes(i)) {
-                sourceTarget = i;
+
+        let sourceTarget;
+        if(rInfo) {
+            let sources = room.find(FIND_SOURCES);
+            for(const index in sources) {
+                let creepNeed = Math.min(this.properties.stages[stage].number, rInfo.sourceInfo[index].space);
+                if (targetCount[index] >= creepNeed) continue;
+                sourceTarget = index;
+                break;
+            }
+        }
+        else {
+            for (var i = 0; i < sourceCount; i++) {
+                let creepNeed = this.properties.stages[stage].number;
+                if (targetCount[index] >= creepNeed) continue;
+                sourceTarget = index;
                 break;
             }
         }
