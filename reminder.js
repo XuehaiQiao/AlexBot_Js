@@ -129,6 +129,7 @@ JSON.stringify(obj);
 Game.rooms['W18S15'].memory.tasks.managerTasks.push({from: STRUCTURE_FACTORY, to: STRUCTURE_STORAGE, resourceType: 'X', volume: 40000});
 Game.rooms['W18S15'].memory.tasks.managerTasks.push({from: STRUCTURE_STORAGE, to: STRUCTURE_TERMINAL, resourceType: 'UO', volume: 3000});
 Game.rooms['W18S15'].memory.tasks.managerTasks.push({from: STRUCTURE_TERMINAL, to: STRUCTURE_FACTORY, resourceType: RESOURCE_PURIFIER, volume: 8000});
+Game.rooms['W18S15'].memory.tasks.managerTasks.push({from: STRUCTURE_STORAGE, to: STRUCTURE_NUKER, resourceType: RESOURCE_ENERGY, volume: 100000});
 // create reaction task
 Game.rooms.W19S17.memory.tasks.labTasks.push({resourceType: 'OH', amount: 3000});
 
@@ -150,8 +151,6 @@ Game.market.createOrder({
     totalAmount: 40000,
     roomName: "W18S15"   
 });
-
-
 
 
 /*
