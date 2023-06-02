@@ -5,10 +5,10 @@ module.exports = {
     properties: {
         type: "builder2",
         stages: {
-            1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, MOVE], number: 5},
+            1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, MOVE], number: 4},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, CARRY, MOVE, WORK, CARRY, MOVE], number: 3},
-            3: {maxEnergyCapacity: 800, bodyParts:[WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE], number: 1},
-            4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(6).fill(WORK), ...new Array(6).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
+            3: {maxEnergyCapacity: 800, bodyParts:[WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE], number: 2},
+            4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(6).fill(WORK), ...new Array(6).fill(CARRY), ...new Array(6).fill(MOVE)], number: 2},
             5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(9).fill(WORK), ...new Array(9).fill(CARRY), ...new Array(9).fill(MOVE)], number: 1},
             6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], number: 1},
             7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], number: 1},
@@ -34,9 +34,8 @@ module.exports = {
             var target = this.assignTarget(creep);
             //no tasks
             if (!target) {
-                if (roomInfo[creep.room.name]) {
-                    creep.moveTo(roomInfo[creep.room.name].restPos);
-                }
+                creep.say('!Target')
+                creep.memory.role = 'upgrader2';
                 return;
             }
             // constructionsite (build)
@@ -54,7 +53,18 @@ module.exports = {
         }
         // harvest
         else {
-            creep.takeEnergyFromClosest();
+            if(creep.room.storage) {
+                creep.takeEnergyFromClosestStore();
+            }
+            else if(
+                roomInfo[creep.room.name] && 
+                roomInfo[creep.room.name].storagePos && 
+                _.find(roomInfo[creep.room.name].storagePos.lookFor(LOOK_STRUCTURES), struct => struct.structureType === STRUCTURE_CONTAINER)
+                ) {
+                creep.takeEnergyFromClosestStore();
+            }
+            else creep.takeEnergyFromClosest();
+            
             return;
         }
     },
@@ -102,34 +112,35 @@ module.exports = {
     },
 
     assignTarget: function(creep) {
-        if (!creep.memory.targetId || !Game.getObjectById(creep.memory.targetId)) {
-            let targets = creep.room.find(FIND_CONSTRUCTION_SITES);
-            if(targets.length) {
-                creep.memory.targetId = targets[0].id;
-                return Game.getObjectById(targets[0].id);
-            }
-            
-            targets = _.filter(creep.room.find(FIND_STRUCTURES), structure => (
-                (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART) && structure.hits < structureLogic.wall.getTargetHits(creep.room)
-            ))
-            if(targets.length) {
-                let target = targets.reduce((a,b) => {
-                    if (a.hits < b.hits) return a;
-                    else return b;
-                });
-                //targets.sort((a,b) => a.hits > b.hits);
-                creep.memory.targetId = target.id;
-                return Game.getObjectById(target.id);
-            }
-        }
-        else {
-            let target = Game.getObjectById(creep.memory.targetId);
+        let target = Game.getObjectById(creep.memory.targetId);
+        if(target) {
             if(target.hits && target.hits >= structureLogic.wall.getTargetHits(creep.room)) {
                 creep.memory.targetId = null;
-                return null;
+                target = null;
             }
-
-            return target;
+            else return target;
         }
+
+
+        let targets = creep.room.find(FIND_CONSTRUCTION_SITES);
+        if(targets.length) {
+            creep.memory.targetId = targets[0].id;
+            return Game.getObjectById(targets[0].id);
+        }
+        
+        targets = _.filter(creep.room.find(FIND_STRUCTURES), structure => (
+            (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART) && structure.hits < structureLogic.wall.getTargetHits(creep.room)
+        ))
+        if(targets.length) {
+            let target = targets.reduce((a,b) => {
+                if (a.hits < b.hits) return a;
+                else return b;
+            });
+            //targets.sort((a,b) => a.hits > b.hits);
+            creep.memory.targetId = target.id;
+            return Game.getObjectById(target.id);
+        }
+
+        return null;
     }
 };

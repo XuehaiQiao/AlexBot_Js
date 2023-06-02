@@ -74,26 +74,24 @@ Room.prototype.reduceFromBoostLab = function (labId, resourceType, amount) {
     return true;
 }
 
-Room.prototype.getStorage = function () {
+// storage, storageContainer, controllerContainer
+Room.prototype.getStorage = function (amount) {
     var storage = this.storage;
 
     // if no storage, change target to containers that near controller
     if (!storage) {
-        let containers = this.find(FIND_STRUCTURES, { filter: struct => struct.structureType == STRUCTURE_CONTAINER });
+        let containers = this.find(FIND_STRUCTURES, { filter: struct => 
+            struct.structureType === STRUCTURE_CONTAINER &&
+            struct.store.getFreeCapacity() >= amount
+        });
 
         if (containers.length) {
             if (roomInfo[this.name] && roomInfo[this.name].storagePos) {
-                storage = _.find(containers, con => (
-                    con.pos.isEqualTo(roomInfo[this.name].storagePos) &&
-                    con.store.getFreeCapacity() > 0
-                ));
+                storage = _.find(containers, con => con.pos.isEqualTo(roomInfo[this.name].storagePos));
             }
 
             if (!storage) {
-                storage = _.find(containers, con => (
-                    con.pos.inRangeTo(this.controller.pos, 3) &&
-                    con.store.getFreeCapacity() > 0
-                ));
+                storage = _.find(containers, con => con.pos.inRangeTo(this.controller.pos, 3));
             }
         };
     }

@@ -112,8 +112,8 @@ module.exports = {
             Memory.outSourceRooms[roomName].sourceNum = Game.rooms[roomName].find(FIND_SOURCES).length;
         }
 
-        let totalNeeds;
-        const rInfo = Memory.rooms[roomName].memory.roomInfo;
+        let totalNeeds = 0;
+        const rInfo = Memory.rooms[roomName] && Memory.rooms[roomName].roomInfo;
         if(rInfo) {
             for(const sourceObj of rInfo.sourceInfo) {
                 totalNeeds += Math.min(this.properties.stages[stage].number, sourceObj.space);
@@ -138,7 +138,7 @@ module.exports = {
 
         const existingThisTypeCreeps = _.filter(Game.creeps, creep => (
             creep.memory.role == this.properties.role && 
-            creep.memory.base == room.name &&
+            creep.memory.targetRoom == outSourceRoomName &&
             !(creep.ticksToLive < creep.body.length * 3)
         ));
         
@@ -154,10 +154,11 @@ module.exports = {
             sourceCount = Memory.outSourceRooms[outSourceRoomName].sourceNum;
         }
 
-        let sourceTarget;
+        console.log("remoteHarvester", outSourceRoomName, JSON.stringify(targetCount));
+
+        let sourceTarget = 0;
         if(rInfo) {
-            let sources = room.find(FIND_SOURCES);
-            for(const index in sources) {
+            for(const index in rInfo.sourceInfo) {
                 let creepNeed = Math.min(this.properties.stages[stage].number, rInfo.sourceInfo[index].space);
                 if (targetCount[index] >= creepNeed) continue;
                 sourceTarget = index;

@@ -674,7 +674,7 @@ module.exports = {
 
         if(result == ERR_NOT_ENOUGH_RESOURCES) {
             let source = creep.room.find(FIND_SOURCES)[creep.memory.target];
-            if(source) creep.memory.rest = source.ticksToRegeneration;
+            if(!source.energy) creep.memory.rest = source.ticksToRegeneration;
         }
     },
     spawn: function(room) {
@@ -685,7 +685,7 @@ module.exports = {
         if(global.roomCensus[room.name][this.properties.role]) creepCount = global.roomCensus[room.name][this.properties.role]
         else creepCount = 0;
 
-        let totalNeeds;
+        let totalNeeds = 0;
         const rInfo = room.memory.roomInfo;
         if(rInfo) {
             for(const sourceObj of rInfo.sourceInfo) {
@@ -695,6 +695,8 @@ module.exports = {
         else {
             totalNeeds = sourceCount * this.properties.stages[stage].number
         }
+
+        console.log(totalNeeds);
 
         if (creepCount < totalNeeds) {
             return true;
@@ -763,8 +765,8 @@ module.exports = {
         type: 'carrier2',
         stages: {
             1: {maxEnergyCapacity: 300, bodyParts:[CARRY, MOVE, CARRY, MOVE], number: 4},
-            2: {maxEnergyCapacity: 550, bodyParts:[CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2},
-            3: {maxEnergyCapacity: 800, bodyParts:[CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2},
+            2: {maxEnergyCapacity: 550, bodyParts:[CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 3},
+            3: {maxEnergyCapacity: 800, bodyParts:[CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 3},
             4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(16).fill(CARRY), ...new Array(8).fill(MOVE)], number: 2},
             5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(20).fill(CARRY), ...new Array(10).fill(MOVE)], number: 2},
             8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(32).fill(CARRY), ...new Array(16).fill(MOVE)], number: 1},
@@ -921,11 +923,11 @@ module.exports = {
         type: 'upgrader2',
         stages: {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, MOVE], number: 1},
-            2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, CARRY, CARRY, MOVE, MOVE], number: 3},
-            3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, CARRY, CARRY, MOVE, MOVE, WORK, WORK, CARRY, CARRY, MOVE, MOVE], number: 3},
-            4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(6).fill(WORK), ...new Array(6).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
-            5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(8).fill(WORK), ...new Array(8).fill(CARRY), ...new Array(8).fill(MOVE)], mBodyParts: [...new Array(12).fill(WORK), ...new Array(3).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
-            6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], mBodyParts: [...new Array(14).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(7).fill(MOVE)], number: 1},
+            2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 8},
+            3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE], number: 8},
+            4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(8).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(4).fill(MOVE)], number: 6},
+            5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(10).fill(WORK), ...new Array(3).fill(CARRY), ...new Array(5).fill(MOVE)], mBodyParts: [...new Array(12).fill(WORK), ...new Array(3).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
+            6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(14).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(7).fill(MOVE)], mBodyParts: [...new Array(14).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(7).fill(MOVE)], number: 1},
             7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(30).fill(WORK), ...new Array(5).fill(CARRY), ...new Array(15).fill(MOVE)], number: 0},
             8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(15).fill(WORK), ...new Array(15).fill(CARRY), ...new Array(15).fill(MOVE)], mBodyParts: [...new Array(15).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(8).fill(MOVE)], number: 1},
         },
@@ -1041,10 +1043,10 @@ module.exports = {
     properties: {
         type: "builder2",
         stages: {
-            1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, MOVE], number: 5},
+            1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, MOVE], number: 4},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, CARRY, MOVE, WORK, CARRY, MOVE], number: 3},
-            3: {maxEnergyCapacity: 800, bodyParts:[WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE], number: 1},
-            4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(6).fill(WORK), ...new Array(6).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
+            3: {maxEnergyCapacity: 800, bodyParts:[WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE], number: 2},
+            4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(6).fill(WORK), ...new Array(6).fill(CARRY), ...new Array(6).fill(MOVE)], number: 2},
             5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(9).fill(WORK), ...new Array(9).fill(CARRY), ...new Array(9).fill(MOVE)], number: 1},
             6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], number: 1},
             7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], number: 1},
@@ -1066,9 +1068,8 @@ module.exports = {
         if(creep.memory.status) {
             var target = this.assignTarget(creep);
             if (!target) {
-                if (roomInfo[creep.room.name]) {
-                    creep.moveTo(roomInfo[creep.room.name].restPos);
-                }
+                creep.say('!Target')
+                creep.memory.role = 'upgrader2';
                 return;
             }
             if (!target.hits) {
@@ -1083,7 +1084,18 @@ module.exports = {
             
         }
         else {
-            creep.takeEnergyFromClosest();
+            if(creep.room.storage) {
+                creep.takeEnergyFromClosestStore();
+            }
+            else if(
+                roomInfo[creep.room.name] && 
+                roomInfo[creep.room.name].storagePos && 
+                _.find(roomInfo[creep.room.name].storagePos.lookFor(LOOK_STRUCTURES), struct => struct.structureType === STRUCTURE_CONTAINER)
+                ) {
+                creep.takeEnergyFromClosestStore();
+            }
+            else creep.takeEnergyFromClosest();
+            
             return;
         }
     },
@@ -1126,34 +1138,35 @@ module.exports = {
     },
 
     assignTarget: function(creep) {
-        if (!creep.memory.targetId || !Game.getObjectById(creep.memory.targetId)) {
-            let targets = creep.room.find(FIND_CONSTRUCTION_SITES);
-            if(targets.length) {
-                creep.memory.targetId = targets[0].id;
-                return Game.getObjectById(targets[0].id);
-            }
-            
-            targets = _.filter(creep.room.find(FIND_STRUCTURES), structure => (
-                (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART) && structure.hits < structureLogic.wall.getTargetHits(creep.room)
-            ))
-            if(targets.length) {
-                let target = targets.reduce((a,b) => {
-                    if (a.hits < b.hits) return a;
-                    else return b;
-                });
-                creep.memory.targetId = target.id;
-                return Game.getObjectById(target.id);
-            }
-        }
-        else {
-            let target = Game.getObjectById(creep.memory.targetId);
+        let target = Game.getObjectById(creep.memory.targetId);
+        if(target) {
             if(target.hits && target.hits >= structureLogic.wall.getTargetHits(creep.room)) {
                 creep.memory.targetId = null;
-                return null;
+                target = null;
             }
-
-            return target;
+            else return target;
         }
+
+
+        let targets = creep.room.find(FIND_CONSTRUCTION_SITES);
+        if(targets.length) {
+            creep.memory.targetId = targets[0].id;
+            return Game.getObjectById(targets[0].id);
+        }
+        
+        targets = _.filter(creep.room.find(FIND_STRUCTURES), structure => (
+            (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART) && structure.hits < structureLogic.wall.getTargetHits(creep.room)
+        ))
+        if(targets.length) {
+            let target = targets.reduce((a,b) => {
+                if (a.hits < b.hits) return a;
+                else return b;
+            });
+            creep.memory.targetId = target.id;
+            return Game.getObjectById(target.id);
+        }
+
+        return null;
     }
 };
 return module.exports;
@@ -1182,7 +1195,7 @@ module.exports = {
                 return;
             }
         }
-        if(creep.memory.updated == undefined || Game.time % 100 == 67) {
+        if(creep.memory.updated == undefined || Game.time % 100 === 67) {
             updateMemory(creep);
         }
         creep.workerSetStatus();
@@ -1219,7 +1232,7 @@ module.exports = {
         }
     },
     spawn: function(room) {
-        if(!room.terminal) return false;
+        if(room.controller.level < 5) return false;
         let creepCount;
         if(global.roomCensus[room.name][this.properties.role]) creepCount = global.roomCensus[room.name][this.properties.role]
         else creepCount = 0;
@@ -1815,6 +1828,7 @@ module.exports = {
         role: "claimer",
         stages: {
             1: {maxEnergyCapacity: 300, bodyParts:[], number: 0},
+            3: {maxEnergyCapacity: 800, bodyParts:[CLAIM, MOVE], number: 2},
             4: {maxEnergyCapacity: 1300, bodyParts:[CLAIM, MOVE, CLAIM, MOVE], number: 1},
             5: {maxEnergyCapacity: 1800, bodyParts:[CLAIM, MOVE, CLAIM, MOVE], number: 1},
             6: {maxEnergyCapacity: 2300, bodyParts:[CLAIM, MOVE, CLAIM, MOVE, CLAIM, MOVE], number: 1},
@@ -2117,8 +2131,8 @@ module.exports = {
             Memory.outSourceRooms[roomName].sourceNum = Game.rooms[roomName].find(FIND_SOURCES).length;
         }
 
-        let totalNeeds;
-        const rInfo = Memory.rooms[roomName].memory.roomInfo;
+        let totalNeeds = 0;
+        const rInfo = Memory.rooms[roomName] && Memory.rooms[roomName].roomInfo;
         if(rInfo) {
             for(const sourceObj of rInfo.sourceInfo) {
                 totalNeeds += Math.min(this.properties.stages[stage].number, sourceObj.space);
@@ -2141,7 +2155,7 @@ module.exports = {
 
         const existingThisTypeCreeps = _.filter(Game.creeps, creep => (
             creep.memory.role == this.properties.role && 
-            creep.memory.base == room.name &&
+            creep.memory.targetRoom == outSourceRoomName &&
             !(creep.ticksToLive < creep.body.length * 3)
         ));
         
@@ -2157,10 +2171,11 @@ module.exports = {
             sourceCount = Memory.outSourceRooms[outSourceRoomName].sourceNum;
         }
 
-        let sourceTarget;
+        console.log("remoteHarvester", outSourceRoomName, JSON.stringify(targetCount));
+
+        let sourceTarget = 0;
         if(rInfo) {
-            let sources = room.find(FIND_SOURCES);
-            for(const index in sources) {
+            for(const index in rInfo.sourceInfo) {
                 let creepNeed = Math.min(this.properties.stages[stage].number, rInfo.sourceInfo[index].space);
                 if (targetCount[index] >= creepNeed) continue;
                 sourceTarget = index;
@@ -2203,7 +2218,7 @@ const { roomInfo } = __require(46,20);
     NOT FINISHED
     todo:
     1. calculate bodypart(WORK MOVE CARRY) / number needed for each room
-    2. advance strategys.
+    2. go directly to target if have vison of the room
 */
 module.exports = {
     properties: {
@@ -2214,7 +2229,7 @@ module.exports = {
         stages: {
             1: { maxEnergyCapacity: 300, bodyParts: [CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2 },
             2: { maxEnergyCapacity: 550, bodyParts: [CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2 },
-            3: { maxEnergyCapacity: 800, bodyParts: [WORK, ...new Array(9).fill(CARRY), ...new Array(5).fill(MOVE)], number: 1 },
+            3: { maxEnergyCapacity: 800, bodyParts: [...new Array(7).fill(CARRY), ...new Array(7).fill(MOVE)], number: 3 },
             4: { maxEnergyCapacity: 1300, bodyParts: [WORK, ...new Array(13).fill(CARRY), ...new Array(7).fill(MOVE)], number: 2 },
             5: { maxEnergyCapacity: 1800, bodyParts: [WORK, ...new Array(15).fill(CARRY), ...new Array(8).fill(MOVE)], number: 2 },
             6: { maxEnergyCapacity: 2300, bodyParts: [WORK, ...new Array(27).fill(CARRY), ...new Array(14).fill(MOVE)], number: 1 }, // 100 + 1350 + 700 = 2150
@@ -2230,34 +2245,17 @@ module.exports = {
                 creep.memory.rest -= 1;
                 return;
             }
-            const nearResouce = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1);
-            if (nearResouce.length > 0) creep.pickup(nearResouce[0]);
-            const nearRain = creep.pos.findInRange(FIND_RUINS, 1, {filter: ruin => ruin.store.getUsedCapacity() > 0});
-            if(nearRain.length > 0) {
-                let resourceType = _.find(Object.keys(nearRain[0].store), resourceType => nearRain[0].store[resourceType] > 0);
-                creep.withdraw(nearRain[0], resourceType);
-            }
-            const nearTomstone = creep.pos.findInRange(FIND_TOMBSTONES, 1, { filter: ts => ts.store.getUsedCapacity() > 0 });
-            if (nearTomstone.length > 0) {
-                let resourceType = _.find(Object.keys(nearTomstone[0].store), resourceType => nearTomstone[0].store[resourceType] > 0);
-                let result = creep.withdraw(nearTomstone[0], resourceType);
-                if (result === OK && nearTomstone[0].store[RESOURCE_ENERGY] > creep.store.getCapacity() * 0.9) creep.memory.status = 1;
+
+            if (takeNearResources(creep)) return;
+            let tRoom = Game.rooms[creep.memory.targetRoom];
+            if (tRoom && creep.room.name != creep.memory.targetRoom) {
+                let closestSource = tRoom.find(FIND_SOURCES)[0];
+                creep.moveToNoCreep(closestSource);
                 return;
             }
-            if (creep.moveToRoomAdv(creep.memory.targetRoom)) return;
+            else if (creep.moveToRoomAdv(creep.memory.targetRoom)) return;
             if (Memory.outSourceRooms[creep.memory.targetRoom] && Memory.outSourceRooms[creep.memory.targetRoom].sourceKeeper === true) {
-                let hostileCreep = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-                if (hostileCreep) {
-                    let distance = creep.pos.getRangeTo(hostileCreep);
-
-                    if (distance <= 5) {
-                        creep.moveToRoomAdv(creep.memory.base);
-                        return;
-                    }
-                    else if (distance <= 6) {
-                        return;
-                    }
-                }
+                if (aviodHostiles(creep)) return;
             }
             if (creep.memory.targetSource != null) withdrawBySouce(creep);
             else if (creep.memory.targetId != null) withdrawByTarget(creep);
@@ -2290,17 +2288,27 @@ module.exports = {
             if (needRepair.length > 0) {
                 creep.repair(needRepair[0]);
             }
+            const needTransfer = creep.pos.findInRange(FIND_MY_STRUCTURES, 1, {
+                filter: struct => (
+                    (struct.structureType === STRUCTURE_SPAWN || struct.structureType === STRUCTURE_EXTENSION || struct.structureType === STRUCTURE_TOWER) &&
+                    struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                )
+            });
+            if (needTransfer.length > 0) {
+                creep.say("tran");
+                creep.transfer(needTransfer[0], RESOURCE_ENERGY);
+            }
             let baseRoom = Game.rooms[creep.memory.base]
             if (baseRoom) {
-                let target = baseRoom.getStorage();
-                if (!target || target.store.getFreeCapacity() === 0) {
-                    if (creep.pos.inRangeTo(creep.room.controller.pos, 4)) {
+                let target = baseRoom.getStorage(creep.store.getUsedCapacity());
+                if (!target || target.store.getFreeCapacity() < creep.store.getUsedCapacity()) {
+                    if (creep.pos.inRangeTo(baseRoom.controller.pos, 4)) {
                         let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
                         creep.drop(resourceType);
                     }
-                    else creep.moveToNoCreepInRoom(creep.room.controller);
+                    else creep.moveToNoCreep(baseRoom.controller);
                 }
-                else if(!creep.pos.inRangeTo(target, 1)) {
+                else {
                     let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
                     if (creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
                         creep.moveToNoCreep(target);
@@ -2311,26 +2319,6 @@ module.exports = {
                 if (creep.memory.base && creep.memory.base != creep.room.name) {
                     creep.moveToRoom(creep.memory.base);
                     return;
-                }
-                let target = creep.room.storage;
-
-                if (!target) {
-                    target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                        filter: struct => (
-                            (struct.structureType == STRUCTURE_CONTAINER) && struct.store.getFreeCapacity() > 0
-                        )
-                    });
-                }
-
-                if (!target) {
-                    if (roomInfo[creep.room.name]) {
-                        creep.moveToNoCreep(roomInfo[creep.room.name].restPos);
-                        return;
-                    };
-                }
-                let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
-                if (creep.transfer(target, resourceType) == ERR_NOT_IN_RANGE) {
-                    creep.moveToNoCreep(target);
                 }
             }
 
@@ -2351,10 +2339,10 @@ module.exports = {
             Memory.outSourceRooms[roomName].sourceNum = Game.rooms[roomName].find(FIND_SOURCES).length;
         }
         let addednum = 0;
-        if((global.roomCensus[roomName] && global.roomCensus[roomName]['remoteMiner'])) {
+        if ((global.roomCensus[roomName] && global.roomCensus[roomName]['remoteMiner'])) {
             addednum += 1;
         }
-        if(Memory.outSourceRooms[roomName] && Memory.outSourceRooms[roomName].addHauler) {
+        if (Memory.outSourceRooms[roomName] && Memory.outSourceRooms[roomName].addHauler) {
             addednum += Memory.outSourceRooms[roomName].addHauler;
         }
         if (creepCount < sourceNum * this.properties.stages[this.getStage(room)].number + addednum) {
@@ -2386,7 +2374,7 @@ function findTarget(creep) {
     if (!targetQ || targetQ.length === 0) {
         let takenIds = _.map(creep.room.find(FIND_MY_CREEPS, { filter: creep => creep.role === 'remoteHauler' }), creep => creep.memory.targetId);
         let containers = creep.room.find(FIND_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_CONTAINER && !takenIds.includes(struct.id) && struct.store.getUsedCapacity() > creep.store.getCapacity() });
-        let dropedResources = creep.room.find(FIND_DROPPED_RESOURCES, { filter: resource => !takenIds.includes(resource.id) && resource.amount > creep.store.getCapacity()});
+        let dropedResources = creep.room.find(FIND_DROPPED_RESOURCES, { filter: resource => !takenIds.includes(resource.id) && resource.amount > creep.store.getCapacity() });
 
         let targets = [...containers, ...dropedResources]
         Memory.outSourceRooms[creep.room.name].haulerTargets = _.map(targets, target => { return { id: target.id, amount: (target.store ? target.store.getUsedCapacity() : target.amount) } });
@@ -2413,14 +2401,14 @@ function findTargetSourceIndex(creep) {
     }
     else {
         let sourceNum = Memory.outSourceRooms[creep.room.name].sourceNum;
-        for(var i = 0; i < sourceNum; i++) {
+        for (var i = 0; i < sourceNum; i++) {
             let curIndex = (res + i) % sourceNum;
-            if(creep.room.find(FIND_MY_CREEPS, {filter: c => c.memory.targetSource === curIndex}).length === 0) {
+            if (creep.room.find(FIND_MY_CREEPS, { filter: c => c.memory.targetSource === curIndex }).length === 0) {
                 Memory.outSourceRooms[creep.room.name].targetSource = (curIndex + 1) % sourceNum;
                 return curIndex;
             }
         }
-        
+
         Memory.outSourceRooms[creep.room.name].targetSource = (res + 1) % sourceNum;
         return res;
     }
@@ -2456,7 +2444,7 @@ function withdrawBySouce(creep) {
         creep.moveToNoCreepInRoom(source);
     }
     else {
-        if(!Memory.outSourceRooms[creep.memory.targetRoom].sourceKeeper) creep.memory.rest = 15;
+        if (!Memory.outSourceRooms[creep.memory.targetRoom].sourceKeeper) creep.memory.rest = 3;
     }
 }
 
@@ -2482,6 +2470,44 @@ function withdrawByTarget(creep) {
         let resourceType = _.find(Object.keys(target.store), resource => target.store[resource] > 0);
         creep.withdraw(target, resourceType);
     }
+}
+
+
+function takeNearResources(creep) {
+    const nearResouce = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1, { filter: droped => creep.room.name != creep.memory.base || !droped.pos.findInRange(creep.room.controller, 4) });
+    if (nearResouce.length > 0) creep.pickup(nearResouce[0]);
+    const nearRain = creep.pos.findInRange(FIND_RUINS, 1, { filter: ruin => ruin.store.getUsedCapacity() > 0 });
+    if (nearRain.length > 0) {
+        let resourceType = _.find(Object.keys(nearRain[0].store), resourceType => nearRain[0].store[resourceType] > 0);
+        creep.withdraw(nearRain[0], resourceType);
+        return true;
+    }
+    const nearTomstone = creep.pos.findInRange(FIND_TOMBSTONES, 1, { filter: ts => ts.store.getUsedCapacity() > 0 });
+    if (nearTomstone.length > 0) {
+        let resourceType = _.find(Object.keys(nearTomstone[0].store), resourceType => nearTomstone[0].store[resourceType] > 0);
+        let result = creep.withdraw(nearTomstone[0], resourceType);
+        if (result === OK && nearTomstone[0].store[RESOURCE_ENERGY] > creep.store.getCapacity() * 0.9) creep.memory.status = 1;
+        return true;
+    }
+
+    return false;
+}
+
+function aviodHostiles(creep) {
+    let hostileCreep = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+    if (hostileCreep) {
+        let distance = creep.pos.getRangeTo(hostileCreep);
+
+        if (distance <= 5) {
+            creep.moveToRoomAdv(creep.memory.base);
+            return true;
+        }
+        else if (distance <= 6) {
+            return true;
+        }
+    }
+
+    return false;
 }
 return module.exports;
 }
@@ -4078,20 +4104,23 @@ module.exports = function (room) {
     }
 
     if (!room.memory.needRepairStructures) room.memory.needRepairStructures = [];
-    if (Game.time % 50 === 0 && room.memory.needRepairStructures.length === 0) {
+    if (Game.time % 10 === 0 && room.memory.needRepairStructures.length === 0) {
         let needRepairStructures = _.filter(room.find(FIND_STRUCTURES), isNeedRepair);
         room.memory.needRepairStructures = _.map(needRepairStructures, structure => structure.id);
     }
 
     let needRepairs = room.memory.needRepairStructures;
-    if(!needRepairs.length) return
-    let target = Game.getObjectById(needRepairs[needRepairs.length - 1]);
-    if(!target || !isNeedRepair(target)) needRepairs.pop();
-    
-    if(!needRepairs.length) return
-    target = Game.getObjectById(needRepairs[needRepairs.length - 1]);
-    let tower = target.pos.findClosestByRange(towers);
-    tower.repair(target);
+    while(needRepairs.length) {
+        let target = Game.getObjectById(needRepairs[needRepairs.length - 1]);
+        if(!target || !isNeedRepair(target)) {
+            needRepairs.pop();
+        }
+        else {
+            let tower = target.pos.findClosestByRange(towers);
+            tower.repair(target);
+            break;
+        }
+    }
 }
 return module.exports;
 }
@@ -6004,7 +6033,7 @@ Creep.prototype.collectEnergy = function collectEnergy(changeStatus = false) {
         filter: structure => (
             structure.structureType == STRUCTURE_CONTAINER &&
             !structure.pos.inRangeTo(this.room.controller.pos, 3) &&
-            (roomInfo[this.room.name] && roomInfo[this.room.name].storagePos && structure.pos.isEqualTo(roomInfo[this.room.name].storagePos)) &&
+            !(roomInfo[this.room.name] && roomInfo[this.room.name].storagePos && structure.pos.isEqualTo(roomInfo[this.room.name].storagePos)) &&
             structure.store.getUsedCapacity(RESOURCE_ENERGY) > this.store.getCapacity() / 2
         )
     });
@@ -6115,6 +6144,25 @@ Creep.prototype.takeEnergyFromClosest = function () {
         return;
     }
     this.toResPos();
+}
+
+Creep.prototype.takeEnergyFromClosestStore = function () {
+    let targets = _.filter(this.room.find(FIND_STRUCTURES), structure => (
+        (structure.structureType == STRUCTURE_CONTAINER || structure.structureType == STRUCTURE_STORAGE) &&
+        structure.store.getUsedCapacity(RESOURCE_ENERGY) > this.store.getFreeCapacity() &&
+        !structure.pos.findInRange(FIND_SOURCES, 1).length
+    ));
+        
+    let target = this.pos.findClosestByRange(targets);
+    if (target) {
+        if (this.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+            this.moveToNoCreepInRoom(target);
+        }
+        return true;
+    }
+    this.toResPos();
+
+    return false;
 }
 
 Creep.prototype.takeEnergyNeerController = function () {
@@ -6322,25 +6370,21 @@ Room.prototype.reduceFromBoostLab = function (labId, resourceType, amount) {
 
     return true;
 }
-
-Room.prototype.getStorage = function () {
+Room.prototype.getStorage = function (amount) {
     var storage = this.storage;
     if (!storage) {
-        let containers = this.find(FIND_STRUCTURES, { filter: struct => struct.structureType == STRUCTURE_CONTAINER });
+        let containers = this.find(FIND_STRUCTURES, { filter: struct => 
+            struct.structureType === STRUCTURE_CONTAINER &&
+            struct.store.getFreeCapacity() >= amount
+        });
 
         if (containers.length) {
             if (roomInfo[this.name] && roomInfo[this.name].storagePos) {
-                storage = _.find(containers, con => (
-                    con.pos.isEqualTo(roomInfo[this.name].storagePos) &&
-                    con.store.getFreeCapacity() > 0
-                ));
+                storage = _.find(containers, con => con.pos.isEqualTo(roomInfo[this.name].storagePos));
             }
 
             if (!storage) {
-                storage = _.find(containers, con => (
-                    con.pos.inRangeTo(this.controller.pos, 3) &&
-                    con.store.getFreeCapacity() > 0
-                ));
+                storage = _.find(containers, con => con.pos.inRangeTo(this.controller.pos, 3));
             }
         };
     }

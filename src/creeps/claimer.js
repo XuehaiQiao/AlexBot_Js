@@ -3,6 +3,7 @@ module.exports = {
         role: "claimer",
         stages: {
             1: {maxEnergyCapacity: 300, bodyParts:[], number: 0},
+            3: {maxEnergyCapacity: 800, bodyParts:[CLAIM, MOVE], number: 2},
             4: {maxEnergyCapacity: 1300, bodyParts:[CLAIM, MOVE, CLAIM, MOVE], number: 1},
             5: {maxEnergyCapacity: 1800, bodyParts:[CLAIM, MOVE, CLAIM, MOVE], number: 1},
             6: {maxEnergyCapacity: 2300, bodyParts:[CLAIM, MOVE, CLAIM, MOVE, CLAIM, MOVE], number: 1},

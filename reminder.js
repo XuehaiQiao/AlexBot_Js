@@ -1,10 +1,5 @@
-// W11S27 X
-// W14S29 O
-// W21S24 O
-// W23S24 O
-// W5S18 X 111
-// W6S18 L
-// W9S19 O 111
+// E6S2
+// E14N3
 
 // claimer spawn
 Game.spawns['Spawn1_W18S15'].spawnCreep([MOVE, CLAIM], 'Claimer' + Game.time, {memory: {role: 'claimer', status: 1, targetRoom: 'W17S14', claim: true}});

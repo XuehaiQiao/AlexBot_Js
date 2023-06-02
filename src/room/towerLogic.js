@@ -33,18 +33,21 @@ module.exports = function (room) {
     }
 
     if (!room.memory.needRepairStructures) room.memory.needRepairStructures = [];
-    if (Game.time % 50 === 0 && room.memory.needRepairStructures.length === 0) {
+    if (Game.time % 10 === 0 && room.memory.needRepairStructures.length === 0) {
         let needRepairStructures = _.filter(room.find(FIND_STRUCTURES), isNeedRepair);
         room.memory.needRepairStructures = _.map(needRepairStructures, structure => structure.id);
     }
 
     let needRepairs = room.memory.needRepairStructures;
-    if(!needRepairs.length) return
-    let target = Game.getObjectById(needRepairs[needRepairs.length - 1]);
-    if(!target || !isNeedRepair(target)) needRepairs.pop();
-    
-    if(!needRepairs.length) return
-    target = Game.getObjectById(needRepairs[needRepairs.length - 1]);
-    let tower = target.pos.findClosestByRange(towers);
-    tower.repair(target);
+    while(needRepairs.length) {
+        let target = Game.getObjectById(needRepairs[needRepairs.length - 1]);
+        if(!target || !isNeedRepair(target)) {
+            needRepairs.pop();
+        }
+        else {
+            let tower = target.pos.findClosestByRange(towers);
+            tower.repair(target);
+            break;
+        }
+    }
 }

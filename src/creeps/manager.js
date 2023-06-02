@@ -22,7 +22,7 @@ module.exports = {
         }
 
         // update memory every 100 sec
-        if(creep.memory.updated == undefined || Game.time % 100 == 67) {
+        if(creep.memory.updated == undefined || Game.time % 100 === 67) {
             updateMemory(creep);
         }
 
@@ -69,7 +69,7 @@ module.exports = {
 
     // checks if the room needs to spawn a creep
     spawn: function(room) {
-        if(!room.terminal) return false;
+        if(room.controller.level < 5) return false;
 
         // 1 manager
         let creepCount;

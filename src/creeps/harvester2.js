@@ -28,7 +28,7 @@ module.exports = {
 
         if(result == ERR_NOT_ENOUGH_RESOURCES) {
             let source = creep.room.find(FIND_SOURCES)[creep.memory.target];
-            if(source) creep.memory.rest = source.ticksToRegeneration;
+            if(!source.energy) creep.memory.rest = source.ticksToRegeneration;
         }
     },
 
@@ -41,7 +41,7 @@ module.exports = {
         if(global.roomCensus[room.name][this.properties.role]) creepCount = global.roomCensus[room.name][this.properties.role]
         else creepCount = 0;
 
-        let totalNeeds;
+        let totalNeeds = 0;
         const rInfo = room.memory.roomInfo;
         if(rInfo) {
             for(const sourceObj of rInfo.sourceInfo) {
@@ -51,6 +51,8 @@ module.exports = {
         else {
             totalNeeds = sourceCount * this.properties.stages[stage].number
         }
+
+        console.log(totalNeeds);
 
         if (creepCount < totalNeeds) {
             return true;

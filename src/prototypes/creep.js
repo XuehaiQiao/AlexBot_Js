@@ -111,7 +111,7 @@ Creep.prototype.collectEnergy = function collectEnergy(changeStatus = false) {
         filter: structure => (
             structure.structureType == STRUCTURE_CONTAINER &&
             !structure.pos.inRangeTo(this.room.controller.pos, 3) &&
-            (roomInfo[this.room.name] && roomInfo[this.room.name].storagePos && structure.pos.isEqualTo(roomInfo[this.room.name].storagePos)) &&
+            !(roomInfo[this.room.name] && roomInfo[this.room.name].storagePos && structure.pos.isEqualTo(roomInfo[this.room.name].storagePos)) &&
             structure.store.getUsedCapacity(RESOURCE_ENERGY) > this.store.getCapacity() / 2
         )
     });
@@ -246,6 +246,28 @@ Creep.prototype.takeEnergyFromClosest = function () {
 
     // if no resources
     this.toResPos();
+}
+
+Creep.prototype.takeEnergyFromClosestStore = function () {
+    // container & storage
+    let targets = _.filter(this.room.find(FIND_STRUCTURES), structure => (
+        (structure.structureType == STRUCTURE_CONTAINER || structure.structureType == STRUCTURE_STORAGE) &&
+        structure.store.getUsedCapacity(RESOURCE_ENERGY) > this.store.getFreeCapacity() &&
+        !structure.pos.findInRange(FIND_SOURCES, 1).length
+    ));
+        
+    let target = this.pos.findClosestByRange(targets);
+    if (target) {
+        if (this.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+            this.moveToNoCreepInRoom(target);
+        }
+        return true;
+    }
+
+    // if no resources
+    this.toResPos();
+
+    return false;
 }
 
 Creep.prototype.takeEnergyNeerController = function () {
