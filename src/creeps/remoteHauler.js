@@ -17,7 +17,7 @@ module.exports = {
             2: { maxEnergyCapacity: 550, bodyParts: [CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2 },
             3: { maxEnergyCapacity: 800, bodyParts: [...new Array(7).fill(CARRY), ...new Array(7).fill(MOVE)], number: 3 },
             4: { maxEnergyCapacity: 1300, bodyParts: [WORK, ...new Array(13).fill(CARRY), ...new Array(7).fill(MOVE)], number: 2 },
-            5: { maxEnergyCapacity: 1800, bodyParts: [WORK, ...new Array(15).fill(CARRY), ...new Array(8).fill(MOVE)], number: 2 },
+            // 5: { maxEnergyCapacity: 1800, bodyParts: [WORK, ...new Array(15).fill(CARRY), ...new Array(8).fill(MOVE)], number: 2 },
             6: { maxEnergyCapacity: 2300, bodyParts: [WORK, ...new Array(27).fill(CARRY), ...new Array(14).fill(MOVE)], number: 1 }, // 100 + 1350 + 700 = 2150
             7: { maxEnergyCapacity: 5600, bodyParts: [WORK, WORK, ...new Array(31).fill(CARRY), ...new Array(17).fill(MOVE)], number: 1 }, // 200 + 1650 + 850 = 2700
         },
@@ -76,7 +76,7 @@ module.exports = {
 
             // build near road and container
             const myConstuct = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 2);
-            if (myConstuct.length > 0) {
+            if (myConstuct.length > 0 && creep.room.name !== creep.memory.base) {
                 if (creep.build(myConstuct[0]) == OK) return;
             }
 

@@ -8,7 +8,7 @@ module.exports = {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, MOVE], number: 4},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, CARRY, MOVE, WORK, CARRY, MOVE], number: 3},
             3: {maxEnergyCapacity: 800, bodyParts:[WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE], number: 2},
-            4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(6).fill(WORK), ...new Array(6).fill(CARRY), ...new Array(6).fill(MOVE)], number: 2},
+            4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(6).fill(WORK), ...new Array(6).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
             5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(9).fill(WORK), ...new Array(9).fill(CARRY), ...new Array(9).fill(MOVE)], number: 1},
             6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], number: 1},
             7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], number: 1},
@@ -53,8 +53,9 @@ module.exports = {
         }
         // harvest
         else {
-            if(creep.room.storage) {
-                creep.takeEnergyFromClosestStore();
+            if(creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY] < 5000) {
+                creep.toResPos();
+                // creep.takeEnergyFromClosestStore();
             }
             else if(
                 roomInfo[creep.room.name] && 

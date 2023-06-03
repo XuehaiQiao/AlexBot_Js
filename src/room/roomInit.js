@@ -46,7 +46,7 @@ function roomInit(room) {
     room.memory.roomInfo = roomUtil.getRoomInfo(room);
     // assign scout
     room.memory.tasks.spawnTasks.push({
-        name: 'explorer', 
+        name: 'explorer',
         body: [MOVE], 
         memory: {
             role: 'scout',

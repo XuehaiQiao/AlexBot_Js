@@ -21,8 +21,8 @@ module.exports = {
             }
         }
 
-        // update memory every 100 sec
-        if(creep.memory.updated == undefined || Game.time % 100 === 67) {
+        // update memory every 30 ticks
+        if(creep.memory.updated == undefined || Game.time % 30 === 17) {
             updateMemory(creep);
         }
 
@@ -101,7 +101,7 @@ function coreWork(creep) {
     if(!controllerLink || !link || !storage) return false;
 
     // upgrade: from storage to managerLink
-    if(controllerLink.store[RESOURCE_ENERGY] < 100 && link.store[RESOURCE_ENERGY] < 700 && link.cooldown <= 2) {
+    if(storage.store[RESOURCE_ENERGY] >= 10000 && controllerLink.store[RESOURCE_ENERGY] < 100 && link.store[RESOURCE_ENERGY] < 700 && link.cooldown <= 2) {
         creep.say('S2L');
         fromA2B(creep, storage, link, RESOURCE_ENERGY, Math.min(link.store.getFreeCapacity(RESOURCE_ENERGY), controllerLink.store.getFreeCapacity(RESOURCE_ENERGY)));
         return true;
@@ -257,11 +257,9 @@ var updateMemory = function(creep) {
 
     // store adjacent structures into memory
     let structList = creep.pos.findInRange(FIND_MY_STRUCTURES, 1);
-    creep.say(structList.length);
     _.forEach(structList, struct => {
         creep.memory[struct.structureType] = struct.id;
     })
 
-    creep.memory.updated = 1
-    creep.say("Updated")
+    creep.memory.updated = 1;
 };

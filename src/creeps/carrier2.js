@@ -4,11 +4,12 @@ module.exports = {
     properties: {
         type: 'carrier2',
         stages: {
-            1: {maxEnergyCapacity: 300, bodyParts:[CARRY, MOVE, CARRY, MOVE], number: 4},
-            2: {maxEnergyCapacity: 550, bodyParts:[CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 3},
-            3: {maxEnergyCapacity: 800, bodyParts:[CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 3},
+            1: {maxEnergyCapacity: 300, bodyParts:[CARRY, MOVE, CARRY, MOVE], number: 3},
+            2: {maxEnergyCapacity: 550, bodyParts:[CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2},
+            3: {maxEnergyCapacity: 800, bodyParts:[CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2},
             4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(16).fill(CARRY), ...new Array(8).fill(MOVE)], number: 2},
             5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(20).fill(CARRY), ...new Array(10).fill(MOVE)], number: 2},
+            6: {maxEnergyCapacity: 5600, bodyParts:[...new Array(20).fill(CARRY), ...new Array(10).fill(MOVE)], number: 1},
             8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(32).fill(CARRY), ...new Array(16).fill(MOVE)], number: 1},
         },
     },
@@ -110,16 +111,26 @@ module.exports = {
         // transfer
         else {
             // list includes: spawn and extensions
-
-            // extension && spwan
-            var extensionSpawn = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
-                filter: function(object) {
-                    return (object.structureType == STRUCTURE_EXTENSION || object.structureType == STRUCTURE_SPAWN) && object.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
-                }
+            let extensionSpawns = creep.room.find(FIND_MY_STRUCTURES, {
+                filter: struct => (struct.structureType == STRUCTURE_EXTENSION || struct.structureType == STRUCTURE_SPAWN) && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0
             });
-            if (extensionSpawn) {
-                if(creep.transfer(extensionSpawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveToNoCreepInRoom(extensionSpawn);
+
+            if (extensionSpawns.length) {
+                let nearestTarget = extensionSpawns.reduce((a, b) => {
+                    return (creep.pos.getRangeTo(a) - creep.pos.getRangeTo(b) > 0) ? b : a;
+                });
+                
+                let result = creep.transfer(nearestTarget, RESOURCE_ENERGY);
+                if(result === ERR_NOT_IN_RANGE) creep.moveToNoCreepInRoom(nearestTarget);
+                else if(result === OK) {
+                    if(extensionSpawns.length > 1) {
+                        let nextTarget = extensionSpawns.reduce((a, b) => {
+                            if(a == nearestTarget) return b;
+                            else if(b == nearestTarget) return a;
+                            return (creep.pos.getRangeTo(a) - creep.pos.getRangeTo(b) > 0) ? b : a;
+                        });
+                        creep.moveToNoCreepInRoom(nextTarget);
+                    }
                 }
                 return;
             }
