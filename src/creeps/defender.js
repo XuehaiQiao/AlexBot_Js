@@ -23,10 +23,10 @@ module.exports = {
             hostile = Game.getObjectById(creep.memory.target);
         } 
         if(!hostile) {
-            hostile = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
+            hostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
         } 
         if(!hostile) {
-            hostile = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {filter: struct => (struct.structureType != STRUCTURE_KEEPER_LAIR &&struct.structureType != STRUCTURE_CONTROLLER)});
+            hostile = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {filter: struct => (struct.structureType != STRUCTURE_KEEPER_LAIR &&struct.structureType != STRUCTURE_CONTROLLER)});
         }
 
         if (hostile) {

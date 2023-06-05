@@ -6,12 +6,12 @@ module.exports = {
         stages: {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, MOVE], number: 1},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 8},
-            3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE], number: 8},
-            4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(8).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(4).fill(MOVE)], number: 3},
-            5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(10).fill(WORK), ...new Array(3).fill(CARRY), ...new Array(5).fill(MOVE)], mBodyParts: [...new Array(12).fill(WORK), ...new Array(3).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
-            6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(14).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(7).fill(MOVE)], mBodyParts: [...new Array(14).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(7).fill(MOVE)], number: 1},
-            7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(30).fill(WORK), ...new Array(5).fill(CARRY), ...new Array(15).fill(MOVE)], number: 0},
-            8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(15).fill(WORK), ...new Array(15).fill(CARRY), ...new Array(15).fill(MOVE)], mBodyParts: [...new Array(15).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(8).fill(MOVE)], number: 1},
+            3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE], number: 8},
+            4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(8).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(4).fill(MOVE)], number: 6},
+            5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(10).fill(WORK), ...new Array(3).fill(CARRY), ...new Array(5).fill(MOVE)], mBodyParts: [...new Array(12).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
+            6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(14).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(7).fill(MOVE)], mBodyParts: [...new Array(14).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(7).fill(MOVE)], number: 1},
+            7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(30).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(15).fill(MOVE)], number: 0},
+            8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(15).fill(WORK), ...new Array(15).fill(CARRY), ...new Array(15).fill(MOVE)], mBodyParts: [...new Array(15).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(8).fill(MOVE)], number: 1},
         },
     },
 
@@ -62,7 +62,13 @@ module.exports = {
 
         // upgrade
         if(creep.memory.status) {
-            if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
+            let constSites = creep.room.controller.pos.findInRange(FIND_CONSTRUCTION_SITES, 3);
+            if(constSites.length) {
+                if(creep.build(constSites[0]) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(creep.room.controller, {reusePath: 10});
+                }
+            }
+            else if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(creep.room.controller, {reusePath: 10});
             }
         }
@@ -96,7 +102,7 @@ module.exports = {
 
         // create more upgrader2 for more energy in storage
         if (storage && storage.store[RESOURCE_ENERGY] > 200000) {
-            num += Math.min(Math.ceil((storage.store[RESOURCE_ENERGY] + 300000) / (1 + storage.store.getFreeCapacity())), 4);
+            num += Math.min(Math.ceil((2 * storage.store[RESOURCE_ENERGY] + 300000) / (1 + storage.store.getFreeCapacity())), 4);
         }
 
         // return upgraders.length < num ? true : false;
@@ -135,7 +141,7 @@ module.exports = {
             }
         }
 
-        console.log(stage);
+        //console.log(stage);
         return stage;
     }
 };

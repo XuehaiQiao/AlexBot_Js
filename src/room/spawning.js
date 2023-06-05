@@ -3,6 +3,17 @@ const creepLogic = require("../creeps");
 // const creepTypes2 = ['carrier2', 'harvester2', 'upgrader2', 'builder2']; // 'mineralCarrier'
 
 module.exports = function (room) {
+    if (room.name === 'E16S2' && Game.time % 1000 === 500) {
+        Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
+            name: 'rangeAtker',
+            body: [...new Array(9).fill(MOVE), ...new Array(5).fill(RANGED_ATTACK), ...new Array(4).fill(HEAL)],
+            memory: {
+                role: 'rangeAtker',
+                targetRoom: 'E16N3',
+            }
+        });
+    }
+
     // return if no idle spawn
     let idleSpawn = _.find(room.find(FIND_MY_SPAWNS), spawn => spawn.spawning == null);
     if (!idleSpawn) return;
@@ -166,7 +177,7 @@ function remoteDefenceCreeps(room, spawn, roomName, roomMemory) {
 }
 
 function remoteSourcingCreeps(room, spawn, roomName, roomMemory) {
-    if (room.energyCapacityAvailable < 550) return false;
+    //if (room.energyCapacityAvailable < 550) return false;
     if(Game.rooms[roomName] && Game.rooms[roomName].find(FIND_HOSTILE_CREEPS).length) return false;
 
     if (!roomMemory.neutral) {

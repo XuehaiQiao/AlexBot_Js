@@ -13,7 +13,7 @@ module.exports = {
     properties: {
         role: 'remoteHauler',
         stages: {
-            1: { maxEnergyCapacity: 300, bodyParts: [CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2 },
+            1: { maxEnergyCapacity: 300, bodyParts: [CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 4 },
             2: { maxEnergyCapacity: 550, bodyParts: [CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2 },
             3: { maxEnergyCapacity: 800, bodyParts: [...new Array(7).fill(CARRY), ...new Array(7).fill(MOVE)], number: 3 },
             4: { maxEnergyCapacity: 1300, bodyParts: [WORK, ...new Array(13).fill(CARRY), ...new Array(7).fill(MOVE)], number: 2 },

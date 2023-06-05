@@ -13,7 +13,10 @@ module.exports = {
             creep.memory.rest -= 1;
         }
 
-        let mine = creep.room.find(FIND_MINERALS)[0];
+        let extractor = creep.room.find(FIND_MY_STRUCTURES, {filter: struct => struct.structureType === STRUCTURE_EXTRACTOR})[0];
+        if(!extractor) return;
+        let mine = creep.room.find(FIND_MINERALS, {filter: mine => mine.pos.isEqualTo(extractor.pos)})[0];
+
         let container = Game.getObjectById(creep.memory.container);
         if(container) {
             haveContainerLogic(creep, mine, container);
@@ -26,12 +29,12 @@ module.exports = {
     // checks if the room needs to spawn a creep
     spawn: function(room) {
         // check mineralAmount & if have extractor
-        let mineral = room.find(FIND_MINERALS)[0];
-        let extractor = _.find(room.find(FIND_MY_STRUCTURES), struct => struct.structureType == STRUCTURE_EXTRACTOR);
         
-        // mineral has resources, room have extractor, storage have less than 100000 this mineral type
-        if(mineral.mineralAmount == 0) return false;
+        let extractor = _.find(room.find(FIND_MY_STRUCTURES), struct => struct.structureType == STRUCTURE_EXTRACTOR);
         if(!extractor) return false;
+        let mineral = room.find(FIND_MINERALS, {filter: mineral => mineral.pos.isEqualTo(extractor.pos)})[0];
+        if(mineral.mineralAmount == 0) return false;
+
         if(room.storage && room.storage.store[mineral.mineralType] >= 80000) return false;
         
         let creepCount;
@@ -51,8 +54,8 @@ module.exports = {
         let stage = this.getStage(room);
 
         if(!room.memory.mineContainerId) {
-            let mine = room.find(FIND_MINERALS)[0];
-            let containers = mine.pos.findInRange(room.find(FIND_STRUCTURES, {filter: struct => struct.structureType === STRUCTURE_CONTAINER}), 1);
+            let extractor = room.find(FIND_MY_STRUCTURES, {filter: struct => struct.structureType === STRUCTURE_EXTRACTOR})[0];
+            let containers = extractor.pos.findInRange(room.find(FIND_STRUCTURES, {filter: struct => struct.structureType === STRUCTURE_CONTAINER}), 1);
             if(containers.length > 0) {
                 room.memory.mineContainerId = containers[0].id;
             }

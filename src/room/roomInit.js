@@ -4,6 +4,22 @@ const ifInit = true;
 
 // Do not use this in the MMO
 function roomInit(room) {
+    // create scout sperately
+    if(room.memory.scout) {
+        const targetRooms = roomUtil.getRoomsInRange(room.name, room.memory.scout);
+        room.memory.tasks.spawnTasks.push({
+            name: 'explorer',
+            body: [MOVE], 
+            memory: {
+                role: 'scout',
+                targetRooms: targetRooms,
+                explorer: true
+            }
+        });
+
+        room.memory.scout = 0;
+    }
+
     if(!ifInit) return;
     if(!room || room.memory.init === false) return;
     if(!room.controller || room.controller.level === 0 || !room.controller.my) return;

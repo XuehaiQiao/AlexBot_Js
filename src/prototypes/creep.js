@@ -10,17 +10,19 @@ Creep.prototype.damaged = function () {
 }
 
 Creep.prototype.moveToNoCreep = function (target) {
-    if (this.isStuck()) {
-        this.moveTo(target, { reusePath: 20 });
-    }
-    this.moveTo(target, { reusePath: 50, ignoreCreeps: true });
+    this.travelTo(target, {allowHostile: true});
+    // if (this.isStuck()) {
+    //     this.moveTo(target, { reusePath: 20 });
+    // }
+    // this.moveTo(target, { reusePath: 50, ignoreCreeps: true });
 }
 
 Creep.prototype.moveToNoCreepInRoom = function (target) {
-    if (this.isStuck()) {
-        this.moveTo(target, { maxRooms: 1 });
-    }
-    this.moveTo(target, { reusePath: 50, ignoreCreeps: true, maxRooms: 1 });
+    this.travelTo(target, { maxRooms: 1 });
+    // if (this.isStuck()) {
+    //     this.moveTo(target, { maxRooms: 1 });
+    // }
+    // this.moveTo(target, { reusePath: 50, ignoreCreeps: true, maxRooms: 1 });
 }
 
 Creep.prototype.moveToRoom = function (roomName) {
@@ -224,28 +226,52 @@ Creep.prototype.takeEnergyFromStorage = function takeEnergyFromStorage() {
 
 Creep.prototype.takeEnergyFromClosest = function () {
     // first find droped resource
-    var dropedResource = this.pos.findClosestByRange(FIND_DROPPED_RESOURCES, { filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount >= this.store.getCapacity() });
-    if (dropedResource) {
-        if (this.pickup(dropedResource) == ERR_NOT_IN_RANGE) {
-            this.moveToNoCreepInRoom(dropedResource);
-        }
-        return;
-    }
-
-    // container & storage
-    let targets = _.filter(this.room.find(FIND_STRUCTURES), structure => (
+    let dropedEnergys = this.room.find(FIND_DROPPED_RESOURCES, { filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount >= this.store.getCapacity() });
+    let stores = this.room.find(FIND_STRUCTURES, {filter: structure => 
         (structure.structureType == STRUCTURE_CONTAINER || structure.structureType == STRUCTURE_STORAGE) &&
-        structure.store.getUsedCapacity(RESOURCE_ENERGY) > this.store.getFreeCapacity()));
+        structure.store.getUsedCapacity(RESOURCE_ENERGY) > this.store.getFreeCapacity()});
+    
+    let targets = [...dropedEnergys, ...stores];
     let target = this.pos.findClosestByRange(targets);
-    if (target) {
+    if(!target) {
+        this.toResPos();
+        return false;
+    }
+    else if(target.amount) {
+        if (this.pickup(target) == ERR_NOT_IN_RANGE) {
+            this.moveToNoCreepInRoom(target);
+        }
+        return true;
+    }
+    else {
         if (this.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
             this.moveToNoCreepInRoom(target);
         }
-        return;
+        return true;
     }
+    
+    // var dropedResource = this.pos.findClosestByRange(FIND_DROPPED_RESOURCES, { filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount >= this.store.getCapacity() });
+    // if (dropedResource) {
+    //     if (this.pickup(dropedResource) == ERR_NOT_IN_RANGE) {
+    //         this.moveToNoCreepInRoom(dropedResource);
+    //     }
+    //     return;
+    // }
 
-    // if no resources
-    this.toResPos();
+    // // container & storage
+    // let targets = _.filter(this.room.find(FIND_STRUCTURES), structure => (
+    //     (structure.structureType == STRUCTURE_CONTAINER || structure.structureType == STRUCTURE_STORAGE) &&
+    //     structure.store.getUsedCapacity(RESOURCE_ENERGY) > this.store.getFreeCapacity()));
+    // let target = this.pos.findClosestByRange(targets);
+    // if (target) {
+    //     if (this.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+    //         this.moveToNoCreepInRoom(target);
+    //     }
+    //     return;
+    // }
+
+    // // if no resources
+    // this.toResPos();
 }
 
 Creep.prototype.takeEnergyFromClosestStore = function () {
@@ -420,4 +446,50 @@ Creep.prototype.getBoosts = function () {
     console.log(4);
 
     this.memory.boosted = true;
+}
+
+Creep.prototype.fleeFrom = function(target) {
+    let targetPos;
+    if(!target) return false;
+    if(!target.pos) targetPos = target;
+    else targetPos = target.pos;
+
+
+    this.say('flee');
+
+    const xDis = this.pos.x - targetPos.x;
+    const yDis = this.pos.y - targetPos.y;
+    
+    if(xDis > 0) {
+        if(yDis > 0) {
+            this.move(BOTTOM_RIGHT);
+        }
+        else if(yDis === 0) {
+            this.move(RIGHT);
+        }
+        else {
+            this.move(TOP_RIGHT);
+        }
+    }
+    else if(xDis === 0) {
+        if(yDis > 0) {
+            this.move(BOTTOM);
+        }
+        else {
+            this.move(TOP);
+        }
+    }
+    else {
+        if(yDis > 0) {
+            this.move(BOTTOM_LEFT);
+        }
+        else if(yDis === 0) {
+            this.move(RIGHT);
+        }
+        else {
+            this.move(TOP_LEFT);
+        }
+    }
+
+    return true;
 }

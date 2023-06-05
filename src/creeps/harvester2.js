@@ -52,7 +52,7 @@ module.exports = {
             totalNeeds = sourceCount * this.properties.stages[stage].number
         }
 
-        console.log(totalNeeds);
+        // console.log(totalNeeds);
 
         if (creepCount < totalNeeds) {
             return true;

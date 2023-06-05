@@ -280,8 +280,8 @@ var labTransfer = function(creep, targetLab, resourceType) {
 
 var mineralContainerWithdraw = function(creep) {
     let storage = creep.room.storage;
-    let mineral = creep.room.find(FIND_MINERALS)[0];
-    if(!mineral || !storage) return false;
+    let extractor = creep.room.find(FIND_MY_STRUCTURES, {filter: struct => struct.structureType === STRUCTURE_EXTRACTOR})[0];
+    if(!extractor || !storage) return false;
 
     // status 1: transfer
     if(creep.memory.status) {
@@ -311,7 +311,7 @@ var mineralContainerWithdraw = function(creep) {
             let containers = creep.room.find(FIND_STRUCTURES, {
                 filter: struct => 
                 (struct.structureType === STRUCTURE_CONTAINER && 
-                struct.pos.inRangeTo(mineral.pos, 1))
+                struct.pos.inRangeTo(extractor.pos, 1))
             });
             if(containers.length === 0) return false;
 
