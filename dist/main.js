@@ -85,7 +85,7 @@ module.exports.loop = function () {
      *            ROOM LOGICS
      * ====================================
      */
-    tools.visual(Game.rooms['E6S2']);
+    tools.visual(Game.rooms['E17N2']);
     Game.myRooms = _.filter(Game.rooms, r => r.controller && r.controller.level > 0 && r.controller.my);
 
     let totalRoomCpu = -Game.cpu.getUsed();
@@ -6823,9 +6823,9 @@ module.exports = function(room) {
     for(var x = 0; x < 50; x++) {
         for(var y = 0; y < 50; y++) {
             let cost = eMatrix.get(x, y);
-            if(cost === 50) roomVisual.circle(x, y, {fill: 'transparent', radius: 0.55, stroke: 'blue'});
-            if(cost === 100) roomVisual.circle(x, y, {fill: 'transparent', radius: 0.55, stroke: 'yellow'});
-            if(cost === 255) roomVisual.circle(x, y, {fill: 'transparent', radius: 0.55, stroke: 'red'});
+            if(cost === 50) roomVisual.circle(x, y, {fill: 'transparent', radius: 0.45, stroke: 'blue', strokeWidth: 0.05});
+            if(cost === 100) roomVisual.circle(x, y, {fill: 'transparent', radius: 0.45, stroke: 'yellow', strokeWidth: 0.05});
+            if(cost === 255) roomVisual.circle(x, y, {fill: 'transparent', radius: 0.45, stroke: 'red', strokeWidth: 0.05});
         }
     }
 }
@@ -6982,7 +6982,7 @@ const baseUtil = {
             let pos = rampart.pos
             enclosureMatrix.set(pos.x, pos.y, 1);
         });
-        let constWalls = room.find(FIND_MY_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_WALL });
+        let constWalls = room.find(FIND_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_WALL });
         constWalls.map(constWall => {
             let pos = constWall.pos
             enclosureMatrix.set(pos.x, pos.y, 1);

@@ -17,10 +17,10 @@ module.exports = function(room) {
     for(var x = 0; x < 50; x++) {
         for(var y = 0; y < 50; y++) {
             let cost = eMatrix.get(x, y);
-            //if(cost === 2) roomVisual.circle(x, y, {fill: 'transparent', radius: 0.55, stroke: '#0f0'});
-            if(cost === 50) roomVisual.circle(x, y, {fill: 'transparent', radius: 0.55, stroke: 'blue'});
-            if(cost === 100) roomVisual.circle(x, y, {fill: 'transparent', radius: 0.55, stroke: 'yellow'});
-            if(cost === 255) roomVisual.circle(x, y, {fill: 'transparent', radius: 0.55, stroke: 'red'});
+            //if(cost === 2) roomVisual.circle(x, y, {fill: 'transparent', radius: 0.45, stroke: '#0f0'});
+            if(cost === 50) roomVisual.circle(x, y, {fill: 'transparent', radius: 0.45, stroke: 'blue', strokeWidth: 0.05});
+            if(cost === 100) roomVisual.circle(x, y, {fill: 'transparent', radius: 0.45, stroke: 'yellow', strokeWidth: 0.05});
+            if(cost === 255) roomVisual.circle(x, y, {fill: 'transparent', radius: 0.45, stroke: 'red', strokeWidth: 0.05});
         }
     }
 }

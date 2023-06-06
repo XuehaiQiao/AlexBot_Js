@@ -41,7 +41,7 @@ const baseUtil = {
         });
 
         // set construction wall
-        let constWalls = room.find(FIND_MY_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_WALL });
+        let constWalls = room.find(FIND_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_WALL });
         constWalls.map(constWall => {
             let pos = constWall.pos
             enclosureMatrix.set(pos.x, pos.y, 1);
