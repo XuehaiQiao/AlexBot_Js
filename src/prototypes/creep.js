@@ -10,7 +10,7 @@ Creep.prototype.damaged = function () {
 }
 
 Creep.prototype.moveToNoCreep = function (target) {
-    this.travelTo(target, {allowHostile: true});
+    this.travelTo(target, { allowHostile: true });
     // if (this.isStuck()) {
     //     this.moveTo(target, { reusePath: 20 });
     // }
@@ -88,10 +88,12 @@ Creep.prototype.workerSetStatusWithAction = function (onHarvest = null, onWork =
 // same as takeEnergy but no storage (only used in carrier)
 Creep.prototype.collectEnergy = function collectEnergy(changeStatus = false) {
     // first find droped resource
-    var dropedResource = this.pos.findClosestByPath(FIND_DROPPED_RESOURCES, { filter: resource => 
-        resource.resourceType == RESOURCE_ENERGY && 
-        !resource.pos.inRangeTo(this.room.controller.pos, 4) &&
-        resource.amount > this.store.getCapacity() / 2 });
+    var dropedResource = this.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {
+        filter: resource =>
+            resource.resourceType == RESOURCE_ENERGY &&
+            !resource.pos.inRangeTo(this.room.controller.pos, 4) &&
+            resource.amount > this.store.getCapacity() / 2
+    });
     if (dropedResource) {
         let result = this.pickup(dropedResource);
         if (result == ERR_NOT_IN_RANGE) {
@@ -227,17 +229,19 @@ Creep.prototype.takeEnergyFromStorage = function takeEnergyFromStorage() {
 Creep.prototype.takeEnergyFromClosest = function () {
     // first find droped resource
     let dropedEnergys = this.room.find(FIND_DROPPED_RESOURCES, { filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount >= this.store.getCapacity() });
-    let stores = this.room.find(FIND_STRUCTURES, {filter: structure => 
-        (structure.structureType == STRUCTURE_CONTAINER || structure.structureType == STRUCTURE_STORAGE) &&
-        structure.store.getUsedCapacity(RESOURCE_ENERGY) > this.store.getFreeCapacity()});
-    
+    let stores = this.room.find(FIND_STRUCTURES, {
+        filter: structure =>
+            (structure.structureType == STRUCTURE_CONTAINER || structure.structureType == STRUCTURE_STORAGE) &&
+            structure.store.getUsedCapacity(RESOURCE_ENERGY) > this.store.getFreeCapacity()
+    });
+
     let targets = [...dropedEnergys, ...stores];
     let target = this.pos.findClosestByRange(targets);
-    if(!target) {
+    if (!target) {
         this.toResPos();
         return false;
     }
-    else if(target.amount) {
+    else if (target.amount) {
         if (this.pickup(target) == ERR_NOT_IN_RANGE) {
             this.moveToNoCreepInRoom(target);
         }
@@ -249,7 +253,7 @@ Creep.prototype.takeEnergyFromClosest = function () {
         }
         return true;
     }
-    
+
     // var dropedResource = this.pos.findClosestByRange(FIND_DROPPED_RESOURCES, { filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount >= this.store.getCapacity() });
     // if (dropedResource) {
     //     if (this.pickup(dropedResource) == ERR_NOT_IN_RANGE) {
@@ -281,7 +285,7 @@ Creep.prototype.takeEnergyFromClosestStore = function () {
         structure.store.getUsedCapacity(RESOURCE_ENERGY) > this.store.getFreeCapacity() &&
         !structure.pos.findInRange(FIND_SOURCES, 1).length
     ));
-        
+
     let target = this.pos.findClosestByRange(targets);
     if (target) {
         if (this.withdraw(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
@@ -298,47 +302,39 @@ Creep.prototype.takeEnergyFromClosestStore = function () {
 
 Creep.prototype.takeEnergyNeerController = function () {
     // first find droped resource
-    let dropedResource = this.pos.findClosestByRange(FIND_DROPPED_RESOURCES, { filter: resource => 
-        resource.resourceType == RESOURCE_ENERGY && 
-        resource.pos.inRangeTo(this.room.controller, 4)
+    let dropedResource = this.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
+        filter: resource =>
+            resource.resourceType == RESOURCE_ENERGY &&
+            resource.pos.inRangeTo(this.room.controller, 4)
     });
     if (dropedResource) {
         let result = this.pickup(dropedResource)
         if (result === ERR_NOT_IN_RANGE) {
             this.moveTo(dropedResource);
         }
-        else if(result === OK) {
+        else if (result === OK) {
             this.memory.status = 1;
         }
         return true;
     }
 
     // container
-    let container = this.pos.findClosestByRange(FIND_STRUCTURES, {filter: struct => 
-        struct.structureType === STRUCTURE_CONTAINER &&
-        struct.pos.inRangeTo(this.room.controller, 3) &&
-        struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+    let container = this.pos.findClosestByRange(FIND_STRUCTURES, {
+        filter: struct =>
+            struct.structureType === STRUCTURE_CONTAINER &&
+            struct.pos.inRangeTo(this.room.controller, 3) &&
+            struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
     })
-    if(container) {
+    if (container) {
         let result = this.withdraw(container, RESOURCE_ENERGY);
         if (result === ERR_NOT_IN_RANGE) {
             this.moveTo(container);
         }
-        else if(result === OK) {
+        else if (result === OK) {
             this.memory.status = 1;
         }
         return true;
     }
-
-    // // storage
-    // let storage = this.room.storage;
-    // if(storage && storage.store[RESOURCE_ENERGY] >= 10000) {
-    //     let result = this.withdraw(storage)
-    //     if (result === ERR_NOT_IN_RANGE) {
-    //         this.moveTo(container);
-    //     }
-    //     return true;
-    // }
 
     return false;
 }
@@ -448,10 +444,10 @@ Creep.prototype.getBoosts = function () {
     this.memory.boosted = true;
 }
 
-Creep.prototype.fleeFrom = function(target) {
+Creep.prototype.fleeFrom = function (target) {
     let targetPos;
-    if(!target) return false;
-    if(!target.pos) targetPos = target;
+    if (!target) return false;
+    if (!target.pos) targetPos = target;
     else targetPos = target.pos;
 
 
@@ -459,20 +455,20 @@ Creep.prototype.fleeFrom = function(target) {
 
     const xDis = this.pos.x - targetPos.x;
     const yDis = this.pos.y - targetPos.y;
-    
-    if(xDis > 0) {
-        if(yDis > 0) {
+
+    if (xDis > 0) {
+        if (yDis > 0) {
             this.move(BOTTOM_RIGHT);
         }
-        else if(yDis === 0) {
+        else if (yDis === 0) {
             this.move(RIGHT);
         }
         else {
             this.move(TOP_RIGHT);
         }
     }
-    else if(xDis === 0) {
-        if(yDis > 0) {
+    else if (xDis === 0) {
+        if (yDis > 0) {
             this.move(BOTTOM);
         }
         else {
@@ -480,10 +476,10 @@ Creep.prototype.fleeFrom = function(target) {
         }
     }
     else {
-        if(yDis > 0) {
+        if (yDis > 0) {
             this.move(BOTTOM_LEFT);
         }
-        else if(yDis === 0) {
+        else if (yDis === 0) {
             this.move(RIGHT);
         }
         else {
@@ -492,4 +488,16 @@ Creep.prototype.fleeFrom = function(target) {
     }
 
     return true;
+}
+
+Creep.prototype.fleeFromAdv = function(goal, range) {
+    let ret = PathFinder.search(this.pos, {pos: goal.pos, range: range}, {
+        flee: true,
+        maxRooms: 1,
+    });
+
+    console.log(ret.path);
+
+    let pos = ret.path[0];
+    this.move(this.pos.getDirectionTo(pos));
 }

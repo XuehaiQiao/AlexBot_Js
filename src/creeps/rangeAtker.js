@@ -24,25 +24,26 @@ module.exports = {
             hostile = Game.getObjectById(creep.memory.target);
             if (!hostile) creep.memory.target = null;
         }
-        if (!hostile && creep.memory.invader) {
-            hostile = _.find(creep.room.find(FIND_HOSTILE_STRUCTURES), struct => struct.structureType == STRUCTURE_INVADER_CORE);
-            if (!hostile && Memory.outSourceRooms[creep.memory.targetRoom]) {
-                Memory.outSourceRooms[creep.memory.targetRoom].invaderCoreLevel = -1;
-            }
+        if (!hostile) {
+            hostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
         }
+        // if (!hostile && creep.memory.invader) {
+        //     hostile = _.find(creep.room.find(FIND_HOSTILE_STRUCTURES), struct => struct.structureType == STRUCTURE_INVADER_CORE);
+        //     if (!hostile && Memory.outSourceRooms[creep.memory.targetRoom]) {
+        //         Memory.outSourceRooms[creep.memory.targetRoom].invaderCoreLevel = -1;
+        //     }
+        // }
         if (!hostile) {
             hostile = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
                 filter: struct => (
                     struct.structureType !== STRUCTURE_KEEPER_LAIR &&
+                    struct.structureType !== STRUCTURE_INVADER_CORE &&
                     struct.structureType !== STRUCTURE_CONTROLLER &&
                     struct.structureType !== STRUCTURE_RAMPART &&
                     struct.structureType !== STRUCTURE_STORAGE &&
                     struct.structureType !== STRUCTURE_TERMINAL
                 )
             });
-        }
-        if (!hostile) {
-            hostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
         }
 
         if (hostile) {
@@ -79,6 +80,7 @@ module.exports = {
                 }
                 else {
                     attackInDistance(creep, hostile, 2);
+
                 }
 
             }
@@ -135,7 +137,7 @@ module.exports = {
 
 function attackInDistance(creep, hostile, range) {
     if (creep.pos.getRangeTo(hostile) > range) creep.moveTo(hostile);
-    else if (creep.pos.getRangeTo(hostile) < range) creep.fleeFrom(hostile);
+    else if (creep.pos.getRangeTo(hostile) < range) creep.fleeFromAdv(hostile, 5);
 
     creep.rangedAttack(hostile);
     if(creep.pos.isNearTo(hostile)) creep.rangedMassAttack();

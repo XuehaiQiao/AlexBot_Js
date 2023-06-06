@@ -1,6 +1,7 @@
 const { wall, rampart } = require("../structures");
 
 module.exports = function (room) {
+    //if(room.name === 'E16S2') return;
     const towers = room.find(FIND_MY_STRUCTURES, {filter: struct => struct.structureType == STRUCTURE_TOWER && struct.store[RESOURCE_ENERGY] >= 10});
     if(!towers.length) return;
 

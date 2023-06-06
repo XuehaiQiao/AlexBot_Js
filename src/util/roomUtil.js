@@ -1,6 +1,6 @@
 const { roomTypes } = require("../constants");
 
-roomUtil = {
+const roomUtil = {
     getRoomCoord: function (roomName) {
         if (roomName.includes('N')) {
             return roomName.substring(1).split('N').map(pos => Number(pos));

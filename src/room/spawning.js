@@ -3,7 +3,7 @@ const creepLogic = require("../creeps");
 // const creepTypes2 = ['carrier2', 'harvester2', 'upgrader2', 'builder2']; // 'mineralCarrier'
 
 module.exports = function (room) {
-    if (room.name === 'E16S2' && Game.time % 1000 === 500) {
+    if (room.name === 'E16S2' && Game.time % 1200 === 500) {
         Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
             name: 'rangeAtker',
             body: [...new Array(9).fill(MOVE), ...new Array(5).fill(RANGED_ATTACK), ...new Array(4).fill(HEAL)],
@@ -35,6 +35,18 @@ module.exports = function (room) {
         }
         
         if (remoteDefenceCreeps(room, idleSpawn, remoteRoomName, roomMemory)) return;
+    }
+
+    for (const remoteRoomName of room.memory.outSourceRooms) {
+        const roomMemory = Memory.outSourceRooms[remoteRoomName];
+        if (!roomMemory) return false;
+
+        // if have invader core, wait to its end to respawn creeps to this room
+        if(roomMemory.invaderCore) {
+            if(roomMemory.invaderCore.endTime > Game.time) continue;
+            else roomMemory.invaderCore = null;
+        }
+        
         if (remoteSourcingCreeps(room, idleSpawn, remoteRoomName, roomMemory)) return;
     }
 }
@@ -58,6 +70,9 @@ function spawnCreep(room, spawn, creepSpawnData) {
 
 function createCoreCreep(room, spawn) {
     coreTypes = ['carrier2', 'harvester2', 'manager', 'upgrader2', 'builder2', 'miner', 'mineralCarrier'];
+    if(room.energyCapacityAvailable < 550) {
+        coreTypes = ['harvester2', 'carrier2', 'upgrader2', 'builder2'];
+    }
     // find a creep type that returns true for the .spawn() function
     let creepTypeNeeded = _.find(coreTypes, type => creepLogic[type].spawn(room));
 
@@ -156,9 +171,14 @@ function remoteDefenceCreeps(room, spawn, roomName, roomMemory) {
         }
     }
 
-    const hostileCreeps = remoteRoom.find(FIND_HOSTILE_CREEPS, { filter: c => c.owner.username !== 'Source Keeper' });
+    const hostileParts = [ATTACK, RANGED_ATTACK, WORK, HEAL, CLAIM]
+    const hostileCreeps = remoteRoom.find(FIND_HOSTILE_CREEPS, { filter: c => 
+        c.owner.username !== 'Source Keeper' &&
+        _.find(hostileParts, partType => c.getActiveBodyparts(partType) > 0)
+    });
     if (hostileCreeps.length) {
         if (!roomMemory.neutral) {
+            console.log(roomName, 'found enemy!');
             if (creepLogic['defender'].spawn(room, roomName)) {
                 spawnCreep(room, spawn, creepLogic['defender'].spawnData(room, roomName));
                 return true;

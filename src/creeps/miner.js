@@ -33,9 +33,9 @@ module.exports = {
         let extractor = _.find(room.find(FIND_MY_STRUCTURES), struct => struct.structureType == STRUCTURE_EXTRACTOR);
         if(!extractor) return false;
         let mineral = room.find(FIND_MINERALS, {filter: mineral => mineral.pos.isEqualTo(extractor.pos)})[0];
-        if(mineral.mineralAmount == 0) return false;
+        if(!mineral || !mineral.mineralAmount) return false;
 
-        if(room.storage && room.storage.store[mineral.mineralType] >= 80000) return false;
+        if(room.storage && room.storage.store[mineral.mineralType] >= 120000) return false;
         
         let creepCount;
         if(global.roomCensus[room.name][this.properties.role]) creepCount = global.roomCensus[room.name][this.properties.role]

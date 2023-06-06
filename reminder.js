@@ -13,10 +13,10 @@ Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
 Game.spawns['Spawn1_W18S15'].spawnCreep([WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], 'harvester2' + Game.time, { memory: { role: 'harvester2', target: 0, targetRoom: 'W17S14' } });
 
 //builder2
-Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
+Game.rooms['E17N2'].memory.tasks.spawnTasks.push({
     name: 'builder',
-    body: [...new Array(9).fill(WORK), ...new Array(9).fill(CARRY), ...new Array(9).fill(MOVE)],
-    memory: { role: 'builder', status: 0, targetRoom: 'E17N2' }
+    body: [...new Array(4).fill(WORK), ...new Array(8).fill(CARRY), ...new Array(4).fill(MOVE)],
+    memory: { role: 'builder', status: 0, targetRoom: 'E18N2' }
 });
 Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], 'builder2' + Game.time, { memory: { role: 'builder2', status: 0, targetRoom: 'W17S14' } });
 
@@ -31,10 +31,10 @@ Game.spawns['Spawn2_W18S15'].spawnCreep([...new Array(25).fill(CARRY), ...new Ar
 Game.spawns['Spawn2_W21S19'].spawnCreep([...new Array(25).fill(CARRY), ...new Array(25).fill(MOVE)], 'transporter' + Game.time, { memory: { role: 'transporter', base: 'W21S19', targetRoom: 'W20S21', workType: 1 } });
 Game.rooms['W16S17'].memory.tasks.spawnTasks.push({ name: 't', body: [...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], memory: { role: 'transporter', base: 'W16S17', targetRoom: 'W16S16', workType: 2 } });
 // defender
-Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
-    name: 'def',
+Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
+    name: 'bM',
     body: [...new Array(4).fill(MOVE), ...new Array(4).fill(ATTACK)],
-    memory: { role: 'defender' }
+    memory: { role: 'baseMelee' }
 });
 
 // scout
@@ -61,7 +61,7 @@ Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
     body: [...new Array(9).fill(MOVE), ...new Array(5).fill(RANGED_ATTACK), ...new Array(4).fill(HEAL)],
     memory: {
         role: 'rangeAtker',
-        targetRoom: 'E22N2',
+        targetRoom: 'E17N2',
     }
 });
 
@@ -84,6 +84,16 @@ Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(25).fill(WORK), ...new Arr
 
 _.forEach(_.filter(Game.rooms['W18S15'].find(FIND_STRUCTURES), structure => structure.structureType == STRUCTURE_TOWER), function (object) {
     object.destroy();
+});
+
+// outSourcer
+Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
+    name: 'outSourcer',
+    body: [...new Array(5).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(15).fill(MOVE)],
+    memory: {
+        role: 'outSourcer',
+        targetRoom: 'E18N2',
+    }
 });
 
 // if no tasks
@@ -138,7 +148,7 @@ Game.rooms.W19S17.memory.tasks.labTasks.push({ resourceType: 'OH', amount: 3000 
 
 
 // orders
-Game.rooms['W13S15'].terminal.send('X', 2000, 'W16S17', 'X');
+Game.rooms['E6S2'].terminal.send(RESOURCE_ENERGY, 30000, 'E2N6', 'From a remote friend');
 Game.rooms['W19S17'].terminal.send('XGHO2', 2000, 'W13S15', 'XGHO2');
 
 Game.market.deal('645bfc8403ae10376b827734', 4000, "W21S19");

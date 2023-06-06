@@ -131,7 +131,7 @@ module.exports = {
     // returns an object with the data to spawn a new creep
     spawnData: function (room, outSourceRoomName) {
         const stage = this.getStage(room);
-        const rInfo = room.memory.roomInfo;
+        let rInfo = Memory.rooms[outSourceRoomName] && Memory.rooms[outSourceRoomName].roomInfo;
 
         let name = this.properties.role + Game.time;
         let body = this.properties.stages[this.getStage(room)].bodyParts;
@@ -139,9 +139,9 @@ module.exports = {
         const existingThisTypeCreeps = _.filter(Game.creeps, creep => (
             creep.memory.role == this.properties.role && 
             creep.memory.targetRoom == outSourceRoomName &&
-            !(creep.ticksToLive < creep.body.length * 3)
+            creep.ticksToLive > creep.body.length * 3
         ));
-        
+
         let targetCount = {}
         existingThisTypeCreeps.forEach((creep) => {
             let targetId = creep.memory.target;
@@ -160,6 +160,7 @@ module.exports = {
         if(rInfo) {
             for(const index in rInfo.sourceInfo) {
                 let creepNeed = Math.min(this.properties.stages[stage].number, rInfo.sourceInfo[index].space);
+                console.log(index, creepNeed, targetCount[index], this.properties.stages[stage].number, rInfo.sourceInfo[index].space)
                 if (targetCount[index] >= creepNeed) continue;
                 sourceTarget = index;
                 break;

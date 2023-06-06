@@ -45,7 +45,10 @@ module.exports = {
                 creep.moveToNoCreep(closestSource);
                 return;
             }
-            else if (creep.moveToRoomAdv(creep.memory.targetRoom)) return;
+            else if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
+                creep.moveToRoom(creep.memory.targetRoom);
+                return;
+            }
 
             // keep lair logic
             if (Memory.outSourceRooms[creep.memory.targetRoom] && Memory.outSourceRooms[creep.memory.targetRoom].sourceKeeper === true) {
@@ -299,8 +302,11 @@ function withdrawByTarget(creep) {
 
 function takeNearResources(creep) {
     // pick up near resources
-    const nearResouce = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1, { filter: droped => creep.room.name != creep.memory.base || !droped.pos.findInRange(creep.room.controller, 4) });
-    if (nearResouce.length > 0) creep.pickup(nearResouce[0]);
+    const nearResouce = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1, { filter: droped => creep.room.name != creep.memory.base || droped.pos.findInRange(creep.room.controller, 4).length === 0 });
+    if (nearResouce.length > 0) {
+        let result = creep.pickup(nearResouce[0]);
+        if(result === OK && nearResouce[0].resourceType === RESOURCE_THORIUM) creep.memory.status = 1;
+    }
 
     // withdraw near rains
     const nearRain = creep.pos.findInRange(FIND_RUINS, 1, { filter: ruin => ruin.store.getUsedCapacity() > 0 });

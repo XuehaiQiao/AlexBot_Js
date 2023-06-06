@@ -2,6 +2,7 @@ const creepLogic = require('./creeps');
 const roomLogic = require('./room');
 const test = require('./test');
 const tools = require('./tools');
+const util = require('./util');
 require('./prototypes');
 
 module.exports.loop = function () {
@@ -32,6 +33,7 @@ module.exports.loop = function () {
      *            ROOM LOGICS
      * ====================================
      */
+    tools.visual(Game.rooms['E6S2']);
 
     // make a list of all of our rooms
     Game.myRooms = _.filter(Game.rooms, r => r.controller && r.controller.level > 0 && r.controller.my);

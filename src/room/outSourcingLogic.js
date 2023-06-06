@@ -5,7 +5,7 @@ module.exports = function(room) {
     if(Game.time % 100 !== 10) return;
     if(!roomInfo[room.name]) return;
 
-    let storagePos = roomInfo[room.name].storagePos;
+    let storagePos = roomInfo[room.name] && roomInfo[room.name].storagePos;
     if(!storagePos) storagePos = roomInfo[room.name].managerPos;
     if(!storagePos) return;
 

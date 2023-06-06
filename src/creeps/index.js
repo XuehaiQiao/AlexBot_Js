@@ -14,6 +14,9 @@ let creepLogic = {
     miner:          require('./miner'),
     mineralCarrier: require('./mineralCarrier'),
 
+    // base defenders
+    baseMelee:      require('./baseMelee'),
+
     // outpost harvest
     claimer:        require('./claimer'),
     outSourcer:     require('./outSourcer'),
@@ -30,7 +33,6 @@ let creepLogic = {
     medic:          require('./medic'),
     scout:          require('./scout'),
     rangeAtker:     require('./rangeAtker'),
-    
 }
 
 module.exports = creepLogic;

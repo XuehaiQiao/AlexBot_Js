@@ -3,6 +3,7 @@ const structureLogic = require("../structures");
 
 module.exports = {
     properties: {
+        role: 'builder',
         stages: {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, MOVE], number: 6, wall: 1000},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, CARRY, MOVE, WORK, CARRY, MOVE], number: 5, wall: 1000000},
@@ -30,31 +31,33 @@ module.exports = {
 
         // build
         if(creep.memory.building == 1) {
-            var targets;
-            
             // 1. build
-            targets = creep.room.find(FIND_CONSTRUCTION_SITES);
-            if(targets.length) {
-                if(creep.build(targets[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(targets[0], {visualizePathStyle: {stroke: '#ffffff'}});
+            var target = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
+            if(target) {
+                if(creep.build(target) == ERR_NOT_IN_RANGE) {
+                    creep.travelTo(target);
                 }
+                return;
+            }
+
+            if(!creep.room.controller || !creep.room.controller.my) {
                 return;
             }
 
             // 2. repair
             // targets: short wall & rampart
-            targets = _.filter(creep.room.find(FIND_STRUCTURES), structure => (
+            target = creep.pos.findClosestByRange(FIND_STRUCTURES), structure => (
                 (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART) && structure.hits < structureLogic.wall.getTargetHits(creep.room)
-            ))
+            );
 
-            if(targets.length > 0) {
-                if(creep.repair(targets[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(targets[0]);
+            if(target) {
+                if(creep.repair(target) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target);
                 }
                 return;
             }
             
-            if(targets.length == 0) {
+            if(!target) {
                 // if no tasks
                 if (roomInfo[creep.room.name]) {
                     creep.moveTo(roomInfo[creep.room.name].restPos);
@@ -64,7 +67,7 @@ module.exports = {
 
         }
         else {
-            var dropedResource = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount > creep.store.getCapacity() / 2});
+            var dropedResource = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {filter: resource => resource.resourceType == RESOURCE_ENERGY && resource.amount > creep.store.getFreeCapacity()});
             if (dropedResource) {
                 if(creep.pickup(dropedResource) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(dropedResource);
@@ -77,7 +80,7 @@ module.exports = {
             if (sourceRuin) {
                 // var resourceType = _.find(Object.keys(sourceRuin.store), resource => sourceRuin.store[resource] > 0);
                 if(creep.withdraw(sourceRuin, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(sourceRuin, {visualizePathStyle: {stroke: '#ffffff'}});
+                    creep.travelTo(sourceRuin);
                 }
                 return;
             }
@@ -86,7 +89,15 @@ module.exports = {
             if (storage && storage.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
                 // var resourceType = _.find(Object.keys(sourceRuin.store), resource => sourceRuin.store[resource] > 0);
                 if(creep.withdraw(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(storage, {visualizePathStyle: {stroke: '#ffffff'}});
+                    creep.travelTo(storage);
+                }
+                return;
+            }
+            var constainer = creep.pos.findClosestByRange(FIND_STRUCTURES, {filter: struct => struct.structureType === STRUCTURE_CONTAINER && struct.store[RESOURCE_ENERGY] >= creep.store.getFreeCapacity()});
+            if (constainer) {
+                // var resourceType = _.find(Object.keys(sourceRuin.store), resource => sourceRuin.store[resource] > 0);
+                if(creep.withdraw(constainer, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.travelTo(constainer);
                 }
                 return;
             }
@@ -97,7 +108,7 @@ module.exports = {
             }
             var source = sources[creep.memory.target];
             if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source, {visualizePathStyle: {stroke: '#ffaa00'}});
+                creep.travelTo(source);
             }
         }
     },

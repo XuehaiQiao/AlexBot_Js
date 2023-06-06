@@ -11,6 +11,7 @@ module.exports = {
     Z: {terminal: 4000, storage: [5000, 10000, 20000]},
     X: {terminal: 4000, storage: [10000, 20000, 30000]},
     G: {terminal: 4000, storage: [5000, 10000, 20000]},
+    T: {terminal: 10000, storage: [10000, 20000, 30000]},
 
     XUH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // attack
     XUHO2: {terminal: 4000, storage: [5000, 10000, 20000]}, // harvest
