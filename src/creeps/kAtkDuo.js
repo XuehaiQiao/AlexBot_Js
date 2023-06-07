@@ -85,7 +85,9 @@ module.exports = {
             return;
         }
 
-        this.atkPassingHostile(creep);
+        //this.atkPassingHostile(creep);
+
+        console.log(partner.hits, partner.hitsMax, creep.hits, creep.hitsMax);
 
         creep.moveTo(partner);
         if(partner.hits === partner.hitsMax && creep.hits === creep.hitsMax) {
@@ -95,10 +97,10 @@ module.exports = {
                 if(creep.heal(target) === ERR_NOT_IN_RANGE) creep.rangedHeal(target);
             }
         }
-        if(partner.hits === partner.hitsMax && creep.hits < creep.hitsMax) {
+        else if(partner.hits === partner.hitsMax && creep.hits < creep.hitsMax) {
             creep.heal(creep);
         }
-        if (creep.hits <= creep.hitsMax - 12 * creep.getActiveBodyparts(HEAL)) {
+        else if (creep.hits <= creep.hitsMax - 12 * creep.getActiveBodyparts(HEAL)) {
             creep.heal(creep);
         }
         else {

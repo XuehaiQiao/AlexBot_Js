@@ -2484,6 +2484,7 @@ module.exports = {
             if (creep.memory.targetSource != null) withdrawBySouce(creep);
             else if (creep.memory.targetId != null) withdrawByTarget(creep);
             else {
+                
                 let targetId = findTarget(creep);
                 if (targetId == null) {
                     if (creep.memory.targetSource == null) creep.memory.targetSource = findTargetSourceIndex(creep);
@@ -2597,16 +2598,16 @@ function findTarget(creep) {
     let targetQ = Memory.outSourceRooms[creep.room.name].haulerTargets;
     if (!targetQ || !targetQ.length) {
         let takenIds = _.map(creep.room.find(FIND_MY_CREEPS, { filter: creep => creep.role === 'remoteHauler' }), c => c.memory.targetId);
-        let containers = creep.room.find(FIND_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_CONTAINER && !takenIds.includes(struct.id) && struct.store.getUsedCapacity() > creep.store.getCapacity() });
+        let containers = creep.room.find(FIND_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_CONTAINER && !takenIds.includes(struct.id) && struct.store.getUsedCapacity() >= creep.store.getCapacity() });
         let dropedResources = creep.room.find(FIND_DROPPED_RESOURCES, { filter: resource => !takenIds.includes(resource.id) && resource.amount > creep.store.getCapacity() * 0.8 });
 
-        let targets = [...containers, ...dropedResources]
+        let targets = [...dropedResources, ...containers];
         Memory.outSourceRooms[creep.room.name].haulerTargets = _.map(targets, target => { return { id: target.id, amount: (target.store ? target.store.getUsedCapacity() : target.amount) } });
     }
     targetQ = Memory.outSourceRooms[creep.room.name].haulerTargets;
 
     while (targetQ.length > 0) {
-        let { id, amount } = targetQ[targetQ.length - 1];
+        let { id, amount } = targetQ[0];
         if (Game.getObjectById(id) && amount > creep.store.getFreeCapacity()) {
             targetQ[0].amount -= creep.store.getFreeCapacity();
             return id;
@@ -3467,7 +3468,7 @@ module.exports = {
             return;
         }
 
-        this.atkPassingHostile(creep);
+        console.log(partner.hits, partner.hitsMax, creep.hits, creep.hitsMax);
 
         creep.moveTo(partner);
         if(partner.hits === partner.hitsMax && creep.hits === creep.hitsMax) {
@@ -3477,10 +3478,10 @@ module.exports = {
                 if(creep.heal(target) === ERR_NOT_IN_RANGE) creep.rangedHeal(target);
             }
         }
-        if(partner.hits === partner.hitsMax && creep.hits < creep.hitsMax) {
+        else if(partner.hits === partner.hitsMax && creep.hits < creep.hitsMax) {
             creep.heal(creep);
         }
-        if (creep.hits <= creep.hitsMax - 12 * creep.getActiveBodyparts(HEAL)) {
+        else if (creep.hits <= creep.hitsMax - 12 * creep.getActiveBodyparts(HEAL)) {
             creep.heal(creep);
         }
         else {
