@@ -6,7 +6,7 @@ module.exports = {
             2: { maxEnergyCapacity: 550, bodyParts: [WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1 },
             3: { maxEnergyCapacity: 800, bodyParts: [WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1 },
             4: { maxEnergyCapacity: 1300, bodyParts: [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE], number: 1 },
-            7: { maxEnergyCapacity: 5600, bodyParts: [...new Array(12).fill(WORK), CARRY, CARRY, ...new Array(6).fill(MOVE)], number: 1 },
+            7: { maxEnergyCapacity: 5600, bodyParts: [...new Array(10).fill(WORK), CARRY, CARRY, ...new Array(6).fill(MOVE)], number: 1 },
         },
     },
     /** @param {Creep} creep **/
@@ -18,16 +18,16 @@ module.exports = {
 
         // keep lair logic
         if (Memory.outSourceRooms[creep.memory.targetRoom] && Memory.outSourceRooms[creep.memory.targetRoom].sourceKeeper === true) {
-            if(creep.memory.target !== undefined) {
+            if (creep.memory.target !== undefined) {
                 let source = creep.room.find(FIND_SOURCES)[creep.memory.target];
-                if(!creep.memory.keeperLairId) {
-                    creep.memory.keeperLairId = source.pos.findInRange(FIND_STRUCTURES, 5, {filter: struct => struct.structureType === STRUCTURE_KEEPER_LAIR})[0].id;
+                if (!creep.memory.keeperLairId) {
+                    creep.memory.keeperLairId = source.pos.findInRange(FIND_STRUCTURES, 5, { filter: struct => struct.structureType === STRUCTURE_KEEPER_LAIR })[0].id;
                 }
                 let keeperLair = Game.getObjectById(creep.memory.keeperLairId);
-                if(keeperLair.ticksToSpawn <= 12) {
+                if (keeperLair.ticksToSpawn <= 12) {
                     creep.memory.rest = 0;
-                    if(creep.store[RESOURCE_ENERGY] > 0) creep.drop(RESOURCE_ENERGY);
-                    if(creep.pos.getRangeTo(keeperLair) <= 5) creep.moveToRoomAdv(creep.memory.base);
+                    if (creep.store[RESOURCE_ENERGY] > 0) creep.drop(RESOURCE_ENERGY);
+                    if (creep.pos.getRangeTo(keeperLair) <= 5) creep.moveToRoomAdv(creep.memory.base);
                     return;
                 }
             }
@@ -45,7 +45,7 @@ module.exports = {
                 }
             }
         }
-        
+
         if (creep.memory.rest) {
             creep.memory.rest -= 1;
             return;
@@ -67,22 +67,22 @@ module.exports = {
             if (container && container.hits < container.hitsMax && container.store[RESOURCE_ENERGY] > 0) {
                 if (creep.store[RESOURCE_ENERGY] == 0) {
                     if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(container, {reusePath: 20, maxRooms: 1});
+                        creep.moveTo(container, { reusePath: 20, maxRooms: 1 });
                     }
                 }
                 creep.repair(container);
             }
             //build container if need
             else {
-                let constSites = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 3, {filter: site => site.structureType === STRUCTURE_CONTAINER});
-                if(constSites.length) {
-                    if(creep.store[RESOURCE_ENERGY] === 0) {
-                        let drops = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1, {filter: droped => droped.resourceType === RESOURCE_ENERGY});
+                let constSites = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 3, { filter: site => site.structureType === STRUCTURE_CONTAINER });
+                if (constSites.length) {
+                    if (creep.store[RESOURCE_ENERGY] === 0) {
+                        let drops = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1, { filter: droped => droped.resourceType === RESOURCE_ENERGY });
                         creep.pickup(drops[0]);
                     }
                     creep.build(constSites[0]);
                 }
-                else if(source.energy === 0) {
+                else if (source.energy === 0) {
                     creep.memory.rest = source.ticksToRegeneration;
                     return;
                 }
@@ -114,8 +114,8 @@ module.exports = {
 
         let totalNeeds = 0;
         const rInfo = Memory.rooms[roomName] && Memory.rooms[roomName].roomInfo;
-        if(rInfo) {
-            for(const sourceObj of rInfo.sourceInfo) {
+        if (rInfo) {
+            for (const sourceObj of rInfo.sourceInfo) {
                 totalNeeds += Math.min(this.properties.stages[stage].number, sourceObj.space);
             }
         }
@@ -137,15 +137,15 @@ module.exports = {
         let body = this.properties.stages[this.getStage(room)].bodyParts;
 
         const existingThisTypeCreeps = _.filter(Game.creeps, creep => (
-            creep.memory.role == this.properties.role && 
+            creep.memory.role == this.properties.role &&
             creep.memory.targetRoom == outSourceRoomName &&
-            creep.ticksToLive > creep.body.length * 3
+            (creep.ticksToLive > creep.body.length * 3 || creep.ticksToLive === undefined)
         ));
 
         let targetCount = {}
         existingThisTypeCreeps.forEach((creep) => {
             let targetId = creep.memory.target;
-            if(targetCount[targetId]) targetCount[targetId] += 1;
+            if (targetCount[targetId]) targetCount[targetId] += 1;
             else targetCount[targetId] = 1;
         });
 
@@ -154,24 +154,22 @@ module.exports = {
             sourceCount = Memory.outSourceRooms[outSourceRoomName].sourceNum;
         }
 
-        console.log("remoteHarvester", outSourceRoomName, JSON.stringify(targetCount));
-
         let sourceTarget = 0;
-        if(rInfo) {
-            for(const index in rInfo.sourceInfo) {
+        if (rInfo) {
+            for (const index in rInfo.sourceInfo) {
                 let creepNeed = Math.min(this.properties.stages[stage].number, rInfo.sourceInfo[index].space);
-                console.log(index, creepNeed, targetCount[index], this.properties.stages[stage].number, rInfo.sourceInfo[index].space)
                 if (targetCount[index] >= creepNeed) continue;
                 sourceTarget = index;
                 break;
             }
         }
         else {
-            for (var i = 0; i < sourceCount; i++) {
-                let creepNeed = this.properties.stages[stage].number;
-                if (targetCount[index] >= creepNeed) continue;
-                sourceTarget = index;
-                break;
+            let existingTargets = _.map(existingThisTypeCreeps, creep => creep.memory.target)
+            for (let i = 0; i < sourceCount; i++) {
+                if (!existingTargets.includes(i)) {
+                    sourceTarget = i;
+                    break;
+                }
             }
         }
 

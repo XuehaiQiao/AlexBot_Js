@@ -108,7 +108,7 @@ module.exports = {
 
         // create more upgrader2 for more energy in storage
         if (storage && storage.store[RESOURCE_ENERGY] > 200000) {
-            num += Math.min(Math.ceil((2 * storage.store[RESOURCE_ENERGY] + 300000) / (1 + storage.store.getFreeCapacity())), 4);
+            num += Math.min(Math.ceil((2 * storage.store[RESOURCE_ENERGY] + 200000) / (1 + storage.store.getFreeCapacity())), 4);
         }
 
         // return upgraders.length < num ? true : false;

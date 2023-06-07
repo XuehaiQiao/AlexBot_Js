@@ -52,11 +52,10 @@ module.exports = function (room) {
 
 // create labTasks if there are enough resources in the storage (recursive dfs-POT)
 // return value: false/array
-function createLabTasks(storage, resourceType, targetAmount, resourceTotal = {}) {
-    if (!storage) return false;
-
+function createLabTasks(room, resourceType, targetAmount, resourceTotal = {}) {
+    if(!room || !room.storage || !room.terminal) return false;
     // amount of resourceType still needs
-    let short = (resourceTotal[resourceType] ? resourceTotal[resourceType] : 0) + targetAmount - storage.store[resourceType];
+    let short = (resourceTotal[resourceType] ? resourceTotal[resourceType] : 0) + targetAmount - room.storage.store[resourceType] - room.terminal.store[resourceType];
     // resourceType is enough - no need for further reactions, add amount to resourceTotal and return [];
     if (short <= 0) {
         if (resourceTotal[resourceType]) resourceTotal[resourceType] += targetAmount;
@@ -70,14 +69,14 @@ function createLabTasks(storage, resourceType, targetAmount, resourceTotal = {})
     }
     // resourceType is not enough but can be produced by further reactions
     else {
-        // task amount range 200-2000
+        // task amount range 500-2000
         if (short > 2000) short = 2000;
-        else if (short < 1000) short = 1000;
+        else if (short < 500) short = 500;
 
         let taskList = [];
         for (const i in reactionResources[resourceType]) {
             let reactant = reactionResources[resourceType][i];
-            let subTasks = createLabTasks(storage, reactant, short, resourceTotal);
+            let subTasks = createLabTasks(room, reactant, short, resourceTotal);
             if (subTasks === false) return false;
             else taskList.push(...subTasks);
         }
@@ -190,7 +189,7 @@ function createTask(room, amountIndex) {
     let res = false;
     for (const compond in compondsRequirements) {
         let targetAmount = compondsRequirements[compond][amountIndex];
-        let createdTasks = createLabTasks(room.storage, compond, targetAmount);
+        let createdTasks = createLabTasks(room, compond, targetAmount);
         if (createdTasks.length > 0) {
             room.memory.tasks.labTasks.push(...createdTasks);
             res = true;

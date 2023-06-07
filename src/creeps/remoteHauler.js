@@ -39,13 +39,7 @@ module.exports = {
             if (takeNearResources(creep)) return;
 
             // move to room if not in
-            let tRoom = Game.rooms[creep.memory.targetRoom];
-            if (tRoom && creep.room.name != creep.memory.targetRoom) {
-                let closestSource = tRoom.find(FIND_SOURCES)[0];
-                creep.moveToNoCreep(closestSource);
-                return;
-            }
-            else if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
+            if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
                 creep.moveToRoom(creep.memory.targetRoom);
                 return;
             }
@@ -61,7 +55,7 @@ module.exports = {
             else {
                 let targetId = findTarget(creep);
                 if (targetId == null) {
-                    if (creep.memory.targetSourc == null) creep.memory.targetSource = findTargetSourceIndex(creep);
+                    if (creep.memory.targetSource == null) creep.memory.targetSource = findTargetSourceIndex(creep);
                     withdrawBySouce(creep);
                     return;
                 }
@@ -193,10 +187,10 @@ module.exports = {
 
 function findTarget(creep) {
     let targetQ = Memory.outSourceRooms[creep.room.name].haulerTargets;
-    if (!targetQ || targetQ.length === 0) {
-        let takenIds = _.map(creep.room.find(FIND_MY_CREEPS, { filter: creep => creep.role === 'remoteHauler' }), creep => creep.memory.targetId);
+    if (!targetQ || !targetQ.length) {
+        let takenIds = _.map(creep.room.find(FIND_MY_CREEPS, { filter: creep => creep.role === 'remoteHauler' }), c => c.memory.targetId);
         let containers = creep.room.find(FIND_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_CONTAINER && !takenIds.includes(struct.id) && struct.store.getUsedCapacity() > creep.store.getCapacity() });
-        let dropedResources = creep.room.find(FIND_DROPPED_RESOURCES, { filter: resource => !takenIds.includes(resource.id) && resource.amount > creep.store.getCapacity() });
+        let dropedResources = creep.room.find(FIND_DROPPED_RESOURCES, { filter: resource => !takenIds.includes(resource.id) && resource.amount > creep.store.getCapacity() * 0.8 });
 
         let targets = [...containers, ...dropedResources]
         Memory.outSourceRooms[creep.room.name].haulerTargets = _.map(targets, target => { return { id: target.id, amount: (target.store ? target.store.getUsedCapacity() : target.amount) } });
@@ -206,10 +200,10 @@ function findTarget(creep) {
     while (targetQ.length > 0) {
         let { id, amount } = targetQ[targetQ.length - 1];
         if (Game.getObjectById(id) && amount > creep.store.getFreeCapacity()) {
-            targetQ[targetQ.length - 1].amount -= creep.store.getFreeCapacity();
+            targetQ[0].amount -= creep.store.getFreeCapacity();
             return id;
         }
-        else targetQ.pop();
+        else targetQ.shift();
     }
 
     return null;

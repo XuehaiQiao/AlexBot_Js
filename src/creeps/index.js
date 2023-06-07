@@ -27,6 +27,8 @@ let creepLogic = {
     transporter:    require('./transporter'),
     defender:       require('./defender'),
     remoteMiner:    require('./remoteMiner'),
+    // outpost harvest v2
+    kAtkDuo:        require('./kAtkDuo'),
 
     // others
     wrecker:        require('./wrecker'),

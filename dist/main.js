@@ -85,7 +85,6 @@ module.exports.loop = function () {
      *            ROOM LOGICS
      * ====================================
      */
-    tools.visual(Game.rooms['E17N2']);
     Game.myRooms = _.filter(Game.rooms, r => r.controller && r.controller.level > 0 && r.controller.my);
 
     let totalRoomCpu = -Game.cpu.getUsed();
@@ -167,10 +166,11 @@ let creepLogic = {
     transporter:    __require(25,1),
     defender:       __require(26,1),
     remoteMiner:    __require(27,1),
-    wrecker:        __require(28,1),
-    medic:          __require(29,1),
-    scout:          __require(30,1),
-    rangeAtker:     __require(31,1),
+    kAtkDuo:        __require(28,1),
+    wrecker:        __require(29,1),
+    medic:          __require(30,1),
+    scout:          __require(31,1),
+    rangeAtker:     __require(32,1),
 }
 
 module.exports = creepLogic;
@@ -180,17 +180,17 @@ return module.exports;
 /********** Start module 2: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/index.js **********/
 __modules[2] = function(module, exports) {
 const roomLogic = {
-    spawning:           __require(32,2),
-    linkTransfer:       __require(33,2),
-    roomCensus:         __require(34,2),
-    exportStats:        __require(35,2),
-    labReaction:        __require(36,2),
-    resourceBalancing:  __require(37,2),
-    powerOperation:     __require(38,2),
-    factorayLogic:      __require(39,2),
-    marketLogic :       __require(40,2),
-    towerLogic:         __require(41,2),
-    roomInit:           __require(42,2),
+    spawning:           __require(33,2),
+    linkTransfer:       __require(34,2),
+    roomCensus:         __require(35,2),
+    exportStats:        __require(36,2),
+    labReaction:        __require(37,2),
+    resourceBalancing:  __require(38,2),
+    powerOperation:     __require(39,2),
+    factorayLogic:      __require(40,2),
+    marketLogic :       __require(41,2),
+    towerLogic:         __require(42,2),
+    roomInit:           __require(43,2),
 }
 
 module.exports = roomLogic;
@@ -200,7 +200,7 @@ return module.exports;
 /********** Start module 3: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/test/index.js **********/
 __modules[3] = function(module, exports) {
 const test = {
-    sandbox: __require(43,3),
+    sandbox: __require(44,3),
 }
 
 module.exports = test;
@@ -210,10 +210,10 @@ return module.exports;
 /********** Start module 4: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/index.js **********/
 __modules[4] = function(module, exports) {
 let tools = {
-    roomPlanner:  __require(44,4),
-    myRoomPlanner:  __require(45,4),
-    traveler:       __require(46,4),
-    visual:         __require(47,4),
+    roomPlanner:  __require(45,4),
+    myRoomPlanner:  __require(46,4),
+    traveler:       __require(47,4),
+    visual:         __require(48,4),
 }
 
 module.exports = tools;
@@ -223,8 +223,8 @@ return module.exports;
 /********** Start module 5: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/util/index.js **********/
 __modules[5] = function(module, exports) {
 const util = {
-    roomUtil: __require(48,5),
-    baseUtil: __require(49,5),
+    roomUtil: __require(49,5),
+    baseUtil: __require(50,5),
 }
 
 module.exports = util;
@@ -233,14 +233,14 @@ return module.exports;
 /********** End of module 5: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/util/index.js **********/
 /********** Start module 6: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/index.js **********/
 __modules[6] = function(module, exports) {
-__require(50,6);
 __require(51,6);
+__require(52,6);
 return module.exports;
 }
 /********** End of module 6: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/index.js **********/
 /********** Start module 7: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/harvester.js **********/
 __modules[7] = function(module, exports) {
-const { roomInfo } = __require(52,7);
+const { roomInfo } = __require(53,7);
 
 module.exports = {
         properties: {
@@ -538,8 +538,8 @@ return module.exports;
 /********** End of module 9: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/upgrader.js **********/
 /********** Start module 10: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/builder.js **********/
 __modules[10] = function(module, exports) {
-const { roomInfo } = __require(52,10);
-const structureLogic = __require(53,10);
+const { roomInfo } = __require(53,10);
+const structureLogic = __require(54,10);
 
 module.exports = {
     properties: {
@@ -681,8 +681,7 @@ module.exports = {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, WORK, MOVE, MOVE], number: 3},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, WORK, WORK, MOVE, MOVE], number: 2},
             3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
-            4: {maxEnergyCapacity: 1300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE], number: 1},
-            7: {maxEnergyCapacity: 5600, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], number: 1},
+            4: {maxEnergyCapacity: 1300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
         },
     },
 
@@ -782,7 +781,7 @@ return module.exports;
 /********** End of module 11: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/harvester2.js **********/
 /********** Start module 12: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/carrier2.js **********/
 __modules[12] = function(module, exports) {
-const { roomInfo } = __require(52,12);
+const { roomInfo } = __require(53,12);
 
 module.exports = {
     properties: {
@@ -953,7 +952,7 @@ return module.exports;
 /********** End of module 12: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/carrier2.js **********/
 /********** Start module 13: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/upgrader2.js **********/
 __modules[13] = function(module, exports) {
-const { roomInfo } = __require(52,13);
+const { roomInfo } = __require(53,13);
 
 module.exports = {
     properties: {
@@ -1046,7 +1045,7 @@ module.exports = {
             else return false;
         }
         if (storage && storage.store[RESOURCE_ENERGY] > 200000) {
-            num += Math.min(Math.ceil((2 * storage.store[RESOURCE_ENERGY] + 300000) / (1 + storage.store.getFreeCapacity())), 4);
+            num += Math.min(Math.ceil((2 * storage.store[RESOURCE_ENERGY] + 200000) / (1 + storage.store.getFreeCapacity())), 4);
         }
         return creepCount < num ? true : false;
     },
@@ -1138,8 +1137,8 @@ return module.exports;
 /********** End of module 13: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/upgrader2.js **********/
 /********** Start module 14: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/builder2.js **********/
 __modules[14] = function(module, exports) {
-const structureLogic = __require(53,14);
-const { roomInfo } = __require(52,14);
+const structureLogic = __require(54,14);
+const { roomInfo } = __require(53,14);
 
 module.exports = {
     properties: {
@@ -1281,8 +1280,8 @@ return module.exports;
 /********** End of module 14: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/builder2.js **********/
 /********** Start module 15: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/manager.js **********/
 __modules[15] = function(module, exports) {
-const { roomInfo, roomResourceConfig } = __require(52,15);
-const { commodities } = __require(54,15);
+const { roomInfo, roomResourceConfig } = __require(53,15);
+const { commodities } = __require(55,15);
 /*
     manager manage: link, storage, terminal, factory, power spawn, nuke.
     logic:
@@ -1663,8 +1662,8 @@ return module.exports;
 /********** End of module 16: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/miner.js **********/
 /********** Start module 17: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/mineralCarrier.js **********/
 __modules[17] = function(module, exports) {
-const { min } = __require(55,17);
-const { reactionResources } = __require(54,17);
+const { min } = __require(56,17);
+const { reactionResources } = __require(55,17);
 
 module.exports = {
     properties: {
@@ -2145,7 +2144,7 @@ return module.exports;
 /********** End of module 19: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/claimer.js **********/
 /********** Start module 20: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/outSourcer.js **********/
 __modules[20] = function(module, exports) {
-const { roomInfo } = __require(52,20);
+const { roomInfo } = __require(53,20);
 
 /*
 outSourcer1 - first generation out sourcer
@@ -2267,7 +2266,7 @@ module.exports = {
             2: { maxEnergyCapacity: 550, bodyParts: [WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1 },
             3: { maxEnergyCapacity: 800, bodyParts: [WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1 },
             4: { maxEnergyCapacity: 1300, bodyParts: [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE], number: 1 },
-            7: { maxEnergyCapacity: 5600, bodyParts: [...new Array(12).fill(WORK), CARRY, CARRY, ...new Array(6).fill(MOVE)], number: 1 },
+            7: { maxEnergyCapacity: 5600, bodyParts: [...new Array(10).fill(WORK), CARRY, CARRY, ...new Array(6).fill(MOVE)], number: 1 },
         },
     },
     /** @param {Creep} creep **/
@@ -2276,16 +2275,16 @@ module.exports = {
             return;
         }
         if (Memory.outSourceRooms[creep.memory.targetRoom] && Memory.outSourceRooms[creep.memory.targetRoom].sourceKeeper === true) {
-            if(creep.memory.target !== undefined) {
+            if (creep.memory.target !== undefined) {
                 let source = creep.room.find(FIND_SOURCES)[creep.memory.target];
-                if(!creep.memory.keeperLairId) {
-                    creep.memory.keeperLairId = source.pos.findInRange(FIND_STRUCTURES, 5, {filter: struct => struct.structureType === STRUCTURE_KEEPER_LAIR})[0].id;
+                if (!creep.memory.keeperLairId) {
+                    creep.memory.keeperLairId = source.pos.findInRange(FIND_STRUCTURES, 5, { filter: struct => struct.structureType === STRUCTURE_KEEPER_LAIR })[0].id;
                 }
                 let keeperLair = Game.getObjectById(creep.memory.keeperLairId);
-                if(keeperLair.ticksToSpawn <= 12) {
+                if (keeperLair.ticksToSpawn <= 12) {
                     creep.memory.rest = 0;
-                    if(creep.store[RESOURCE_ENERGY] > 0) creep.drop(RESOURCE_ENERGY);
-                    if(creep.pos.getRangeTo(keeperLair) <= 5) creep.moveToRoomAdv(creep.memory.base);
+                    if (creep.store[RESOURCE_ENERGY] > 0) creep.drop(RESOURCE_ENERGY);
+                    if (creep.pos.getRangeTo(keeperLair) <= 5) creep.moveToRoomAdv(creep.memory.base);
                     return;
                 }
             }
@@ -2303,7 +2302,7 @@ module.exports = {
                 }
             }
         }
-        
+
         if (creep.memory.rest) {
             creep.memory.rest -= 1;
             return;
@@ -2321,21 +2320,21 @@ module.exports = {
             if (container && container.hits < container.hitsMax && container.store[RESOURCE_ENERGY] > 0) {
                 if (creep.store[RESOURCE_ENERGY] == 0) {
                     if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(container, {reusePath: 20, maxRooms: 1});
+                        creep.moveTo(container, { reusePath: 20, maxRooms: 1 });
                     }
                 }
                 creep.repair(container);
             }
             else {
-                let constSites = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 3, {filter: site => site.structureType === STRUCTURE_CONTAINER});
-                if(constSites.length) {
-                    if(creep.store[RESOURCE_ENERGY] === 0) {
-                        let drops = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1, {filter: droped => droped.resourceType === RESOURCE_ENERGY});
+                let constSites = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 3, { filter: site => site.structureType === STRUCTURE_CONTAINER });
+                if (constSites.length) {
+                    if (creep.store[RESOURCE_ENERGY] === 0) {
+                        let drops = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1, { filter: droped => droped.resourceType === RESOURCE_ENERGY });
                         creep.pickup(drops[0]);
                     }
                     creep.build(constSites[0]);
                 }
-                else if(source.energy === 0) {
+                else if (source.energy === 0) {
                     creep.memory.rest = source.ticksToRegeneration;
                     return;
                 }
@@ -2363,8 +2362,8 @@ module.exports = {
 
         let totalNeeds = 0;
         const rInfo = Memory.rooms[roomName] && Memory.rooms[roomName].roomInfo;
-        if(rInfo) {
-            for(const sourceObj of rInfo.sourceInfo) {
+        if (rInfo) {
+            for (const sourceObj of rInfo.sourceInfo) {
                 totalNeeds += Math.min(this.properties.stages[stage].number, sourceObj.space);
             }
         }
@@ -2384,15 +2383,15 @@ module.exports = {
         let body = this.properties.stages[this.getStage(room)].bodyParts;
 
         const existingThisTypeCreeps = _.filter(Game.creeps, creep => (
-            creep.memory.role == this.properties.role && 
+            creep.memory.role == this.properties.role &&
             creep.memory.targetRoom == outSourceRoomName &&
-            creep.ticksToLive > creep.body.length * 3
+            (creep.ticksToLive > creep.body.length * 3 || creep.ticksToLive === undefined)
         ));
 
         let targetCount = {}
         existingThisTypeCreeps.forEach((creep) => {
             let targetId = creep.memory.target;
-            if(targetCount[targetId]) targetCount[targetId] += 1;
+            if (targetCount[targetId]) targetCount[targetId] += 1;
             else targetCount[targetId] = 1;
         });
 
@@ -2401,24 +2400,22 @@ module.exports = {
             sourceCount = Memory.outSourceRooms[outSourceRoomName].sourceNum;
         }
 
-        console.log("remoteHarvester", outSourceRoomName, JSON.stringify(targetCount));
-
         let sourceTarget = 0;
-        if(rInfo) {
-            for(const index in rInfo.sourceInfo) {
+        if (rInfo) {
+            for (const index in rInfo.sourceInfo) {
                 let creepNeed = Math.min(this.properties.stages[stage].number, rInfo.sourceInfo[index].space);
-                console.log(index, creepNeed, targetCount[index], this.properties.stages[stage].number, rInfo.sourceInfo[index].space)
                 if (targetCount[index] >= creepNeed) continue;
                 sourceTarget = index;
                 break;
             }
         }
         else {
-            for (var i = 0; i < sourceCount; i++) {
-                let creepNeed = this.properties.stages[stage].number;
-                if (targetCount[index] >= creepNeed) continue;
-                sourceTarget = index;
-                break;
+            let existingTargets = _.map(existingThisTypeCreeps, creep => creep.memory.target)
+            for (let i = 0; i < sourceCount; i++) {
+                if (!existingTargets.includes(i)) {
+                    sourceTarget = i;
+                    break;
+                }
             }
         }
 
@@ -2443,7 +2440,7 @@ return module.exports;
 /********** End of module 21: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/remoteHarvester.js **********/
 /********** Start module 22: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/remoteHauler.js **********/
 __modules[22] = function(module, exports) {
-const { roomInfo } = __require(52,22);
+const { roomInfo } = __require(53,22);
 
 /*
     NOT FINISHED
@@ -2477,13 +2474,7 @@ module.exports = {
             }
 
             if (takeNearResources(creep)) return;
-            let tRoom = Game.rooms[creep.memory.targetRoom];
-            if (tRoom && creep.room.name != creep.memory.targetRoom) {
-                let closestSource = tRoom.find(FIND_SOURCES)[0];
-                creep.moveToNoCreep(closestSource);
-                return;
-            }
-            else if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
+            if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
                 creep.moveToRoom(creep.memory.targetRoom);
                 return;
             }
@@ -2495,7 +2486,7 @@ module.exports = {
             else {
                 let targetId = findTarget(creep);
                 if (targetId == null) {
-                    if (creep.memory.targetSourc == null) creep.memory.targetSource = findTargetSourceIndex(creep);
+                    if (creep.memory.targetSource == null) creep.memory.targetSource = findTargetSourceIndex(creep);
                     withdrawBySouce(creep);
                     return;
                 }
@@ -2604,10 +2595,10 @@ module.exports = {
 
 function findTarget(creep) {
     let targetQ = Memory.outSourceRooms[creep.room.name].haulerTargets;
-    if (!targetQ || targetQ.length === 0) {
-        let takenIds = _.map(creep.room.find(FIND_MY_CREEPS, { filter: creep => creep.role === 'remoteHauler' }), creep => creep.memory.targetId);
+    if (!targetQ || !targetQ.length) {
+        let takenIds = _.map(creep.room.find(FIND_MY_CREEPS, { filter: creep => creep.role === 'remoteHauler' }), c => c.memory.targetId);
         let containers = creep.room.find(FIND_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_CONTAINER && !takenIds.includes(struct.id) && struct.store.getUsedCapacity() > creep.store.getCapacity() });
-        let dropedResources = creep.room.find(FIND_DROPPED_RESOURCES, { filter: resource => !takenIds.includes(resource.id) && resource.amount > creep.store.getCapacity() });
+        let dropedResources = creep.room.find(FIND_DROPPED_RESOURCES, { filter: resource => !takenIds.includes(resource.id) && resource.amount > creep.store.getCapacity() * 0.8 });
 
         let targets = [...containers, ...dropedResources]
         Memory.outSourceRooms[creep.room.name].haulerTargets = _.map(targets, target => { return { id: target.id, amount: (target.store ? target.store.getUsedCapacity() : target.amount) } });
@@ -2617,10 +2608,10 @@ function findTarget(creep) {
     while (targetQ.length > 0) {
         let { id, amount } = targetQ[targetQ.length - 1];
         if (Game.getObjectById(id) && amount > creep.store.getFreeCapacity()) {
-            targetQ[targetQ.length - 1].amount -= creep.store.getFreeCapacity();
+            targetQ[0].amount -= creep.store.getFreeCapacity();
             return id;
         }
-        else targetQ.pop();
+        else targetQ.shift();
     }
 
     return null;
@@ -2754,7 +2745,7 @@ __modules[23] = function(module, exports) {
 
 module.exports = {
     properties: {
-        role: 'keeperAttacker'
+        role: 'keeperAttacker',
     },
     /** @param {Creep} creep **/
     run: function(creep) {
@@ -2824,8 +2815,8 @@ return module.exports;
 /********** End of module 23: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/keeperAttacker.js **********/
 /********** Start module 24: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/invaderAttacker.js **********/
 __modules[24] = function(module, exports) {
-const { G } = __require(56,24);
-const { T3_HEAL, T3_TOUGH, T3_RANGE_ATTACK } = __require(57,24);
+const { G } = __require(57,24);
+const { T3_HEAL, T3_TOUGH, T3_RANGE_ATTACK } = __require(58,24);
 
 module.exports = {
     properties: {
@@ -3220,16 +3211,16 @@ return module.exports;
 /********** End of module 26: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/defender.js **********/
 /********** Start module 27: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/remoteMiner.js **********/
 __modules[27] = function(module, exports) {
-const { drop } = __require(55,27);
+const { drop } = __require(56,27);
 module.exports = {
     properties: {
         role: 'remoteMiner',
         body: [...new Array(32).fill(WORK), CARRY, CARRY, ...new Array(16).fill(MOVE)],
-        boostInfo: {UHO2: 32},
+        boostInfo: { UHO2: 32 },
     },
     /** @param {Creep} creep **/
-    run: function(creep) {
-        if(creep.memory.boost && !creep.memory.boosted && creep.memory.boostInfo) {
+    run: function (creep) {
+        if (creep.memory.boost && !creep.memory.boosted && creep.memory.boostInfo) {
             creep.getBoosts();
             return;
         }
@@ -3237,86 +3228,86 @@ module.exports = {
             return;
         }
 
-        if(!creep.memory.targetId) creep.memory.targetId = creep.room.find(FIND_MINERALS)[0].id;
+        if (!creep.memory.targetId) creep.memory.targetId = creep.room.find(FIND_MINERALS)[0].id;
         let mineral = Game.getObjectById(creep.memory.targetId);
 
-        if(keeperLairLogic(creep, mineral)) return;
+        if (keeperLairLogic(creep, mineral)) return;
 
-        if(creep.memory.rest) {
+        if (creep.memory.rest) {
             creep.memory.rest -= 1;
             return;
         }
 
         let container = Game.getObjectById(creep.memory.containerId);
-        if(container) {
+        if (container) {
             haveContainerMineLogic(creep, mineral, container);
         }
         else {
-            container = mineral.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType == STRUCTURE_CONTAINER})[0];
-            if(container) {
+            container = mineral.pos.findInRange(FIND_STRUCTURES, 1, { filter: struct => struct.structureType == STRUCTURE_CONTAINER })[0];
+            if (container) {
                 creep.memory.containerId = container.id;
                 haveContainerMineLogic(creep, mineral, container);
             }
             else noContainerMineLogic(creep, mineral);
         }
 
-        if(mineral.ticksToRegeneration > 0) {
+        if (mineral.ticksToRegeneration > 0) {
             Memory.outSourceRooms[creep.room.name].mineralRegenTime = Game.time + mineral.ticksToRegeneration;
         }
     },
-    spawn: function(room, roomName) {
-        if(room.energyCapacityAvailable < 5600) return false;
-        if(!Memory.outSourceRooms[roomName] || Memory.outSourceRooms[roomName].neutral !== true) return false;
-        
-        if(!Game.rooms[roomName]) return false;
+    spawn: function (room, roomName) {
+        if (room.energyCapacityAvailable < 5600) return false;
+        if (!Memory.outSourceRooms[roomName] || Memory.outSourceRooms[roomName].neutral !== true) return false;
+
+        if (!Game.rooms[roomName]) return false;
         mine = Game.rooms[roomName].find(FIND_MINERALS)[0];
-        if(mine.mineralAmount === 0) return false;
-        if(room.storage && room.storage.store[mine.resourceType] > 80000) return false;
+        if (mine.mineralAmount === 0) return false;
+        if (room.storage && room.storage.store[mine.resourceType] > 80000) return false;
         let creepCount;
-        if(global.roomCensus[roomName] && global.roomCensus[roomName][this.properties.role]) {
+        if (global.roomCensus[roomName] && global.roomCensus[roomName][this.properties.role]) {
             creepCount = global.roomCensus[roomName][this.properties.role]
         }
         else creepCount = 0;
-        
+
         if (creepCount < 1) {
             return true;
         }
     },
-    spawnData: function(room, outSourceRoomName) {
+    spawnData: function (room, outSourceRoomName) {
         let name = this.properties.role + Game.time;
         let body = this.properties.body;
         let memory = {
             role: this.properties.role,
-            base: room.name, 
+            base: room.name,
             targetRoom: outSourceRoomName,
             boost: true,
             boostInfo: this.properties.boostInfo
         };
 
-        return {name, body, memory};
+        return { name, body, memory };
     },
 };
 
-var haveContainerMineLogic = function(creep, mine, container) {
-    if(!creep.pos.isEqualTo(container.pos)) {
+var haveContainerMineLogic = function (creep, mine, container) {
+    if (!creep.pos.isEqualTo(container.pos)) {
         creep.moveToNoCreepInRoom(container);
         return;
     }
 
-    let drops = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1, {filter: droped => droped.resourceType === RESOURCE_ENERGY});
-    let tombs = creep.pos.findInRange(FIND_TOMBSTONES, 1, {filter: tomeb => tomeb.store[RESOURCE_ENERGY] > 0});
-    if(container.hits < container.hitsMax && (drops.length > 0 || tombs.length > 0)) {
+    let drops = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1, { filter: droped => droped.resourceType === RESOURCE_ENERGY });
+    let tombs = creep.pos.findInRange(FIND_TOMBSTONES, 1, { filter: tomeb => tomeb.store[RESOURCE_ENERGY] > 0 });
+    if (container.hits < container.hitsMax && (drops.length > 0 || tombs.length > 0)) {
         creep.say("repair")
         let nonEnergy = _.find(Object.keys(creep.store), resourceType => creep.store[resourceType] > 0 && resourceType !== RESOURCE_ENERGY);
-        if(nonEnergy) {
+        if (nonEnergy) {
             creep.drop(nonEnergy);
             return;
         }
 
-        if(creep.store[RESOURCE_ENERGY] === 0) {
-            if(drops.length) creep.pickup(drops[0]);
-            else if(tombs.length) creep.withdraw(tombs[0], RESOURCE_ENERGY);
-            else if(container.store[RESOURCE_ENERGY] > 0) creep.withdraw(container, RESOURCE_ENERGY);
+        if (creep.store[RESOURCE_ENERGY] === 0) {
+            if (drops.length) creep.pickup(drops[0]);
+            else if (tombs.length) creep.withdraw(tombs[0], RESOURCE_ENERGY);
+            else if (container.store[RESOURCE_ENERGY] > 0) creep.withdraw(container, RESOURCE_ENERGY);
         }
         creep.repair(container);
     }
@@ -3327,30 +3318,32 @@ var haveContainerMineLogic = function(creep, mine, container) {
     }
 };
 
-var noContainerMineLogic = function(creep, mine) {
-    if(creep.pos.getRangeTo(mine) > 1) {
+var noContainerMineLogic = function (creep, mine) {
+    if (creep.pos.getRangeTo(mine) > 1) {
         creep.moveToNoCreepInRoom(mine);
     }
 
-    let constSites = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 3, {filter: site => site.structureType === STRUCTURE_CONTAINER});
-    if(constSites.length) {
+    let constSites = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 3, { filter: site => site.structureType === STRUCTURE_CONTAINER });
+    let drops = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1, { filter: droped => droped.resourceType === RESOURCE_ENERGY });
+    let tombs = creep.pos.findInRange(FIND_TOMBSTONES, 1, { filter: tomeb => tomeb.store[RESOURCE_ENERGY] > 0 });
+    if (constSites.length && (drops.length || tombs.length)) {
         let nonEnergy = _.find(Object.keys(creep.store), resourceType => creep.store[resourceType] > 0 && resourceType !== RESOURCE_ENERGY);
-        if(nonEnergy) {
+        if (nonEnergy) {
             creep.drop(nonEnergy);
             return;
         }
 
-        if(creep.store[RESOURCE_ENERGY] === 0) {
-            let drops = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1, {filter: droped => droped.resourceType === RESOURCE_ENERGY});
-            let tombs = creep.pos.findInRange(FIND_TOMBSTONES, 1, {filter: tomeb => tomeb.store[RESOURCE_ENERGY] > 0});
-            if(drops.length) creep.pickup(drops[0]);
-            if(tombs.length) creep.withdraw(tombs[0], RESOURCE_ENERGY);
+        if (creep.store[RESOURCE_ENERGY] === 0) {
+            let drops = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1, { filter: droped => droped.resourceType === RESOURCE_ENERGY });
+            let tombs = creep.pos.findInRange(FIND_TOMBSTONES, 1, { filter: tomeb => tomeb.store[RESOURCE_ENERGY] > 0 });
+            if (drops.length) creep.pickup(drops[0]);
+            if (tombs.length) creep.withdraw(tombs[0], RESOURCE_ENERGY);
         }
         creep.build(constSites[0]);
     }
     else {
         let result = creep.harvest(mine);
-        if(result === OK) {
+        if (result === OK) {
             creep.memory.rest = 4;
         }
     }
@@ -3358,17 +3351,17 @@ var noContainerMineLogic = function(creep, mine) {
 
 function keeperLairLogic(creep, mineral) {
     if (Memory.outSourceRooms[creep.memory.targetRoom] && Memory.outSourceRooms[creep.memory.targetRoom].sourceKeeper === true) {
-        if(!creep.memory.keeperLairId) {
-            creep.memory.keeperLairId = mineral.pos.findInRange(FIND_STRUCTURES, 5, {filter: struct => struct.structureType === STRUCTURE_KEEPER_LAIR})[0].id;
+        if (!creep.memory.keeperLairId) {
+            creep.memory.keeperLairId = mineral.pos.findInRange(FIND_STRUCTURES, 5, { filter: struct => struct.structureType === STRUCTURE_KEEPER_LAIR })[0].id;
         }
         let keeperLair = Game.getObjectById(creep.memory.keeperLairId);
-        if(keeperLair.ticksToSpawn <= 12) {
+        if (keeperLair.ticksToSpawn <= 12) {
             creep.memory.rest = 0;
-            if(creep.store.getUsedCapacity() > 0) {
+            if (creep.store.getUsedCapacity() > 0) {
                 let resourceType = _.find(Object.keys(creep.store), rt => creep.store[rt] > 0);
                 creep.drop(resourceType);
             }
-            if(creep.pos.getRangeTo(keeperLair) <= 4) creep.moveToRoomAdv(creep.memory.base);
+            if (creep.pos.getRangeTo(keeperLair) <= 4) creep.moveToRoomAdv(creep.memory.base);
             return true;
         }
 
@@ -3376,11 +3369,11 @@ function keeperLairLogic(creep, mineral) {
         if (hostileCreep) {
             let distance = creep.pos.getRangeTo(hostileCreep);
 
-            if (distance < 3) {
+            if (distance <= 4) {
                 creep.moveToRoomAdv(creep.memory.base);
                 return true;
             }
-            else if (distance <= 6) {
+            else if (distance <= 5) {
                 return true;
             }
         }
@@ -3391,8 +3384,231 @@ function keeperLairLogic(creep, mineral) {
 return module.exports;
 }
 /********** End of module 27: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/remoteMiner.js **********/
-/********** Start module 28: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/wrecker.js **********/
+/********** Start module 28: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/kAtkDuo.js **********/
 __modules[28] = function(module, exports) {
+// todo
+
+module.exports = {
+    properties: {
+        role: 'kAtkDuo',
+        type: {
+            front: {
+                body: [...new Array(6).fill(RANGED_ATTACK), ...new Array(25).fill(MOVE), ...new Array(19).fill(ATTACK)] // $3670,
+            },
+            back: {
+                body: [...new Array(15).fill(HEAL), ...new Array(15).fill(MOVE)], // $4500
+            }
+        }
+
+    },
+    /** @param {Creep} creep **/
+    run: function (creep) {
+        if (creep.memory.type === 'front') this.runFront(creep);
+        else if (creep.memory.type === 'back') this.runBack(creep);
+    },
+
+    runFront: function (creep) {
+        if (!creep.memory.back) {
+            creep.toResPos(0);
+            return;
+        }
+
+        this.atkPassingHostile(creep);
+
+        let partner = Game.getObjectById(creep.memory.back);
+        if (!partner) {
+            creep.memory.role = 'keeperAttacker';
+            return;
+        }
+        else if (!creep.pos.isNearTo(partner) && !creep.isAtEdge()) {
+            return;
+        }
+        else {
+            creep.pull(partner);
+            if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
+                creep.moveToRoom(creep.memory.targetRoom);
+                return;
+            }
+
+            let actions = [
+                this.atkPlayer, // todo
+                this.atkInvader,
+                this.atkSourceKeeper
+            ]
+
+            for (let action of actions) {
+                if (action(creep)) return;
+            }
+        }
+    },
+
+    runBack: function (creep) {
+        if (creep.spawning) return;
+
+        if (!creep.memory.front) {
+            let partner = creep.room.find(FIND_MY_CREEPS, {
+                filter: c => (
+                    c.memory.role === this.properties.role &&
+                    c.memory.type === 'front' &&
+                    !c.memory.back &&
+                    c.memory.targetRoom === creep.memory.targetRoom
+                )
+            })[0]
+
+            if (partner) {
+                creep.memory.front = partner.id;
+                partner.memory.back = creep.id;
+            }
+            else creep.toResPos(0);
+        }
+
+        let partner = Game.getObjectById(creep.memory.front);
+        if (!partner) {
+            return;
+        }
+
+        this.atkPassingHostile(creep);
+
+        creep.moveTo(partner);
+        if(partner.hits === partner.hitsMax && creep.hits === creep.hitsMax) {
+            let adjCreeps = creep.pos.findInRange(FIND_MY_CREEPS, 3, {filter: c => c.hits < c.hitsMax});
+            if(adjCreeps.length > 0) {
+                let target = creep.pos.findClosestByRange(adjCreeps);
+                if(creep.heal(target) === ERR_NOT_IN_RANGE) creep.rangedHeal(target);
+            }
+        }
+        if(partner.hits === partner.hitsMax && creep.hits < creep.hitsMax) {
+            creep.heal(creep);
+        }
+        if (creep.hits <= creep.hitsMax - 12 * creep.getActiveBodyparts(HEAL)) {
+            creep.heal(creep);
+        }
+        else {
+            creep.heal(partner);
+            if(!creep.pos.isNearTo(partner)) creep.rangedHeal(partner);
+        }
+    },
+
+    atkPlayer: function (creep) {
+        return false;
+    },
+
+    atkInvader: function (creep) {
+        let invaders = creep.room.find(FIND_HOSTILE_CREEPS, { filter: c => c.owner.username === 'Invader' });
+        if (invaders.length) {
+            let invader;
+            let medic = creep.pos.findClosestByRange(invaders, { filter: invader => invader.getActiveBodyparts(HEAL) > 0 });
+            if (medic) invader = medic;
+            else invader = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: c => c.owner.username === 'Invader' });
+
+            if (creep.pos.getRangeTo(invader) > 3) {
+                creep.travelTo(invader, { allowSK: true, movingTarget: true });
+            }
+            else {
+                let result = creep.attack(invader);
+                creep.say(result);
+                creep.rangedAttack(invader);
+                if(result === ERR_NOT_IN_RANGE) {
+                    creep.heal(creep);
+                }
+                creep.moveTo(invader);
+            }
+            return true;
+        }
+        return false;
+    },
+
+    atkSourceKeeper: function (creep) {
+        let targetKeeper = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: creep => creep.owner.username === 'Source Keeper' });
+        if (targetKeeper) {
+            if(creep.attack(targetKeeper) === ERR_NOT_IN_RANGE) {
+                creep.heal(creep);
+                creep.moveTo(targetKeeper);
+            }
+            creep.rangedAttack(targetKeeper);
+        }
+        else {
+            let targetLairs = creep.room.find(FIND_HOSTILE_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_KEEPER_LAIR });
+            if (targetLairs.length === 0) {
+                console.log(creep.room, 'NO KEEPER LAIR!');
+                return false;
+            };
+
+            targetLairs.sort((a, b) => a.ticksToSpawn - b.ticksToSpawn);
+
+            if (!creep.pos.inRangeTo(targetLairs[0].pos, 1)) {
+                creep.moveToNoCreepInRoom(targetLairs[0]);
+            }
+            creep.heal(creep);
+        }
+
+        return true;
+    },
+
+    atkPassingHostile(creep) {
+        let hostiles = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3);
+        if (hostiles.length) {
+            let target = creep.pos.findClosestByRange(hostiles);
+            creep.attack(target)
+            creep.rangedAttack(target);
+        }
+
+        return false;
+    },
+    spawn: function (room, targetRoomName) {
+        if (!Memory.outSourceRooms[targetRoomName]) return false;
+        if (Memory.outSourceRooms[targetRoomName].sourceKeeper !== true || Memory.outSourceRooms[targetRoomName].neutral !== true) return false;
+        if (room.energyCapacityAvailable < 5600) return false;
+
+        let creeps = _.filter(Game.creeps, c => (
+            c.memory.role === this.properties.role &&
+            c.memory.targetRoom === targetRoomName &&
+            (c.ticksToLive > c.body.length * 3 + 50 || c.ticksToLive === undefined)
+        ));
+
+        let workingFront = _.find(creeps, c => c.memory.back != null);
+        if (workingFront) return false
+
+        let waitings = _.filter(creeps, c => c.memory.front == null && c.memory.back == null);
+        
+        console.log('waitings', waitings);
+        if (waitings.length < 2) {
+            return true;
+        }
+    },
+    spawnData: function (room, targetRoomName) {
+        let creeps = _.filter(Game.creeps, c => (
+            c.memory.role === this.properties.role &&
+            c.memory.targetRoom === targetRoomName
+        ));
+        let waitings = _.filter(creeps, c => (c.memory.front == null && c.memory.back == null));
+
+        let name;
+        let body;
+        let memory;
+
+        if(waitings.length < 1) {
+            name = this.properties.role + 'F' + Game.time % 10000;
+            body = this.properties.type.front.body;
+            memory = { role: this.properties.role, base: room.name, targetRoom: targetRoomName, type: 'front', back: null };
+
+        }
+        else {
+            name = this.properties.role + 'B' + Game.time % 10000;
+            body = this.properties.type.back.body;
+            memory = { role: this.properties.role, base: room.name, targetRoom: targetRoomName, type: 'back', front: null };
+        }
+
+        return { name, body, memory };
+    },
+
+
+};
+return module.exports;
+}
+/********** End of module 28: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/kAtkDuo.js **********/
+/********** Start module 29: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/wrecker.js **********/
+__modules[29] = function(module, exports) {
 module.exports = {
     properties: {
         role: "wrecker"
@@ -3443,9 +3659,9 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 28: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/wrecker.js **********/
-/********** Start module 29: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/medic.js **********/
-__modules[29] = function(module, exports) {
+/********** End of module 29: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/wrecker.js **********/
+/********** Start module 30: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/medic.js **********/
+__modules[30] = function(module, exports) {
 module.exports = {
     properties: {
         role: "medic"
@@ -3503,9 +3719,9 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 29: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/medic.js **********/
-/********** Start module 30: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/scout.js **********/
-__modules[30] = function(module, exports) {
+/********** End of module 30: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/medic.js **********/
+/********** Start module 31: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/scout.js **********/
+__modules[31] = function(module, exports) {
 module.exports = {
     properties: {
         role: "scout"
@@ -3576,10 +3792,10 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 30: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/scout.js **********/
-/********** Start module 31: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/rangeAtker.js **********/
-__modules[31] = function(module, exports) {
-const { T3_HEAL, T3_TOUGH, T3_RANGE_ATTACK } = __require(57,31);
+/********** End of module 31: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/scout.js **********/
+/********** Start module 32: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/rangeAtker.js **********/
+__modules[32] = function(module, exports) {
+const { T3_HEAL, T3_TOUGH, T3_RANGE_ATTACK } = __require(58,32);
 
 module.exports = {
     properties: {
@@ -3707,11 +3923,11 @@ function attackInDistance(creep, hostile, range) {
 }
 return module.exports;
 }
-/********** End of module 31: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/rangeAtker.js **********/
-/********** Start module 32: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/spawning.js **********/
-__modules[32] = function(module, exports) {
-const { roomInfo } = __require(52,32);
-const creepLogic = __require(1,32);
+/********** End of module 32: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/creeps/rangeAtker.js **********/
+/********** Start module 33: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/spawning.js **********/
+__modules[33] = function(module, exports) {
+const { roomInfo } = __require(53,33);
+const creepLogic = __require(1,33);
 
 module.exports = function (room) {
     if (room.name === 'E16S2' && Game.time % 1200 === 500) {
@@ -3732,22 +3948,22 @@ module.exports = function (room) {
     for (const remoteRoomName of room.memory.outSourceRooms) {
         const roomMemory = Memory.outSourceRooms[remoteRoomName];
         if (!roomMemory) return false;
-        if(roomMemory.invaderCore) {
-            if(roomMemory.invaderCore.endTime > Game.time) continue;
+        if (roomMemory.invaderCore) {
+            if (roomMemory.invaderCore.endTime > Game.time) continue;
             else roomMemory.invaderCore = null;
         }
-        
+
         if (remoteDefenceCreeps(room, idleSpawn, remoteRoomName, roomMemory)) return;
     }
 
     for (const remoteRoomName of room.memory.outSourceRooms) {
         const roomMemory = Memory.outSourceRooms[remoteRoomName];
         if (!roomMemory) return false;
-        if(roomMemory.invaderCore) {
-            if(roomMemory.invaderCore.endTime > Game.time) continue;
+        if (roomMemory.invaderCore) {
+            if (roomMemory.invaderCore.endTime > Game.time) continue;
             else roomMemory.invaderCore = null;
         }
-        
+
         if (remoteSourcingCreeps(room, idleSpawn, remoteRoomName, roomMemory)) return;
     }
 }
@@ -3768,7 +3984,7 @@ function spawnCreep(room, spawn, creepSpawnData) {
 
 function createCoreCreep(room, spawn) {
     coreTypes = ['carrier2', 'harvester2', 'manager', 'upgrader2', 'builder2', 'miner', 'mineralCarrier'];
-    if(room.energyCapacityAvailable < 550) {
+    if (room.energyCapacityAvailable < 550) {
         coreTypes = ['harvester2', 'carrier2', 'upgrader2', 'builder2'];
     }
     let creepTypeNeeded = _.find(coreTypes, type => creepLogic[type].spawn(room));
@@ -3789,11 +4005,11 @@ function createTaskCreep(room, spawn) {
     let spawnTasks = room.memory.tasks.spawnTasks;
     if (spawnTasks.length) {
         const task = spawnTasks[0];
-        
+
         let spawnData = JSON.parse(JSON.stringify(task));
         spawnData.name += Game.time % 10000;
-        
-        if(!spawnData.memory.base) spawnData.memory.base = room.name;
+
+        if (!spawnData.memory.base) spawnData.memory.base = room.name;
         if (spawnCreep(room, spawn, spawnData) === OK) {
             spawnTasks.shift();
             return true;
@@ -3815,52 +4031,24 @@ function remoteDefenceCreeps(room, spawn, roomName, roomMemory) {
     if (!remoteRoom) return false;
     const invaderCore = _.find(remoteRoom.find(FIND_HOSTILE_STRUCTURES), struct => struct.structureType == STRUCTURE_INVADER_CORE);
     if (invaderCore) {
-        switch (invaderCore.level) {
-            case 0:
-                if (creepLogic['defender'].spawn(room, roomName)) {
-                    spawnCreep(room, spawn, creepLogic['defender'].spawnData(room, roomName, invaderCore.id));
-                    return true;
-                }
-                break;
-            case 1:
-                if (creepLogic['rangeAtker'].spawn(room, roomName) && (invaderCore.ticksToDeploy < 250 || invaderCore.ticksToDeploy === undefined)) {
-                    spawnCreep(room, spawn, creepLogic['rangeAtker'].spawnData(room, roomName, { invader: true }));
-                    return true;
-                }
-                break;
-            case 2:
-                if (creepLogic['rangeAtker'].spawn(room, roomName) && (invaderCore.ticksToDeploy < 250 || invaderCore.ticksToDeploy === undefined)) {
-                    spawnCreep(room, spawn, creepLogic['rangeAtker'].spawnData(room, roomName, { invader: true }));
-                    return true;
-                }
-                break;
-            case 3:
-                if (invaderCore.ticksToDeploy < 1500 || invaderCore.ticksToDeploy === undefined) {
-                    roomMemory.invaderCore = {level: invaderCore.level, endTime: Game.time + 70000 + invaderCore.ticksToDeploy};
-                    return false;
-                }
-                break;
-            case 4:
-                if (invaderCore.ticksToDeploy < 1500 || invaderCore.ticksToDeploy === undefined) {
-                    roomMemory.invaderCore = {level: invaderCore.level, endTime: Game.time + 70000 + invaderCore.ticksToDeploy};
-                    return false;
-                }
-                break;
-            case 5:
-                if (invaderCore.ticksToDeploy < 1500 || invaderCore.ticksToDeploy === undefined) {
-                    roomMemory.invaderCore = {level: invaderCore.level, endTime: Game.time + 70000 + invaderCore.ticksToDeploy};
-                    return false;
-                }
-                break;
-            default:
-                console.log(roomName, 'invaderCore level:', invaderCore.level);
+        if(invaderCore.level === 0) {
+            if (creepLogic['defender'].spawn(room, roomName)) {
+                spawnCreep(room, spawn, creepLogic['defender'].spawnData(room, roomName, invaderCore.id));
+                return true;
+            }
+        }
+        else if(invaderCore.ticksToDeploy < 1500 || invaderCore.ticksToDeploy === undefined) {
+            roomMemory.invaderCore = { level: invaderCore.level, endTime: Game.time + 70000 + invaderCore.ticksToDeploy };
+            return false;
         }
     }
+                
 
     const hostileParts = [ATTACK, RANGED_ATTACK, WORK, HEAL, CLAIM]
-    const hostileCreeps = remoteRoom.find(FIND_HOSTILE_CREEPS, { filter: c => 
-        c.owner.username !== 'Source Keeper' &&
-        _.find(hostileParts, partType => c.getActiveBodyparts(partType) > 0)
+    const hostileCreeps = remoteRoom.find(FIND_HOSTILE_CREEPS, {
+        filter: c =>
+            c.owner.username !== 'Source Keeper' &&
+            _.find(hostileParts, partType => c.getActiveBodyparts(partType) > 0)
     });
     if (hostileCreeps.length) {
         if (!roomMemory.neutral) {
@@ -3871,11 +4059,6 @@ function remoteDefenceCreeps(room, spawn, roomName, roomMemory) {
             }
         }
         else {
-            if (creepLogic['invaderAttacker'].spawn(room, roomName)) {
-                spawnCreep(room, spawn, creepLogic['invaderAttacker'].spawnData(room, roomName));
-                console.log('invaderAtker')
-                return true;
-            }
         }
     }
 
@@ -3883,7 +4066,7 @@ function remoteDefenceCreeps(room, spawn, roomName, roomMemory) {
 }
 
 function remoteSourcingCreeps(room, spawn, roomName, roomMemory) {
-    if(Game.rooms[roomName] && Game.rooms[roomName].find(FIND_HOSTILE_CREEPS).length) return false;
+    if(roomName === 'E16S4') console.log(roomName, '1231232312')
 
     if (!roomMemory.neutral) {
         let outSourceTypes = ['claimer', 'remoteHarvester', 'remoteHauler'];
@@ -3896,8 +4079,9 @@ function remoteSourcingCreeps(room, spawn, roomName, roomMemory) {
     }
     else {
         if (room.energyCapacityAvailable < 5600) return false;
-        let outSourceTypes = ['keeperAttacker', 'remoteHarvester', 'remoteHauler', 'remoteMiner'];
+        let outSourceTypes = ['kAtkDuo', 'remoteHarvester', 'remoteHauler', 'remoteMiner'];
         for (const cType of outSourceTypes) {
+            if(roomName === 'E16S4') console.log(creepLogic[cType].spawn(room, roomName), cType)
             if (creepLogic[cType].spawn(room, roomName)) {
                 spawnCreep(room, spawn, creepLogic[cType].spawnData(room, roomName));
                 return true;
@@ -3909,10 +4093,10 @@ function remoteSourcingCreeps(room, spawn, roomName, roomMemory) {
 }
 return module.exports;
 }
-/********** End of module 32: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/spawning.js **********/
-/********** Start module 33: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/linkTransfer.js **********/
-__modules[33] = function(module, exports) {
-const { roomInfo } = __require(52,33);
+/********** End of module 33: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/spawning.js **********/
+/********** Start module 34: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/linkTransfer.js **********/
+__modules[34] = function(module, exports) {
+const { roomInfo } = __require(53,34);
 
 module.exports = function(room) {
     if (!roomInfo[room.name] || !roomInfo[room.name].managerPos) {
@@ -3993,9 +4177,9 @@ function updateLinkInfo(room) {
 };
 return module.exports;
 }
-/********** End of module 33: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/linkTransfer.js **********/
-/********** Start module 34: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/roomCensus.js **********/
-__modules[34] = function(module, exports) {
+/********** End of module 34: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/linkTransfer.js **********/
+/********** Start module 35: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/roomCensus.js **********/
+__modules[35] = function(module, exports) {
 module.exports = function() {
     global.roomCensus = {};
     _.forEach(Game.creeps, creep => {
@@ -4030,9 +4214,9 @@ function addInCensusObj(creep, roomName, role) {
 }
 return module.exports;
 }
-/********** End of module 34: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/roomCensus.js **********/
-/********** Start module 35: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/exportStats.js **********/
-__modules[35] = function(module, exports) {
+/********** End of module 35: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/roomCensus.js **********/
+/********** Start module 36: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/exportStats.js **********/
+__modules[36] = function(module, exports) {
 // Call this function at the end of your main loop
 function exportStats() {
     Memory.stats = {
@@ -4067,12 +4251,12 @@ function exportStats() {
 module.exports = exportStats;
 return module.exports;
 }
-/********** End of module 35: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/exportStats.js **********/
-/********** Start module 36: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/labReaction.js **********/
-__modules[36] = function(module, exports) {
-const { transferTask, LabTask } = __require(58,36);
-const { reactionResources } = __require(54,36);
-const { compondsRequirements } = __require(52,36);
+/********** End of module 36: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/exportStats.js **********/
+/********** Start module 37: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/labReaction.js **********/
+__modules[37] = function(module, exports) {
+const { transferTask, LabTask } = __require(59,37);
+const { reactionResources } = __require(55,37);
+const { compondsRequirements } = __require(53,37);
 
 
 module.exports = function (room) {
@@ -4110,9 +4294,9 @@ module.exports = function (room) {
     }
     runLab(room);
 };
-function createLabTasks(storage, resourceType, targetAmount, resourceTotal = {}) {
-    if (!storage) return false;
-    let short = (resourceTotal[resourceType] ? resourceTotal[resourceType] : 0) + targetAmount - storage.store[resourceType];
+function createLabTasks(room, resourceType, targetAmount, resourceTotal = {}) {
+    if(!room || !room.storage || !room.terminal) return false;
+    let short = (resourceTotal[resourceType] ? resourceTotal[resourceType] : 0) + targetAmount - room.storage.store[resourceType] - room.terminal.store[resourceType];
     if (short <= 0) {
         if (resourceTotal[resourceType]) resourceTotal[resourceType] += targetAmount;
         else resourceTotal[resourceType] = targetAmount;
@@ -4124,12 +4308,12 @@ function createLabTasks(storage, resourceType, targetAmount, resourceTotal = {})
     }
     else {
         if (short > 2000) short = 2000;
-        else if (short < 1000) short = 1000;
+        else if (short < 500) short = 500;
 
         let taskList = [];
         for (const i in reactionResources[resourceType]) {
             let reactant = reactionResources[resourceType][i];
-            let subTasks = createLabTasks(storage, reactant, short, resourceTotal);
+            let subTasks = createLabTasks(room, reactant, short, resourceTotal);
             if (subTasks === false) return false;
             else taskList.push(...subTasks);
         }
@@ -4232,7 +4416,7 @@ function createTask(room, amountIndex) {
     let res = false;
     for (const compond in compondsRequirements) {
         let targetAmount = compondsRequirements[compond][amountIndex];
-        let createdTasks = createLabTasks(room.storage, compond, targetAmount);
+        let createdTasks = createLabTasks(room, compond, targetAmount);
         if (createdTasks.length > 0) {
             room.memory.tasks.labTasks.push(...createdTasks);
             res = true;
@@ -4252,10 +4436,10 @@ function createTask(room, amountIndex) {
 }
 return module.exports;
 }
-/********** End of module 36: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/labReaction.js **********/
-/********** Start module 37: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/resourceBalancing.js **********/
-__modules[37] = function(module, exports) {
-const { roomResourceConfig } = __require(52,37);
+/********** End of module 37: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/labReaction.js **********/
+/********** Start module 38: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/resourceBalancing.js **********/
+__modules[38] = function(module, exports) {
+const { roomResourceConfig } = __require(53,38);
 
 module.exports = function(myRooms) {
     if(Game.time % 200 == 45) {
@@ -4307,9 +4491,9 @@ module.exports = function(myRooms) {
 };
 return module.exports;
 }
-/********** End of module 37: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/resourceBalancing.js **********/
-/********** Start module 38: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/powerOperation.js **********/
-__modules[38] = function(module, exports) {
+/********** End of module 38: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/resourceBalancing.js **********/
+/********** Start module 39: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/powerOperation.js **********/
+__modules[39] = function(module, exports) {
 module.exports = function(room) {
 
     if(room.controller.level == 8) {
@@ -4327,9 +4511,9 @@ module.exports = function(room) {
 };
 return module.exports;
 }
-/********** End of module 38: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/powerOperation.js **********/
-/********** Start module 39: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/factorayLogic.js **********/
-__modules[39] = function(module, exports) {
+/********** End of module 39: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/powerOperation.js **********/
+/********** Start module 40: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/factorayLogic.js **********/
+__modules[40] = function(module, exports) {
 module.exports = function(room) {
     if(room.level < 7) return;
     let factory = _.find(room.find(FIND_MY_STRUCTURES), struct => struct.structureType === STRUCTURE_FACTORY);
@@ -4340,9 +4524,9 @@ module.exports = function(room) {
 }
 return module.exports;
 }
-/********** End of module 39: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/factorayLogic.js **********/
-/********** Start module 40: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/marketLogic.js **********/
-__modules[40] = function(module, exports) {
+/********** End of module 40: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/factorayLogic.js **********/
+/********** Start module 41: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/marketLogic.js **********/
+__modules[41] = function(module, exports) {
 module.exports = function() {
     if(Game.time % 10 !== 10) return;
     
@@ -4379,10 +4563,10 @@ module.exports = function() {
 }
 return module.exports;
 }
-/********** End of module 40: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/marketLogic.js **********/
-/********** Start module 41: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/towerLogic.js **********/
-__modules[41] = function(module, exports) {
-const { wall, rampart } = __require(53,41);
+/********** End of module 41: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/marketLogic.js **********/
+/********** Start module 42: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/towerLogic.js **********/
+__modules[42] = function(module, exports) {
+const { wall, rampart } = __require(54,42);
 
 module.exports = function (room) {
     const towers = room.find(FIND_MY_STRUCTURES, {filter: struct => struct.structureType == STRUCTURE_TOWER && struct.store[RESOURCE_ENERGY] >= 10});
@@ -4431,11 +4615,11 @@ module.exports = function (room) {
 }
 return module.exports;
 }
-/********** End of module 41: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/towerLogic.js **********/
-/********** Start module 42: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/roomInit.js **********/
-__modules[42] = function(module, exports) {
-const { roomInfo } = __require(52,42);
-const { roomUtil } = __require(5,42);
+/********** End of module 42: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/towerLogic.js **********/
+/********** Start module 43: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/roomInit.js **********/
+__modules[43] = function(module, exports) {
+const { roomInfo } = __require(53,43);
+const { roomUtil } = __require(5,43);
 const ifInit = true;
 function roomInit(room) {
     if(room.memory.scout) {
@@ -4507,10 +4691,10 @@ function roomInit(room) {
 module.exports = roomInit;
 return module.exports;
 }
-/********** End of module 42: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/roomInit.js **********/
-/********** Start module 43: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/test/sandbox.js **********/
-__modules[43] = function(module, exports) {
-const { roomUtil } = __require(5,43);
+/********** End of module 43: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/room/roomInit.js **********/
+/********** Start module 44: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/test/sandbox.js **********/
+__modules[44] = function(module, exports) {
+const { roomUtil } = __require(5,44);
 
 const sandbox = {
     startOfTheTick: function() {
@@ -4524,9 +4708,9 @@ const sandbox = {
 module.exports = sandbox;
 return module.exports;
 }
-/********** End of module 43: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/test/sandbox.js **********/
-/********** Start module 44: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/roomPlanner.js **********/
-__modules[44] = function(module, exports) {
+/********** End of module 44: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/test/sandbox.js **********/
+/********** Start module 45: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/roomPlanner.js **********/
+__modules[45] = function(module, exports) {
 
 function planner_loop(roomName, opts = {}) {
     let _this = {};
@@ -5393,9 +5577,9 @@ function relPoly(x, y, poly) {
 module.exports = planner_loop;
 return module.exports;
 }
-/********** End of module 44: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/roomPlanner.js **********/
-/********** Start module 45: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/myRoomPlanner.js **********/
-__modules[45] = function(module, exports) {
+/********** End of module 45: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/roomPlanner.js **********/
+/********** Start module 46: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/myRoomPlanner.js **********/
+__modules[46] = function(module, exports) {
 
 function planner_loop(roomName, opts = {}) {
     let _this = {};
@@ -6254,9 +6438,9 @@ function relPoly(x, y, poly) {
 module.exports = planner_loop;
 return module.exports;
 }
-/********** End of module 45: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/myRoomPlanner.js **********/
-/********** Start module 46: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/traveler.js **********/
-__modules[46] = function(module, exports) {
+/********** End of module 46: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/myRoomPlanner.js **********/
+/********** Start module 47: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/traveler.js **********/
+__modules[47] = function(module, exports) {
 const traveler = {
     structureMatrixCache: {},
     creepMatrixCache: {},
@@ -6810,10 +6994,10 @@ Creep.prototype.travelTo = function (destination, options) {
 module.exports = traveler;
 return module.exports;
 }
-/********** End of module 46: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/traveler.js **********/
-/********** Start module 47: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/visual.js **********/
-__modules[47] = function(module, exports) {
-const { baseUtil } = __require(5,47);
+/********** End of module 47: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/traveler.js **********/
+/********** Start module 48: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/visual.js **********/
+__modules[48] = function(module, exports) {
+const { baseUtil } = __require(5,48);
 
 module.exports = function(room) {
     if(!room) return;
@@ -6831,10 +7015,10 @@ module.exports = function(room) {
 }
 return module.exports;
 }
-/********** End of module 47: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/visual.js **********/
-/********** Start module 48: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/util/roomUtil.js **********/
-__modules[48] = function(module, exports) {
-const { roomTypes } = __require(54,48);
+/********** End of module 48: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/tools/visual.js **********/
+/********** Start module 49: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/util/roomUtil.js **********/
+__modules[49] = function(module, exports) {
+const { roomTypes } = __require(55,49);
 
 const roomUtil = {
     getRoomCoord: function (roomName) {
@@ -6940,9 +7124,9 @@ const roomUtil = {
 module.exports = roomUtil;
 return module.exports;
 }
-/********** End of module 48: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/util/roomUtil.js **********/
-/********** Start module 49: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/util/baseUtil.js **********/
-__modules[49] = function(module, exports) {
+/********** End of module 49: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/util/roomUtil.js **********/
+/********** Start module 50: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/util/baseUtil.js **********/
+__modules[50] = function(module, exports) {
 const baseUtil = {
     posTowerDamage: function (room, pos) {
         if (!room || !pos || pos.roomName != room.name) return null;
@@ -7096,11 +7280,11 @@ const baseUtil = {
 module.exports = baseUtil;
 return module.exports;
 }
-/********** End of module 49: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/util/baseUtil.js **********/
-/********** Start module 50: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/creep.js **********/
-__modules[50] = function(module, exports) {
-const { roomInfo } = __require(52,50);
-const { boostCreep } = __require(59,50);
+/********** End of module 50: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/util/baseUtil.js **********/
+/********** Start module 51: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/creep.js **********/
+__modules[51] = function(module, exports) {
+const { roomInfo } = __require(53,51);
+const { boostCreep } = __require(60,51);
 
 Creep.prototype.sayHello = function sayHello(words = "Hello") {
     this.say(words, true);
@@ -7111,23 +7295,20 @@ Creep.prototype.damaged = function () {
 }
 
 Creep.prototype.moveToNoCreep = function (target) {
-    this.travelTo(target, { allowHostile: true });
+    this.travelTo(target, { allowHostile: true, allowSK: true });
 }
 
 Creep.prototype.moveToNoCreepInRoom = function (target) {
-    this.travelTo(target, { maxRooms: 1 });
+    this.travelTo(target, { maxRooms: 1, allowHostile: true, allowSK: true });
 }
 
 Creep.prototype.moveToRoom = function (roomName) {
-    if (this.isStuck()) {
-        this.moveTo(new RoomPosition(25, 25, roomName));
-    }
-    return this.moveToNoCreep(new RoomPosition(25, 25, roomName));
+    return this.travelTo(new RoomPosition(25, 25, roomName), { allowHostile: true, allowSK: true });
 }
 
 Creep.prototype.moveToRoomAdv = function (roomName) {
     if (roomName && roomName != this.room.name) {
-        this.moveToNoCreep(new RoomPosition(25, 25, roomName));
+        this.travelTo(new RoomPosition(25, 25, roomName), { allowHostile: true, allowSK: true });
         return true;
     }
     if (this.pos.x == 0) {
@@ -7224,7 +7405,7 @@ Creep.prototype.collectEnergy = function collectEnergy(changeStatus = false) {
     return false;
 }
 
-Creep.prototype.harvestEnergy = function harvestEnergy() {
+Creep.prototype.harvestEnergy = function () {
     let source;
     let result;
     if (this.memory.target != null) {
@@ -7240,16 +7421,18 @@ Creep.prototype.harvestEnergy = function harvestEnergy() {
         return ERR_NOT_FOUND;
     }
 
-    if (!this.pos.inRangeTo(source.pos, 1)) {
+    if (!this.pos.isNearTo(source)) {
         this.moveToNoCreepInRoom(source);
         result = ERR_NOT_IN_RANGE;
     }
     else {
-        let links = this.pos.findInRange(FIND_STRUCTURES, 1, { filter: struct => struct.structureType == STRUCTURE_LINK && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0 });
+        let links = source.pos.findInRange(FIND_STRUCTURES, 2, { filter: struct => struct.structureType == STRUCTURE_LINK && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0 });
         if (links.length > 0) {
             result = this.harvest(source);
             if (links.length > 0 && (this.store.getFreeCapacity() < 20 || this.ticksToLive < 2 || result == ERR_NOT_ENOUGH_RESOURCES)) {
-                this.transfer(links[0], RESOURCE_ENERGY);
+                if(this.transfer(links[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+                    this.moveTo(links[0]);
+                }
             }
         }
         else {
@@ -7517,17 +7700,15 @@ Creep.prototype.fleeFromAdv = function(goal, range) {
         maxRooms: 1,
     });
 
-    console.log(ret.path);
-
     let pos = ret.path[0];
     this.move(this.pos.getDirectionTo(pos));
 }
 return module.exports;
 }
-/********** End of module 50: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/creep.js **********/
-/********** Start module 51: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/room.js **********/
-__modules[51] = function(module, exports) {
-const { roomInfo } = __require(52,51);
+/********** End of module 51: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/creep.js **********/
+/********** Start module 52: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/room.js **********/
+__modules[52] = function(module, exports) {
+const { roomInfo } = __require(53,52);
 
 Room.prototype.addTransferTask = function (task) {
     if (!this.memory.tasks) this.memory.tasks = {};
@@ -7620,47 +7801,47 @@ Room.prototype.getStorage = function (amount) {
 }
 return module.exports;
 }
-/********** End of module 51: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/room.js **********/
-/********** Start module 52: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/config/index.js **********/
-__modules[52] = function(module, exports) {
+/********** End of module 52: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/prototypes/room.js **********/
+/********** Start module 53: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/config/index.js **********/
+__modules[53] = function(module, exports) {
 const config = {
-    roomInfo:               __require(60,52),
-    roomResourceConfig:     __require(56,52),
-    compondsRequirements:   __require(61,52),
+    roomInfo:               __require(61,53),
+    roomResourceConfig:     __require(57,53),
+    compondsRequirements:   __require(62,53),
 }
 
 module.exports = config;
 return module.exports;
 }
-/********** End of module 52: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/config/index.js **********/
-/********** Start module 53: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/index.js **********/
-__modules[53] = function(module, exports) {
+/********** End of module 53: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/config/index.js **********/
+/********** Start module 54: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/index.js **********/
+__modules[54] = function(module, exports) {
 let structureLogic = {
-    rampart:  __require(62,53),
-    wall:     __require(63,53),
-    lab:      __require(59,53),
+    rampart:  __require(63,54),
+    wall:     __require(64,54),
+    lab:      __require(60,54),
 }
 
 module.exports = structureLogic;
 return module.exports;
 }
-/********** End of module 53: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/index.js **********/
-/********** Start module 54: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/index.js **********/
-__modules[54] = function(module, exports) {
+/********** End of module 54: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/index.js **********/
+/********** Start module 55: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/index.js **********/
+__modules[55] = function(module, exports) {
 let constants = {
-    reactionResources:  __require(64,54),
-    creepRoles:         __require(65,54),
-    boostName:          __require(57,54),
-    commodities:        __require(66,54),
-    roomTypes:          __require(67,54),
+    reactionResources:  __require(65,55),
+    creepRoles:         __require(66,55),
+    boostName:          __require(58,55),
+    commodities:        __require(67,55),
+    roomTypes:          __require(68,55),
 }
 
 module.exports = constants;
 return module.exports;
 }
-/********** End of module 54: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/index.js **********/
-/********** Start module 55: /Users/piece/Desktop/Me/screeps/AlexBot_Js/node_modules/lodash/index.js **********/
-__modules[55] = function(module, exports) {
+/********** End of module 55: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/index.js **********/
+/********** Start module 56: /Users/piece/Desktop/Me/screeps/AlexBot_Js/node_modules/lodash/index.js **********/
+__modules[56] = function(module, exports) {
 /**
  * @license
  * lodash 3.10.1 (Custom Build) <https://lodash.com/>
@@ -19848,9 +20029,9 @@ __modules[55] = function(module, exports) {
 
 return module.exports;
 }
-/********** End of module 55: /Users/piece/Desktop/Me/screeps/AlexBot_Js/node_modules/lodash/index.js **********/
-/********** Start module 56: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/config/roomResourceConfig.js **********/
-__modules[56] = function(module, exports) {
+/********** End of module 56: /Users/piece/Desktop/Me/screeps/AlexBot_Js/node_modules/lodash/index.js **********/
+/********** Start module 57: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/config/roomResourceConfig.js **********/
+__modules[57] = function(module, exports) {
 // resourceType: {terminal: amount, storage: [ShortageLine, AbundantLine, ExceededLine]}
 module.exports = {
     energy: {terminal: 50000, storage: [200000, 500000, 600000]},
@@ -19882,9 +20063,9 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 56: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/config/roomResourceConfig.js **********/
-/********** Start module 57: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/boostName.js **********/
-__modules[57] = function(module, exports) {
+/********** End of module 57: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/config/roomResourceConfig.js **********/
+/********** Start module 58: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/boostName.js **********/
+__modules[58] = function(module, exports) {
 // order based on creation priority
 module.exports = {
     T3_ATTACK: 'XUH2O', // x4
@@ -19904,9 +20085,9 @@ module.exports = {
 }
 return module.exports;
 }
-/********** End of module 57: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/boostName.js **********/
-/********** Start module 58: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/models/taskModels.js **********/
-__modules[58] = function(module, exports) {
+/********** End of module 58: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/boostName.js **********/
+/********** Start module 59: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/models/taskModels.js **********/
+__modules[59] = function(module, exports) {
 var ManagerTask = function(from, to, resourceType, amount, priority = 0) {
     return {
         from: from,
@@ -19937,9 +20118,9 @@ var transferTask = function(withdrawTarget, transferTarget, resourceType, amount
 module.exports = {ManagerTask, TowerRepairTask, LabTask, transferTask};
 return module.exports;
 }
-/********** End of module 58: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/models/taskModels.js **********/
-/********** Start module 59: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/lab.js **********/
-__modules[59] = function(module, exports) {
+/********** End of module 59: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/models/taskModels.js **********/
+/********** Start module 60: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/lab.js **********/
+__modules[60] = function(module, exports) {
 module.exports = {
     boostCreep: function(lab, creep, resourceType, bodyPartCount) {
         if(!lab.store[resourceType] || lab.store[resourceType] < bodyPartCount * 30) return ERR_NOT_ENOUGH_RESOURCES;
@@ -19956,9 +20137,9 @@ module.exports = {
 }
 return module.exports;
 }
-/********** End of module 59: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/lab.js **********/
-/********** Start module 60: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/config/roomConfig.js **********/
-__modules[60] = function(module, exports) {
+/********** End of module 60: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/lab.js **********/
+/********** Start module 61: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/config/roomConfig.js **********/
+__modules[61] = function(module, exports) {
 module.exports = {
     E16S2: {
         restPos: new RoomPosition(27, 29, "E16S2"),
@@ -19978,11 +20159,21 @@ module.exports = {
 }
 return module.exports;
 }
-/********** End of module 60: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/config/roomConfig.js **********/
-/********** Start module 61: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/config/labProductConfig.js **********/
-__modules[61] = function(module, exports) {
+/********** End of module 61: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/config/roomConfig.js **********/
+/********** Start module 62: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/config/labProductConfig.js **********/
+__modules[62] = function(module, exports) {
 // order based on creation priority
 module.exports = {
+    OH: [5000, 12000],
+    KO: [5000, 12000],
+    UH: [5000, 12000],
+    LO: [5000, 12000],
+
+    KHO2: [5000, 12000],
+    UH2O: [5000, 12000],
+    LHO2: [5000, 12000],
+
+
     XUH2O: [5000, 12000], // attack
     XLH2O: [5000, 12000],  // repair & build
 
@@ -19997,17 +20188,12 @@ module.exports = {
     XUHO2: [5000, 12000], // harvest
 
     G: [5000, 12000],
-
-    GH: [5000, 12000], // +50% upgrade
-    UO: [5000, 12000], // +200% harvest
-
-    OH: [5000, 12000],
 }
 return module.exports;
 }
-/********** End of module 61: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/config/labProductConfig.js **********/
-/********** Start module 62: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/rampart.js **********/
-__modules[62] = function(module, exports) {
+/********** End of module 62: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/config/labProductConfig.js **********/
+/********** Start module 63: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/rampart.js **********/
+__modules[63] = function(module, exports) {
 var rampart = {
     targetHits: {
         0: 0,
@@ -20033,9 +20219,9 @@ var rampart = {
 module.exports = rampart;
 return module.exports;
 }
-/********** End of module 62: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/rampart.js **********/
-/********** Start module 63: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/wall.js **********/
-__modules[63] = function(module, exports) {
+/********** End of module 63: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/rampart.js **********/
+/********** Start module 64: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/wall.js **********/
+__modules[64] = function(module, exports) {
 var wall = {
     targetHits: {
         0: 0,
@@ -20061,9 +20247,9 @@ var wall = {
 module.exports = wall;
 return module.exports;
 }
-/********** End of module 63: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/wall.js **********/
-/********** Start module 64: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/reactionResources.js **********/
-__modules[64] = function(module, exports) {
+/********** End of module 64: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/structures/wall.js **********/
+/********** Start module 65: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/reactionResources.js **********/
+__modules[65] = function(module, exports) {
 module.exports = {
     OH: [ 'H', 'O' ],
     LH: [ 'H', 'L' ],
@@ -20102,9 +20288,9 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 64: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/reactionResources.js **********/
-/********** Start module 65: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/creepRoles.js **********/
-__modules[65] = function(module, exports) {
+/********** End of module 65: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/reactionResources.js **********/
+/********** Start module 66: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/creepRoles.js **********/
+__modules[66] = function(module, exports) {
 const roles = {
     HARVESTER:      'harvester2',
     CARRIER:        'carrier2',
@@ -20129,9 +20315,9 @@ const roles = {
 module.exports = roles;
 return module.exports;
 }
-/********** End of module 65: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/creepRoles.js **********/
-/********** Start module 66: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/commodities.js **********/
-__modules[66] = function(module, exports) {
+/********** End of module 66: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/creepRoles.js **********/
+/********** Start module 67: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/commodities.js **********/
+__modules[67] = function(module, exports) {
 module.exports = [
     RESOURCE_COMPOSITE,
     RESOURCE_CRYSTAL,
@@ -20167,9 +20353,9 @@ module.exports = [
 ]
 return module.exports;
 }
-/********** End of module 66: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/commodities.js **********/
-/********** Start module 67: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/roomTypes.js **********/
-__modules[67] = function(module, exports) {
+/********** End of module 67: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/commodities.js **********/
+/********** Start module 68: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/roomTypes.js **********/
+__modules[68] = function(module, exports) {
 const roomTypes = {
     HIGHWAY: 0,
     NORMAL: 1,
@@ -20180,7 +20366,7 @@ const roomTypes = {
 module.exports = roomTypes;
 return module.exports;
 }
-/********** End of module 67: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/roomTypes.js **********/
+/********** End of module 68: /Users/piece/Desktop/Me/screeps/AlexBot_Js/src/constants/roomTypes.js **********/
 /********** Footer **********/
 if(typeof module === "object")
 	module.exports = __require(0);

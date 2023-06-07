@@ -33,7 +33,8 @@ module.exports.loop = function () {
      *            ROOM LOGICS
      * ====================================
      */
-    tools.visual(Game.rooms['E17N2']);
+    
+    //tools.visual(Game.rooms['E17N2']);
 
     // make a list of all of our rooms
     Game.myRooms = _.filter(Game.rooms, r => r.controller && r.controller.level > 0 && r.controller.my);

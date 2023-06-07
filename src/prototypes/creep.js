@@ -10,7 +10,7 @@ Creep.prototype.damaged = function () {
 }
 
 Creep.prototype.moveToNoCreep = function (target) {
-    this.travelTo(target, { allowHostile: true });
+    this.travelTo(target, { allowHostile: true, allowSK: true });
     // if (this.isStuck()) {
     //     this.moveTo(target, { reusePath: 20 });
     // }
@@ -18,7 +18,7 @@ Creep.prototype.moveToNoCreep = function (target) {
 }
 
 Creep.prototype.moveToNoCreepInRoom = function (target) {
-    this.travelTo(target, { maxRooms: 1 });
+    this.travelTo(target, { maxRooms: 1, allowHostile: true, allowSK: true });
     // if (this.isStuck()) {
     //     this.moveTo(target, { maxRooms: 1 });
     // }
@@ -26,16 +26,13 @@ Creep.prototype.moveToNoCreepInRoom = function (target) {
 }
 
 Creep.prototype.moveToRoom = function (roomName) {
-    if (this.isStuck()) {
-        this.moveTo(new RoomPosition(25, 25, roomName));
-    }
-    return this.moveToNoCreep(new RoomPosition(25, 25, roomName));
+    return this.travelTo(new RoomPosition(25, 25, roomName), { allowHostile: true, allowSK: true });
 }
 
 Creep.prototype.moveToRoomAdv = function (roomName) {
     // return true if its moving to the target room
     if (roomName && roomName != this.room.name) {
-        this.moveToNoCreep(new RoomPosition(25, 25, roomName));
+        this.travelTo(new RoomPosition(25, 25, roomName), { allowHostile: true, allowSK: true });
         return true;
     }
     // move 1 more step to leave the room edge
@@ -160,7 +157,7 @@ Creep.prototype.collectEnergy = function collectEnergy(changeStatus = false) {
     return false;
 }
 
-Creep.prototype.harvestEnergy = function harvestEnergy() {
+Creep.prototype.harvestEnergy = function () {
     // todo:
     // add targetRoom option, to create harvest path before enter the target room.
     let source;
@@ -178,16 +175,18 @@ Creep.prototype.harvestEnergy = function harvestEnergy() {
         return ERR_NOT_FOUND;
     }
 
-    if (!this.pos.inRangeTo(source.pos, 1)) {
+    if (!this.pos.isNearTo(source)) {
         this.moveToNoCreepInRoom(source);
         result = ERR_NOT_IN_RANGE;
     }
     else {
-        let links = this.pos.findInRange(FIND_STRUCTURES, 1, { filter: struct => struct.structureType == STRUCTURE_LINK && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0 });
+        let links = source.pos.findInRange(FIND_STRUCTURES, 2, { filter: struct => struct.structureType == STRUCTURE_LINK && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0 });
         if (links.length > 0) {
             result = this.harvest(source);
             if (links.length > 0 && (this.store.getFreeCapacity() < 20 || this.ticksToLive < 2 || result == ERR_NOT_ENOUGH_RESOURCES)) {
-                this.transfer(links[0], RESOURCE_ENERGY);
+                if(this.transfer(links[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+                    this.moveTo(links[0]);
+                }
             }
         }
         // if not near link, move to container / check if container is full
@@ -495,8 +494,6 @@ Creep.prototype.fleeFromAdv = function(goal, range) {
         flee: true,
         maxRooms: 1,
     });
-
-    console.log(ret.path);
 
     let pos = ret.path[0];
     this.move(this.pos.getDirectionTo(pos));

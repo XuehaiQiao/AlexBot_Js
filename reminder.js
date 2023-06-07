@@ -18,6 +18,11 @@ Game.rooms['E17N2'].memory.tasks.spawnTasks.push({
     body: [...new Array(4).fill(WORK), ...new Array(8).fill(CARRY), ...new Array(4).fill(MOVE)],
     memory: { role: 'builder', status: 0, targetRoom: 'E18N2' }
 });
+Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
+    name: 'builder2',
+    body: [...new Array(5).fill(WORK), ...new Array(15).fill(CARRY), ...new Array(10).fill(MOVE)],
+    memory: { role: 'builder', targetRoom: 'E16S4' }
+});
 Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], 'builder2' + Game.time, { memory: { role: 'builder2', status: 0, targetRoom: 'W17S14' } });
 
 // upgrader2

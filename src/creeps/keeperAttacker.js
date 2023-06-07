@@ -2,7 +2,7 @@
 
 module.exports = {
     properties: {
-        role: 'keeperAttacker'
+        role: 'keeperAttacker',
     },
     /** @param {Creep} creep **/
     run: function(creep) {

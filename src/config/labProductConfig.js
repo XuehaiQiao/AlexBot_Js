@@ -1,5 +1,15 @@
 // order based on creation priority
 module.exports = {
+    OH: [5000, 12000],
+    KO: [5000, 12000],
+    UH: [5000, 12000],
+    LO: [5000, 12000],
+
+    KHO2: [5000, 12000],
+    UH2O: [5000, 12000],
+    LHO2: [5000, 12000],
+
+
     XUH2O: [5000, 12000], // attack
     XLH2O: [5000, 12000],  // repair & build
 
@@ -14,9 +24,4 @@ module.exports = {
     XUHO2: [5000, 12000], // harvest
 
     G: [5000, 12000],
-
-    GH: [5000, 12000], // +50% upgrade
-    UO: [5000, 12000], // +200% harvest
-
-    OH: [5000, 12000],
 }

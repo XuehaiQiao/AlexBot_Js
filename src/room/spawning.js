@@ -29,11 +29,11 @@ module.exports = function (room) {
         if (!roomMemory) return false;
 
         // if have invader core, wait to its end to respawn creeps to this room
-        if(roomMemory.invaderCore) {
-            if(roomMemory.invaderCore.endTime > Game.time) continue;
+        if (roomMemory.invaderCore) {
+            if (roomMemory.invaderCore.endTime > Game.time) continue;
             else roomMemory.invaderCore = null;
         }
-        
+
         if (remoteDefenceCreeps(room, idleSpawn, remoteRoomName, roomMemory)) return;
     }
 
@@ -42,11 +42,11 @@ module.exports = function (room) {
         if (!roomMemory) return false;
 
         // if have invader core, wait to its end to respawn creeps to this room
-        if(roomMemory.invaderCore) {
-            if(roomMemory.invaderCore.endTime > Game.time) continue;
+        if (roomMemory.invaderCore) {
+            if (roomMemory.invaderCore.endTime > Game.time) continue;
             else roomMemory.invaderCore = null;
         }
-        
+
         if (remoteSourcingCreeps(room, idleSpawn, remoteRoomName, roomMemory)) return;
     }
 }
@@ -70,7 +70,7 @@ function spawnCreep(room, spawn, creepSpawnData) {
 
 function createCoreCreep(room, spawn) {
     coreTypes = ['carrier2', 'harvester2', 'manager', 'upgrader2', 'builder2', 'miner', 'mineralCarrier'];
-    if(room.energyCapacityAvailable < 550) {
+    if (room.energyCapacityAvailable < 550) {
         coreTypes = ['harvester2', 'carrier2', 'upgrader2', 'builder2'];
     }
     // find a creep type that returns true for the .spawn() function
@@ -98,11 +98,11 @@ function createTaskCreep(room, spawn) {
     if (spawnTasks.length) {
         // task = [{name, body, memory}, ...]
         const task = spawnTasks[0];
-        
+
         let spawnData = JSON.parse(JSON.stringify(task));
         spawnData.name += Game.time % 10000;
-        
-        if(!spawnData.memory.base) spawnData.memory.base = room.name;
+
+        if (!spawnData.memory.base) spawnData.memory.base = room.name;
         if (spawnCreep(room, spawn, spawnData) === OK) {
             spawnTasks.shift();
             return true;
@@ -129,52 +129,24 @@ function remoteDefenceCreeps(room, spawn, roomName, roomMemory) {
     // invader defence
     const invaderCore = _.find(remoteRoom.find(FIND_HOSTILE_STRUCTURES), struct => struct.structureType == STRUCTURE_INVADER_CORE);
     if (invaderCore) {
-        switch (invaderCore.level) {
-            case 0:
-                if (creepLogic['defender'].spawn(room, roomName)) {
-                    spawnCreep(room, spawn, creepLogic['defender'].spawnData(room, roomName, invaderCore.id));
-                    return true;
-                }
-                break;
-            case 1:
-                if (creepLogic['rangeAtker'].spawn(room, roomName) && (invaderCore.ticksToDeploy < 250 || invaderCore.ticksToDeploy === undefined)) {
-                    spawnCreep(room, spawn, creepLogic['rangeAtker'].spawnData(room, roomName, { invader: true }));
-                    return true;
-                }
-                break;
-            case 2:
-                if (creepLogic['rangeAtker'].spawn(room, roomName) && (invaderCore.ticksToDeploy < 250 || invaderCore.ticksToDeploy === undefined)) {
-                    spawnCreep(room, spawn, creepLogic['rangeAtker'].spawnData(room, roomName, { invader: true }));
-                    return true;
-                }
-                break;
-            case 3:
-                if (invaderCore.ticksToDeploy < 1500 || invaderCore.ticksToDeploy === undefined) {
-                    roomMemory.invaderCore = {level: invaderCore.level, endTime: Game.time + 70000 + invaderCore.ticksToDeploy};
-                    return false;
-                }
-                break;
-            case 4:
-                if (invaderCore.ticksToDeploy < 1500 || invaderCore.ticksToDeploy === undefined) {
-                    roomMemory.invaderCore = {level: invaderCore.level, endTime: Game.time + 70000 + invaderCore.ticksToDeploy};
-                    return false;
-                }
-                break;
-            case 5:
-                if (invaderCore.ticksToDeploy < 1500 || invaderCore.ticksToDeploy === undefined) {
-                    roomMemory.invaderCore = {level: invaderCore.level, endTime: Game.time + 70000 + invaderCore.ticksToDeploy};
-                    return false;
-                }
-                break;
-            default:
-                console.log(roomName, 'invaderCore level:', invaderCore.level);
+        if(invaderCore.level === 0) {
+            if (creepLogic['defender'].spawn(room, roomName)) {
+                spawnCreep(room, spawn, creepLogic['defender'].spawnData(room, roomName, invaderCore.id));
+                return true;
+            }
+        }
+        else if(invaderCore.ticksToDeploy < 1500 || invaderCore.ticksToDeploy === undefined) {
+            roomMemory.invaderCore = { level: invaderCore.level, endTime: Game.time + 70000 + invaderCore.ticksToDeploy };
+            return false;
         }
     }
+                
 
     const hostileParts = [ATTACK, RANGED_ATTACK, WORK, HEAL, CLAIM]
-    const hostileCreeps = remoteRoom.find(FIND_HOSTILE_CREEPS, { filter: c => 
-        c.owner.username !== 'Source Keeper' &&
-        _.find(hostileParts, partType => c.getActiveBodyparts(partType) > 0)
+    const hostileCreeps = remoteRoom.find(FIND_HOSTILE_CREEPS, {
+        filter: c =>
+            c.owner.username !== 'Source Keeper' &&
+            _.find(hostileParts, partType => c.getActiveBodyparts(partType) > 0)
     });
     if (hostileCreeps.length) {
         if (!roomMemory.neutral) {
@@ -185,11 +157,11 @@ function remoteDefenceCreeps(room, spawn, roomName, roomMemory) {
             }
         }
         else {
-            if (creepLogic['invaderAttacker'].spawn(room, roomName)) {
-                spawnCreep(room, spawn, creepLogic['invaderAttacker'].spawnData(room, roomName));
-                console.log('invaderAtker')
-                return true;
-            }
+            // if (creepLogic['invaderAttacker'].spawn(room, roomName)) {
+            //     spawnCreep(room, spawn, creepLogic['invaderAttacker'].spawnData(room, roomName));
+            //     console.log('invaderAtker')
+            //     return true;
+            // }
         }
     }
 
@@ -197,8 +169,8 @@ function remoteDefenceCreeps(room, spawn, roomName, roomMemory) {
 }
 
 function remoteSourcingCreeps(room, spawn, roomName, roomMemory) {
+    if(roomName === 'E16S4') console.log(roomName, '1231232312')
     //if (room.energyCapacityAvailable < 550) return false;
-    if(Game.rooms[roomName] && Game.rooms[roomName].find(FIND_HOSTILE_CREEPS).length) return false;
 
     if (!roomMemory.neutral) {
         let outSourceTypes = ['claimer', 'remoteHarvester', 'remoteHauler'];
@@ -211,8 +183,9 @@ function remoteSourcingCreeps(room, spawn, roomName, roomMemory) {
     }
     else {
         if (room.energyCapacityAvailable < 5600) return false;
-        let outSourceTypes = ['keeperAttacker', 'remoteHarvester', 'remoteHauler', 'remoteMiner'];
+        let outSourceTypes = ['kAtkDuo', 'remoteHarvester', 'remoteHauler', 'remoteMiner'];
         for (const cType of outSourceTypes) {
+            if(roomName === 'E16S4') console.log(creepLogic[cType].spawn(room, roomName), cType)
             if (creepLogic[cType].spawn(room, roomName)) {
                 spawnCreep(room, spawn, creepLogic[cType].spawnData(room, roomName));
                 return true;
