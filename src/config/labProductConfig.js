@@ -1,8 +1,8 @@
 // order based on creation priority
 module.exports = {
-    OH: [5000, 12000],
-    KO: [5000, 12000],
     UH: [5000, 12000],
+    KO: [5000, 12000],
+    OH: [5000, 12000],
     LO: [5000, 12000],
 
     KHO2: [5000, 12000],

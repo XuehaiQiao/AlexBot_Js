@@ -10,6 +10,7 @@ const roomLogic = {
     marketLogic :       require('./marketLogic'),
     towerLogic:         require('./towerLogic'),
     roomInit:           require('./roomInit'),
+    activeSafeMode:     require('./activeSafeMode'),
 }
 
 module.exports = roomLogic;

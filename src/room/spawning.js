@@ -7,10 +7,14 @@ module.exports = function (room) {
         Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
             name: 'rangeAtker',
             body: [...new Array(9).fill(MOVE), ...new Array(5).fill(RANGED_ATTACK), ...new Array(4).fill(HEAL)],
-            memory: {
-                role: 'rangeAtker',
-                targetRoom: 'E16N3',
-            }
+            memory: { role: 'rangeAtker', targetRoom: 'E16N3', }
+        });
+    }
+    if (room.name === 'E17N2' && Game.time % 1400 === 500) {
+        Game.rooms['E17N2'].memory.tasks.spawnTasks.push({
+            name: 'rangeAtker',
+            body: [...new Array(9).fill(MOVE), ...new Array(5).fill(RANGED_ATTACK), ...new Array(4).fill(HEAL)],
+            memory: { role: 'rangeAtker', targetRoom: 'E21N2', }
         });
     }
 
@@ -129,18 +133,18 @@ function remoteDefenceCreeps(room, spawn, roomName, roomMemory) {
     // invader defence
     const invaderCore = _.find(remoteRoom.find(FIND_HOSTILE_STRUCTURES), struct => struct.structureType == STRUCTURE_INVADER_CORE);
     if (invaderCore) {
-        if(invaderCore.level === 0) {
+        if (invaderCore.level === 0) {
             if (creepLogic['defender'].spawn(room, roomName)) {
                 spawnCreep(room, spawn, creepLogic['defender'].spawnData(room, roomName, invaderCore.id));
                 return true;
             }
         }
-        else if(invaderCore.ticksToDeploy < 1500 || invaderCore.ticksToDeploy === undefined) {
+        else if (invaderCore.ticksToDeploy < 1500 || invaderCore.ticksToDeploy === undefined) {
             roomMemory.invaderCore = { level: invaderCore.level, endTime: Game.time + 70000 + invaderCore.ticksToDeploy };
             return false;
         }
     }
-                
+
 
     const hostileParts = [ATTACK, RANGED_ATTACK, WORK, HEAL, CLAIM]
     const hostileCreeps = remoteRoom.find(FIND_HOSTILE_CREEPS, {
@@ -169,7 +173,6 @@ function remoteDefenceCreeps(room, spawn, roomName, roomMemory) {
 }
 
 function remoteSourcingCreeps(room, spawn, roomName, roomMemory) {
-    if(roomName === 'E16S4') console.log(roomName, '1231232312')
     //if (room.energyCapacityAvailable < 550) return false;
 
     if (!roomMemory.neutral) {
@@ -185,7 +188,6 @@ function remoteSourcingCreeps(room, spawn, roomName, roomMemory) {
         if (room.energyCapacityAvailable < 5600) return false;
         let outSourceTypes = ['kAtkDuo', 'remoteHarvester', 'remoteHauler', 'remoteMiner'];
         for (const cType of outSourceTypes) {
-            if(roomName === 'E16S4') console.log(creepLogic[cType].spawn(room, roomName), cType)
             if (creepLogic[cType].spawn(room, roomName)) {
                 spawnCreep(room, spawn, creepLogic[cType].spawnData(room, roomName));
                 return true;

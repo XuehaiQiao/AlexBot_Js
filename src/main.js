@@ -44,6 +44,7 @@ module.exports.loop = function () {
     roomLogic.roomCensus();
     // run room logic for each room in our empire
     _.forEach(Game.myRooms, r => {
+        roomLogic.activeSafeMode(r);
         roomLogic.roomInit(r);
         roomLogic.spawning(r);
         roomLogic.towerLogic(r);

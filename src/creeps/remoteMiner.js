@@ -56,7 +56,7 @@ module.exports = {
         if (!Game.rooms[roomName]) return false;
         mine = Game.rooms[roomName].find(FIND_MINERALS)[0];
         if (mine.mineralAmount === 0) return false;
-        if (room.storage && room.storage.store[mine.resourceType] > 80000) return false;
+        if (room.storage && room.storage.store[mine.resourceType] > 50000) return false;
 
         // check if need spawn
         let creepCount;

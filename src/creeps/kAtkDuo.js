@@ -87,8 +87,6 @@ module.exports = {
 
         //this.atkPassingHostile(creep);
 
-        console.log(partner.hits, partner.hitsMax, creep.hits, creep.hitsMax);
-
         creep.moveTo(partner);
         if(partner.hits === partner.hitsMax && creep.hits === creep.hitsMax) {
             let adjCreeps = creep.pos.findInRange(FIND_MY_CREEPS, 3, {filter: c => c.hits < c.hitsMax});
@@ -194,7 +192,6 @@ module.exports = {
 
         let waitings = _.filter(creeps, c => c.memory.front == null && c.memory.back == null);
         
-        console.log('waitings', waitings);
         if (waitings.length < 2) {
             return true;
         }
