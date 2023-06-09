@@ -1,5 +1,5 @@
 module.exports = function (room) {
-    if (!room || !room.controller) return;
+    if (!room || !room.controller || room.controller.level < 4) return;
     if (room.controller.safeMode != undefined) return;
     
     if(room.memory.enemyStayTime === undefined) room.memory.enemyStayTime = 0;
@@ -15,11 +15,11 @@ module.exports = function (room) {
     let isEnemy = false;
 
     for (let e of enemies) {
-        let nearRamparts = e.pos.findInRange(FIND_MY_STRUCTURES, 1, { filter: struct => struct.structureType === STRUCTURE_RAMPART });
-        if (nearRamparts.length) {
-            isEnemy = true;
-            break;
-        }
+        // let nearRamparts = e.pos.findInRange(FIND_MY_STRUCTURES, 1, { filter: struct => struct.structureType === STRUCTURE_RAMPART });
+        // if (nearRamparts.length) {
+        //     isEnemy = true;
+        //     break;
+        // }
 
         let closeSpwanAndExtensions = e.pos.findInRange(FIND_MY_STRUCTURES, 3, {
             filter: struct => (
@@ -40,7 +40,7 @@ module.exports = function (room) {
         room.memory.enemyStayTime = 0;
     }
 
-    if(room.memory.enemyStayTime >= 50) {
+    if(room.memory.enemyStayTime >= 2) {
         room.controller.activateSafeMode();
     }
 }

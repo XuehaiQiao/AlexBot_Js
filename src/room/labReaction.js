@@ -20,7 +20,7 @@ module.exports = function (room) {
 
     // For every 1000 ticks, double check if have need boost creeps
     if (Game.time % 1000 === 686) {
-        let needBoostCreep = _.find(Game.creeps, creep => creep.memory.base === room.name && creep.memory.boost === true && creep.memory.boosted === false);
+        let needBoostCreep = _.find(Game.creeps, creep => creep.memory.base === room.name && creep.memory.boost === true && !creep.memory.boosted);
         if (!needBoostCreep) {
             room.memory.labs.boostLab = {};
         }

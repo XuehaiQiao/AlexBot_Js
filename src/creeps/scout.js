@@ -1,3 +1,5 @@
+const { roomUtil } = require("../util");
+
 module.exports = {
     properties: {
         role: "scout"
@@ -39,11 +41,7 @@ module.exports = {
         }
         else creep.suicide();
 
-        if (creep.moveToRoomAdv(targetRoomName)) {
-            return;
-        }
-
-
+        if (creep.moveToRoomAdv(targetRoomName)) return;
 
         const newRoomInfo = roomUtil.getRoomInfo(creep.room);
         if (!creep.room.memory.roomInfo) {
@@ -56,7 +54,6 @@ module.exports = {
             }
         }
 
-        // remove current room after searched logic
         creep.memory.targetRooms.shift();
     },
 

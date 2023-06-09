@@ -3,18 +3,18 @@ const creepLogic = require("../creeps");
 // const creepTypes2 = ['carrier2', 'harvester2', 'upgrader2', 'builder2']; // 'mineralCarrier'
 
 module.exports = function (room) {
-    if (room.name === 'E16S2' && Game.time % 1200 === 500) {
-        Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
+    if (room.name === 'E17N2' && Game.time % 1400 === 500) {
+        Game.rooms['E17N2'].memory.tasks.spawnTasks.push({
             name: 'rangeAtker',
             body: [...new Array(9).fill(MOVE), ...new Array(5).fill(RANGED_ATTACK), ...new Array(4).fill(HEAL)],
             memory: { role: 'rangeAtker', targetRoom: 'E16N3', }
         });
     }
-    if (room.name === 'E17N2' && Game.time % 1400 === 500) {
-        Game.rooms['E17N2'].memory.tasks.spawnTasks.push({
+    if (room.name === 'E16S2' && Game.time % 1350 === 500) {
+        Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
             name: 'rangeAtker',
             body: [...new Array(9).fill(MOVE), ...new Array(5).fill(RANGED_ATTACK), ...new Array(4).fill(HEAL)],
-            memory: { role: 'rangeAtker', targetRoom: 'E21N2', }
+            memory: { role: 'rangeAtker', targetRoom: 'E15N2', }
         });
     }
 
@@ -119,8 +119,8 @@ function createTaskCreep(room, spawn) {
 function roomDefenceCreeps(room, spawn) {
     // stop sending outSourcer if base room found enemy
     // todo: create active defence creeps
-    let enemies = room.find(FIND_HOSTILE_CREEPS);
-    if (enemies.length) return true;
+    // let enemies = room.find(FIND_HOSTILE_CREEPS);
+    // if (enemies.length) return true;
 
     return false;
 }

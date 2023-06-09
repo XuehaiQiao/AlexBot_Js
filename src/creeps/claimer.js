@@ -24,7 +24,12 @@ module.exports = {
             return;
         }
         else if (creep.memory.claim) {
-            if(creep.claimController(controller) == ERR_NOT_IN_RANGE) {
+            if(controller && !controller.my && (controller.reservation || controller.level)) {
+                if(creep.attackController(controller) == ERR_NOT_IN_RANGE) {
+                    creep.moveToNoCreepInRoom(controller);
+                }
+            }
+            else if(creep.claimController(controller) == ERR_NOT_IN_RANGE) {
                 creep.moveToNoCreepInRoom(controller);
             }
             else {

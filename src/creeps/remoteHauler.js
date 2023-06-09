@@ -211,13 +211,13 @@ function findTarget(creep) {
 }
 
 function findTargetSourceIndex(creep) {
+    let sourceNum = Memory.outSourceRooms[creep.room.name].sourceNum;
     let res = Memory.outSourceRooms[creep.room.name].targetSource;
     if (res == null) {
-        Memory.outSourceRooms[creep.room.name].targetSource = 1;
+        Memory.outSourceRooms[creep.room.name].targetSource = 1 % sourceNum;
         return 0;
     }
     else {
-        let sourceNum = Memory.outSourceRooms[creep.room.name].sourceNum;
         // asign a no hauler source
         for (var i = 0; i < sourceNum; i++) {
             let curIndex = (res + i) % sourceNum;

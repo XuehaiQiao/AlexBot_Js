@@ -2,7 +2,7 @@ const baseUtil = {
     posTowerDamage: function (room, pos) {
         if (!room || !pos || pos.roomName != room.name) return null;
 
-        let towers = room.find(FIND_MY_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_TOWER });
+        let towers = room.find(FIND_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_TOWER });
 
         let totalDamage = 0;
         for (let tower of towers) {

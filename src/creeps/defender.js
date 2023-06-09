@@ -7,7 +7,7 @@ module.exports = {
             3: {maxEnergyCapacity: 800, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
             //4: {maxEnergyCapacity: 1300, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
             //5: {maxEnergyCapacity: 1800, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
-            6: {maxEnergyCapacity: 2300, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
+            6: {maxEnergyCapacity: 2300, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, RANGED_ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, HEAL, MOVE], number: 1},
         },
     },
     /** @param {Creep} creep **/
@@ -31,11 +31,22 @@ module.exports = {
 
         if (hostile) {
             creep.rangedAttack(hostile);
-            creep.attack(hostile);
+            if(creep.attack(hostile) !== OK) creep.heal(creep);
             creep.moveTo(hostile, {visualizePathStyle: {stroke: '#ff0000'}, maxRooms: 1});
             //creep.say(moveResult);
-            return;
         }
+        else if(creep.getActiveBodyparts(HEAL)) {
+            if(creep.hits < creep.hitsMax) creep.heal(creep);
+            let damaged = creep.pos.findClosestByRange(FIND_MY_CREEPS, {filter: c => c.hits < c.hitsMax});
+            if(damaged) {
+                if(creep.heal(damaged) === ERR_NOT_IN_RANGE) {
+                    creep.travelTo(damaged);
+                }
+                creep.rangedHeal(damaged);
+            }
+        }
+
+        
     },
 
     // checks if the room needs to spawn a creep

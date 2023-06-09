@@ -32,7 +32,7 @@ Creep.prototype.moveToRoom = function (roomName) {
 Creep.prototype.moveToRoomAdv = function (roomName) {
     // return true if its moving to the target room
     if (roomName && roomName != this.room.name) {
-        this.travelTo(new RoomPosition(25, 25, roomName), { allowHostile: true, allowSK: true });
+        this.travelTo(new RoomPosition(25, 25, roomName), { allowSK: true });
         return true;
     }
     // move 1 more step to leave the room edge
@@ -184,7 +184,7 @@ Creep.prototype.harvestEnergy = function () {
         if (links.length > 0) {
             result = this.harvest(source);
             if (links.length > 0 && (this.store.getFreeCapacity() < 20 || this.ticksToLive < 2 || result == ERR_NOT_ENOUGH_RESOURCES)) {
-                if(this.transfer(links[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+                if (this.transfer(links[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
                     this.moveTo(links[0]);
                 }
             }
@@ -489,12 +489,35 @@ Creep.prototype.fleeFrom = function (target) {
     return true;
 }
 
-Creep.prototype.fleeFromAdv = function(goal, range) {
-    let ret = PathFinder.search(this.pos, {pos: goal.pos, range: range}, {
+Creep.prototype.fleeFromAdv = function (goal, range) {
+    let ret = PathFinder.search(this.pos, { pos: goal.pos, range: range }, {
         flee: true,
         maxRooms: 1,
     });
 
     let pos = ret.path[0];
     this.move(this.pos.getDirectionTo(pos));
+}
+
+Creep.prototype.travelToRoom = function (targetRoomName, allowSK = false) {
+    if (!targetRoomName) return false;
+
+    if (targetRoomName != this.room.name) {
+        // check if next to the targetRoom
+        let isNextTo = false;
+        _.forEach(Game.map.describeExits(this.room.name), rN => {
+            if (rN === targetRoomName) isNextTo = true;
+        });
+
+        if (isNextTo) {
+            this.travelTo(new RoomPosition(25, 25, targetRoomName), { allowHostile: true, allowSK: allowSK });
+        }
+        else {
+            this.travelTo(new RoomPosition(25, 25, targetRoomName), { allowSK: allowSK });
+        }
+
+        return true;
+    }
+
+    return false;
 }

@@ -2,26 +2,26 @@
 // E14N3
 
 // claimer spawn
-Game.spawns['Spawn1_W18S15'].spawnCreep([MOVE, CLAIM], 'Claimer' + Game.time, { memory: { role: 'claimer', status: 1, targetRoom: 'W17S14', claim: true } });
+Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(6).fill(CLAIM), ...new Array(6).fill(MOVE)], 'Claimer' + Game.time, { memory: { role: 'claimer', status: 1, targetRoom: 'E14N3', claim: true } });
 
 Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
     name: 'claim',
-    body: [MOVE, MOVE, MOVE, MOVE, MOVE, CLAIM],
-    memory: { role: 'claimer', status: 1, targetRoom: 'E17N2', claim: true }
+    body: [...new Array(6).fill(CLAIM), ...new Array(6).fill(MOVE)],
+    memory: { role: 'claimer', status: 1, targetRoom: 'E14N1', claim: true }
 });
 // harvester2
 Game.spawns['Spawn1_W18S15'].spawnCreep([WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], 'harvester2' + Game.time, { memory: { role: 'harvester2', target: 0, targetRoom: 'W17S14' } });
 
 //builder2
-Game.rooms['E17N2'].memory.tasks.spawnTasks.push({
+Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
     name: 'builder',
-    body: [...new Array(4).fill(WORK), ...new Array(8).fill(CARRY), ...new Array(4).fill(MOVE)],
-    memory: { role: 'builder', status: 0, targetRoom: 'E18N2' }
+    body: [...new Array(5).fill(WORK), ...new Array(5).fill(CARRY), ...new Array(5).fill(MOVE)],
+    memory: { role: 'builder', status: 0, targetRoom: 'E6S3' }
 });
-Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
+Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
     name: 'builder2',
-    body: [...new Array(5).fill(WORK), ...new Array(15).fill(CARRY), ...new Array(10).fill(MOVE)],
-    memory: { role: 'builder', targetRoom: 'E16S4' }
+    body: [...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)],
+    memory: { role: 'builder', targetRoom: 'E6S4' }
 });
 Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], 'builder2' + Game.time, { memory: { role: 'builder2', status: 0, targetRoom: 'W17S14' } });
 
@@ -36,9 +36,14 @@ Game.spawns['Spawn2_W18S15'].spawnCreep([...new Array(25).fill(CARRY), ...new Ar
 Game.spawns['Spawn2_W21S19'].spawnCreep([...new Array(25).fill(CARRY), ...new Array(25).fill(MOVE)], 'transporter' + Game.time, { memory: { role: 'transporter', base: 'W21S19', targetRoom: 'W20S21', workType: 1 } });
 Game.rooms['W16S17'].memory.tasks.spawnTasks.push({ name: 't', body: [...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], memory: { role: 'transporter', base: 'W16S17', targetRoom: 'W16S16', workType: 2 } });
 // defender
-Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
+Game.rooms['E14N3'].memory.tasks.spawnTasks.push({
     name: 'bM',
-    body: [...new Array(4).fill(MOVE), ...new Array(4).fill(ATTACK)],
+    body: [...new Array(2).fill(MOVE), ...new Array(2).fill(ATTACK)],
+    memory: { role: 'defender' }
+});
+Game.rooms['E14N4'].memory.tasks.spawnTasks.push({
+    name: 'bM',
+    body: [...new Array(2).fill(MOVE), ...new Array(2).fill(ATTACK)],
     memory: { role: 'baseMelee' }
 });
 
@@ -61,12 +66,12 @@ Game.rooms['W21S19'].memory.tasks.spawnTasks.push({
     }
 });
 
-Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
+Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
     name: 'rangeAtker',
     body: [...new Array(9).fill(MOVE), ...new Array(5).fill(RANGED_ATTACK), ...new Array(4).fill(HEAL)],
     memory: {
         role: 'rangeAtker',
-        targetRoom: 'E17N2',
+        targetRoom: 'E7N1',
     }
 });
 

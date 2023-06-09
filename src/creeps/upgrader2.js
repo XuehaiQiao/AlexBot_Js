@@ -6,8 +6,8 @@ module.exports = {
         stages: {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, MOVE], number: 1},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 6},
-            3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 6},
-            4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(8).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(4).fill(MOVE)], number: 5},
+            3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 5},
+            4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(8).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(4).fill(MOVE)], number: 3},
             5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(10).fill(WORK), ...new Array(3).fill(CARRY), ...new Array(5).fill(MOVE)], mBodyParts: [...new Array(12).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
             6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(14).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(7).fill(MOVE)], mBodyParts: [...new Array(14).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(7).fill(MOVE)], number: 1},
             7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(30).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(15).fill(MOVE)], number: 0},
@@ -108,7 +108,9 @@ module.exports = {
 
         // create more upgrader2 for more energy in storage
         if (storage && storage.store[RESOURCE_ENERGY] > 200000) {
-            num += Math.min(Math.ceil((2 * storage.store[RESOURCE_ENERGY] + 200000) / (1 + storage.store.getFreeCapacity())), 4);
+            // let added = Math.min(Math.ceil((2 * storage.store[RESOURCE_ENERGY] + 200000) / (1 + storage.store.getFreeCapacity())), 4);
+            let added = Math.min(Math.ceil((storage.store[RESOURCE_ENERGY] - 200000) / 50000), 4);
+            num += added;
         }
 
         // return upgraders.length < num ? true : false;

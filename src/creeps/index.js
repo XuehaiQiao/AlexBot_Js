@@ -35,6 +35,10 @@ let creepLogic = {
     medic:          require('./medic'),
     scout:          require('./scout'),
     rangeAtker:     require('./rangeAtker'),
+
+    // attackers
+    atkMelee:       require('./atkMelee'),
+    atkMedic:       require('./atkMedic'),
 }
 
 module.exports = creepLogic;

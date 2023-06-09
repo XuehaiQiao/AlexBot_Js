@@ -9,7 +9,7 @@ module.exports = {
                 body: [...new Array(6).fill(RANGED_ATTACK), ...new Array(25).fill(MOVE), ...new Array(19).fill(ATTACK)] // $3670,
             },
             back: {
-                body: [...new Array(15).fill(HEAL), ...new Array(15).fill(MOVE)], // $4500
+                body: [...new Array(10).fill(HEAL), ...new Array(15).fill(MOVE), ...new Array(5).fill(HEAL)], // $4500
             }
         }
 
@@ -108,6 +108,28 @@ module.exports = {
     },
 
     atkPlayer: function (creep) {
+        let enemies = creep.room.find(FIND_HOSTILE_CREEPS, { filter: c => c.owner.username !== 'Invader' && c.owner.username !== 'Source Keeper' });
+        if (enemies.length) {
+            let invader;
+            let medic = creep.pos.findClosestByRange(enemies, { filter: c => c.getActiveBodyparts(HEAL) > 0 });
+            if (medic) invader = medic;
+            else invader = creep.pos.findClosestByRange(enemies);
+
+            if (creep.pos.getRangeTo(invader) > 3) {
+                creep.travelTo(invader, { allowSK: true, movingTarget: true });
+            }
+            else {
+                let result = creep.attack(invader);
+                creep.say(result);
+                creep.rangedAttack(invader);
+                if(result !== OK) {
+                    creep.heal(creep);
+                    creep.travelTo(invader, { allowSK: true, movingTarget: true });
+                }
+                
+            }
+            return true;
+        }
         return false;
     },
 
@@ -129,7 +151,7 @@ module.exports = {
                 if(result === ERR_NOT_IN_RANGE) {
                     creep.heal(creep);
                 }
-                creep.moveTo(invader);
+                creep.travelTo(invader, { allowSK: true, movingTarget: true });
             }
             return true;
         }
@@ -137,7 +159,7 @@ module.exports = {
     },
 
     atkSourceKeeper: function (creep) {
-        let targetKeeper = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: creep => creep.owner.username === 'Source Keeper' });
+        let targetKeeper = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: c => c.owner.username === 'Source Keeper' });
         if (targetKeeper) {
             if(creep.attack(targetKeeper) === ERR_NOT_IN_RANGE) {
                 creep.heal(creep);
