@@ -65,8 +65,14 @@ module.exports = {
             return;
         }
 
-        // attack flaged wall/rampart
+        // attack wall/rampart flag logic
         if (this.greenFlagLogic(creep, state)) {
+            this.checkAndHeal(creep, state);
+            return;
+        }
+
+        // moveTo flag logic
+        if (this.blueFlagLogic(creep, state)) {
             this.checkAndHeal(creep, state);
             return;
         }
@@ -157,6 +163,17 @@ module.exports = {
             else {
                 creep.pull(state.partner);
             }
+        }
+
+        return false;
+    },
+
+    blueFlagLogic: function (creep, state) {
+        let blueFlag = creep.pos.findClosestByPath(FIND_FLAGS, { filter: { color: COLOR_BLUE } });
+        if (blueFlag) {
+            creep.moveTo(blueFlag, {maxRooms: 1});
+            this.atkOnTheWay(creep, state);
+            return true;
         }
 
         return false;

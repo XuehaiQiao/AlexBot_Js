@@ -4,7 +4,7 @@ Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
     body: [...new Array(5).fill(RANGED_ATTACK), ...new Array(15).fill(ATTACK), ...new Array(25).fill(MOVE), ...new Array(5).fill(HEAL)],
     memory: {
         role: 'atkMelee',
-        targetRoom: 'E16N1',
+        targetRoom: 'E15N3',
         duoNumber: 1,
         boost: true,
         boostInfo: { LHO2: 5, KHO2: 5, UH: 15 }
