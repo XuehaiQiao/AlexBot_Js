@@ -1,6 +1,22 @@
 const { roomTypes } = require("../constants");
 
 const roomUtil = {
+    posTowerDamage: function (room, pos) {
+        if (!room || !pos || pos.roomName != room.name) return null;
+
+        let towers = room.find(FIND_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_TOWER });
+
+        let totalDamage = 0;
+        for (let tower of towers) {
+            let range = tower.pos.getRangeTo(pos);
+            if (range <= 5) totalDamage += 600;
+            else if (range >= 20) totalDamage += 150;
+            else totalDamage += (750 - range * 30);
+        }
+
+        return totalDamage;
+    },
+    
     getRoomCoord: function (roomName) {
         if (roomName.includes('N')) {
             return roomName.substring(1).split('N').map(pos => Number(pos));

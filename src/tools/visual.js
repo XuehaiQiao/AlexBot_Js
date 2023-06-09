@@ -1,4 +1,4 @@
-const { baseUtil } = require("../util");
+const { baseUtil, roomUtil } = require("../util");
 
 module.exports = function(room) {
     if(!room) return;
@@ -8,7 +8,7 @@ module.exports = function(room) {
     // let creeps = room.find(FIND_HOSTILE_CREEPS);
 
     // creeps.map(creep => {
-    //     roomVisual.text(baseUtil.posTowerDamage(room, creep.pos), creep.pos.x, creep.pos.y - 1, {color: 'white', font: 0.4});
+    //     roomVisual.text(roomUtil.posTowerDamage(room, creep.pos), creep.pos.x, creep.pos.y - 1, {color: 'white', font: 0.4});
     // });
 
 
