@@ -1,22 +1,28 @@
 // E6S2
 // E14N3
 
+const { UH2O } = require("./src/config/labProductConfig");
+
 // claimer spawn
 Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(6).fill(CLAIM), ...new Array(6).fill(MOVE)], 'Claimer' + Game.time, { memory: { role: 'claimer', status: 1, targetRoom: 'E14N3', claim: true } });
 
 Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
     name: 'claim',
-    body: [...new Array(6).fill(CLAIM), ...new Array(6).fill(MOVE)],
-    memory: { role: 'claimer', status: 1, targetRoom: 'E14N1', claim: true }
+    body: [...new Array(1).fill(CLAIM), ...new Array(1).fill(MOVE)],
+    memory: { role: 'claimer', status: 1, targetRoom: 'E11S2', claim: true }
 });
 // harvester2
 Game.spawns['Spawn1_W18S15'].spawnCreep([WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], 'harvester2' + Game.time, { memory: { role: 'harvester2', target: 0, targetRoom: 'W17S14' } });
-
+Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
+    name: 'hav',
+    body: [...new Array(6).fill(WORK), ...new Array(6).fill(MOVE)],
+    memory: { role: 'harvester2', status: 0, targetRoom: 'E11S2' }
+});
 //builder2
-Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
+Game.rooms['E14N3'].memory.tasks.spawnTasks.push({
     name: 'builder',
-    body: [...new Array(5).fill(WORK), ...new Array(5).fill(CARRY), ...new Array(5).fill(MOVE)],
-    memory: { role: 'builder', status: 0, targetRoom: 'E6S3' }
+    body: [...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)],
+    memory: { role: 'builder', status: 0, targetRoom: 'E15N3' }
 });
 Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
     name: 'builder2',
@@ -66,12 +72,12 @@ Game.rooms['W21S19'].memory.tasks.spawnTasks.push({
     }
 });
 
-Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
+Game.rooms['E17N2'].memory.tasks.spawnTasks.push({
     name: 'rangeAtker',
     body: [...new Array(9).fill(MOVE), ...new Array(5).fill(RANGED_ATTACK), ...new Array(4).fill(HEAL)],
     memory: {
         role: 'rangeAtker',
-        targetRoom: 'E7N1',
+        targetRoom: 'E20N4',
     }
 });
 
@@ -151,15 +157,16 @@ JSON.stringify(obj);
 
 // create task
 Game.rooms['W18S15'].memory.tasks.managerTasks.push({ from: STRUCTURE_FACTORY, to: STRUCTURE_STORAGE, resourceType: 'X', volume: 40000 });
-Game.rooms['W21S19'].memory.tasks.managerTasks.push({ from: STRUCTURE_STORAGE, to: STRUCTURE_TERMINAL, resourceType: RESOURCE_ALLOY, volume: 90000 });
-Game.rooms['W12S21'].memory.tasks.managerTasks.push({ from: STRUCTURE_STORAGE, to: STRUCTURE_NUKER, resourceType: 'G', volume: 5000 });
+Game.rooms['E6S2'].memory.tasks.managerTasks.push({ from: STRUCTURE_STORAGE, to: STRUCTURE_TERMINAL, resourceType: 'LHO2', volume: 2000 });
+Game.rooms['W13S15'].memory.tasks.managerTasks.push({ from: STRUCTURE_STORAGE, to: STRUCTURE_NUKER, resourceType: 'G', volume: 5000 });
+Game.rooms['W13S15'].memory.tasks.managerTasks.push({ from: STRUCTURE_STORAGE, to: STRUCTURE_NUKER, resourceType: 'energy', volume: 100000 });
 // create reaction task
 Game.rooms.W19S17.memory.tasks.labTasks.push({ resourceType: 'OH', amount: 3000 });
 
 
 // orders
 Game.rooms['E6S2'].terminal.send(RESOURCE_ENERGY, 30000, 'E2N6', 'From a remote friend');
-Game.rooms['W19S17'].terminal.send('XGHO2', 2000, 'W13S15', 'XGHO2');
+Game.rooms['E6S2'].terminal.send('L', 4000, 'E17N2', 'L');
 
 Game.market.deal('645bfc8403ae10376b827734', 4000, "W21S19");
 // purifier

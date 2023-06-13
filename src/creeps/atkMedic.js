@@ -33,6 +33,7 @@ module.exports = {
         console.log('medic partner', partner)
         if (!partner) {
             // todo: heal surronding creeps
+            creep.heal(creep);
             return;
         }
 

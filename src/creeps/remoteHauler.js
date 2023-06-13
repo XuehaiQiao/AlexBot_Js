@@ -53,7 +53,7 @@ module.exports = {
             if (creep.memory.targetSource != null) withdrawBySouce(creep);
             else if (creep.memory.targetId != null) withdrawByTarget(creep);
             else {
-                
+
                 let targetId = findTarget(creep);
                 if (targetId == null) {
                     if (creep.memory.targetSource == null) creep.memory.targetSource = findTargetSourceIndex(creep);
@@ -297,10 +297,14 @@ function withdrawByTarget(creep) {
 
 function takeNearResources(creep) {
     // pick up near resources
-    const nearResouce = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1, { filter: droped => creep.room.name != creep.memory.base || droped.pos.findInRange(creep.room.controller, 4).length === 0 });
+    const nearResouce = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1, {
+        filter: droped => (
+            creep.room.name !== creep.memory.base ||
+            droped.pos.getRangeTo(creep.room.controller) > 4)
+    });
     if (nearResouce.length > 0) {
         let result = creep.pickup(nearResouce[0]);
-        if(result === OK && nearResouce[0].resourceType === RESOURCE_THORIUM) creep.memory.status = 1;
+        if (result === OK && nearResouce[0].resourceType === RESOURCE_THORIUM) creep.memory.status = 1;
     }
 
     // withdraw near rains

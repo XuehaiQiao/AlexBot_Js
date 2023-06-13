@@ -88,6 +88,7 @@ module.exports = {
         }
         else {
             if(creep.hits < creep.hitsMax) creep.heal(creep);
+            creep.toResPos();
         }
 
     },

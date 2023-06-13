@@ -45,15 +45,16 @@ module.exports = {
         };
 
         // boost
-        if(creep.memory.boost && !creep.memory.boosted && creep.memory.boostInfo) {
+        if (creep.memory.boost && !creep.memory.boosted && creep.memory.boostInfo) {
             creep.say('boost')
             creep.getBoosts();
             return;
         }
 
         // duo logic
-        if (this.duoLogic(creep, state)) { 
+        if (this.duoLogic(creep, state)) {
             creep.say('freeze')
+            this.checkAndHeal(creep, state);
             return;
         }
 
@@ -65,14 +66,26 @@ module.exports = {
             return;
         }
 
+        // moveTo flag logic
+        if (this.blueFlagLogic(creep, state)) {
+            this.checkAndHeal(creep, state);
+            return;
+        }
+
+        // flee flag logic
+        if (this.redFlagLogic(creep, state)) {
+            this.checkAndHeal(creep, state);
+            return;
+        }
+
         // attack wall/rampart flag logic
         if (this.greenFlagLogic(creep, state)) {
             this.checkAndHeal(creep, state);
             return;
         }
 
-        // moveTo flag logic
-        if (this.blueFlagLogic(creep, state)) {
+        // attack wall/rampart flag logic
+        if (this.yellowFlagLogic(creep, state)) {
             this.checkAndHeal(creep, state);
             return;
         }
@@ -82,16 +95,16 @@ module.exports = {
             filter: struct => (
                 struct.structureType != STRUCTURE_CONTROLLER &&
                 struct.structureType != STRUCTURE_RAMPART &&
-                struct.structureType != STRUCTURE_STORAGE &&
+                //struct.structureType != STRUCTURE_STORAGE &&
                 struct.structureType != STRUCTURE_TERMINAL
             )
         });
 
         if (target) {
             let result = creep.attack(target);
-            
+
             if (result === ERR_NOT_IN_RANGE) {
-                creep.moveTo(target, {maxRooms: 1});
+                creep.moveTo(target, { maxRooms: 1 });
                 creep.rangedAttack(target);
             }
             else if (result === OK) {
@@ -106,7 +119,7 @@ module.exports = {
         // attack creeps
         target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
         if (target) {
-            creep.moveTo(target, {maxRooms: 1});
+            creep.moveTo(target, { maxRooms: 1 });
 
             this.atkOnTheWay(creep, state);
             this.checkAndHeal(creep, state);
@@ -114,7 +127,7 @@ module.exports = {
         }
 
         // heal self
-        if(creep.hits < creep.hitsMax) {
+        if (creep.hits < creep.hitsMax) {
             this.checkAndHeal(creep, state);
             return;
         }
@@ -126,8 +139,8 @@ module.exports = {
                 struct.structureType === STRUCTURE_RAMPART
             )
         });
-        if(target) {
-            creep.moveTo(target, {maxRooms: 1});
+        if (target) {
+            creep.moveTo(target, { maxRooms: 1 });
             creep.attack(target);
             creep.rangedAttack(target);
         }
@@ -171,7 +184,7 @@ module.exports = {
     blueFlagLogic: function (creep, state) {
         let blueFlag = creep.pos.findClosestByPath(FIND_FLAGS, { filter: { color: COLOR_BLUE } });
         if (blueFlag) {
-            creep.moveTo(blueFlag, {maxRooms: 1});
+            creep.moveTo(blueFlag, { maxRooms: 1 });
             this.atkOnTheWay(creep, state);
             return true;
         }
@@ -191,7 +204,7 @@ module.exports = {
                 let result = creep.attack(target);
                 creep.rangedAttack(target);
                 if (result === ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target, {maxRooms: 1});
+                    creep.moveTo(target, { maxRooms: 1 });
                 }
                 else if (result === OK) {
                     state.attackResult = OK;
@@ -202,10 +215,57 @@ module.exports = {
                     let targetCreep = creep.pos.findClosestByRange(closeHostiles);
                     creep.rangedAttack(targetCreep);
                 }
+                else {
+                    if (state.attackResult === OK) creep.rangedMassAttack();
+                }
 
                 return true
             }
             else greenFlag.remove();
+        }
+
+        return false;
+    },
+
+    yellowFlagLogic: function (creep, state) {
+        let yellowFlag = creep.pos.findClosestByPath(FIND_FLAGS, { filter: { color: COLOR_YELLOW } });
+        if (yellowFlag) {
+            let target = _.find(yellowFlag.pos.lookFor(LOOK_STRUCTURES));
+
+            if (target) {
+                let result = creep.attack(target);
+                creep.rangedAttack(target);
+                if (result === ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target, { maxRooms: 1 });
+                }
+                else if (result === OK) {
+                    state.attackResult = OK;
+                }
+
+                let closeHostiles = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3);
+                if (closeHostiles.length) {
+                    let targetCreep = creep.pos.findClosestByRange(closeHostiles);
+                    creep.rangedAttack(targetCreep);
+                }
+                else {
+                    if (state.attackResult === OK) creep.rangedMassAttack();
+                }
+
+                return true
+            }
+            else yellowFlag.remove();
+        }
+
+        return false;
+    },
+
+    redFlagLogic: function (creep, state) {
+        let redFlag = creep.pos.findClosestByPath(FIND_FLAGS, { filter: { color: COLOR_RED } });
+        if (redFlag && (creep.hits < creep.hitsMax)) {
+            creep.say('flee');
+            creep.fleeFromAdv(redFlag, creep.pos.getRangeTo(redFlag) + 5);
+            this.atkOnTheWay(creep, state);
+            return true;
         }
 
         return false;
@@ -219,7 +279,7 @@ module.exports = {
             if (hostiles.length) {
                 let target = creep.pos.findClosestByRange(hostiles);
                 attackResult = creep.attack(target);
-                if(attackResult === OK) {
+                if (attackResult === OK) {
                     creep.rangedMassAttack();
                 }
                 else creep.rangedAttack(target);
@@ -238,7 +298,18 @@ module.exports = {
     },
 
     checkAndHeal: function (creep, state) {
-        if (state.attackResult !== OK) creep.heal(creep);
+        if (state.partner && creep.hits > creep.hitsMax - 500 && state.partner.hits < state.partner.hitsMax - 500) {
+            creep.heal(state.partner);
+            return;
+        }
+
+        if (state.attackResult !== OK) {
+            creep.heal(creep);
+        }
+        else if (creep.hits < creep.hitsMax * 0.85) {
+            creep.say('heal');
+            creep.heal(creep);
+        }
     },
 
     // checks if the room needs to spawn a creep

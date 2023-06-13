@@ -82,6 +82,7 @@ module.exports = {
         let partner = Game.getObjectById(creep.memory.front);
         if (!partner) {
             // todo: heal surronding creeps
+            creep.heal(creep);
             return;
         }
 

@@ -1,21 +1,32 @@
+const { baseUtil } = require("../util");
+
 module.exports = {
     properties: {
-        role: "defender",
+        role: "defMelee",
         stages: {
             1: {maxEnergyCapacity: 300, bodyParts:[MOVE, ATTACK, MOVE, ATTACK], number: 1},
             2: {maxEnergyCapacity: 550, bodyParts:[MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK], number: 1},
             3: {maxEnergyCapacity: 800, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
-            //4: {maxEnergyCapacity: 1300, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
-            5: {maxEnergyCapacity: 1800, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, RANGED_ATTACK, RANGED_ATTACK, ATTACK, ATTACK, ATTACK, HEAL, MOVE], number: 1},
-            6: {maxEnergyCapacity: 2300, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, RANGED_ATTACK, RANGED_ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, HEAL, MOVE], number: 1},
+            4: {maxEnergyCapacity: 1300, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
+            5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(12).fill(ATTACK), ...new Array(12).fill(MOVE)], number: 1},
+            6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(15).fill(ATTACK), ...new Array(15).fill(MOVE)], number: 1},
+            7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(25).fill(ATTACK), ...new Array(25).fill(MOVE)], number: 1},
         },
     },
     /** @param {Creep} creep **/
     run: function(creep) {
-        // move to its target room if not in
-        if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
-            creep.moveToRoomAdv(creep.memory.targetRoom);
+
+        // boost
+        if (creep.memory.boost && !creep.memory.boosted && creep.memory.boostInfo) {
+            creep.say('boost');
+            creep.getBoosts();
             return;
+        }
+
+        let room = Game.rooms[creep.memory.base];
+        if(!room) {
+            console.log('lost room', creep.memory.base);
+            return
         }
 
         let hostile;
@@ -25,28 +36,33 @@ module.exports = {
         if(!hostile) {
             hostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
         } 
-        if(!hostile) {
-            hostile = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {filter: struct => (struct.structureType != STRUCTURE_KEEPER_LAIR &&struct.structureType != STRUCTURE_CONTROLLER)});
-        }
 
         if (hostile) {
             creep.rangedAttack(hostile);
-            if(creep.attack(hostile) !== OK) creep.heal(creep);
-            creep.moveTo(hostile, {visualizePathStyle: {stroke: '#ff0000'}, maxRooms: 1});
-            //creep.say(moveResult);
-        }
-        else if(creep.getActiveBodyparts(HEAL)) {
-            if(creep.hits < creep.hitsMax) creep.heal(creep);
-            let damaged = creep.pos.findClosestByRange(FIND_MY_CREEPS, {filter: c => c.hits < c.hitsMax});
-            if(damaged) {
-                if(creep.heal(damaged) === ERR_NOT_IN_RANGE) {
-                    creep.travelTo(damaged);
-                }
-                creep.rangedHeal(damaged);
+            creep.attack(hostile);
+            
+            let nearestRampart = hostile.pos.findClosestByRange(FIND_MY_STRUCTURES, {filter: struct => struct.structureType === STRUCTURE_RAMPART});
+            if(nearestRampart) {
+                creep.travelTo(nearestRampart, {roomCallback: (roomName, costMatrix) => {
+                    if(Memory.rooms[roomName] && Game.rooms[roomName]) {
+                        return baseUtil.getEnclosureMatrix(Game.rooms[roomName]);
+                    }
+                    else return undefined;
+                }});
             }
-        }
+            else {
+                creep.travelTo(hostile, {roomCallback: (roomName, costMatrix) => {
+                    if(Memory.rooms[roomName] && Game.rooms[roomName]) {
+                        return baseUtil.getEnclosureMatrix(Game.rooms[roomName]);
+                    }
+                    else return undefined;
+                }});
+            }
 
-        
+        }
+        else {
+            creep.toResPos();
+        }
     },
 
     // checks if the room needs to spawn a creep

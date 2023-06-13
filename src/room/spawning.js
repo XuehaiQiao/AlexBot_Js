@@ -3,20 +3,27 @@ const creepLogic = require("../creeps");
 // const creepTypes2 = ['carrier2', 'harvester2', 'upgrader2', 'builder2']; // 'mineralCarrier'
 
 module.exports = function (room) {
-    if (room.name === 'E17N2' && Game.time % 1400 === 500) {
-        Game.rooms['E17N2'].memory.tasks.spawnTasks.push({
-            name: 'rangeAtker',
-            body: [...new Array(9).fill(MOVE), ...new Array(5).fill(RANGED_ATTACK), ...new Array(4).fill(HEAL)],
-            memory: { role: 'rangeAtker', targetRoom: 'E16N3', }
-        });
-    }
-    if (room.name === 'E16S2' && Game.time % 1350 === 500) {
-        Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
-            name: 'rangeAtker',
-            body: [...new Array(9).fill(MOVE), ...new Array(5).fill(RANGED_ATTACK), ...new Array(4).fill(HEAL)],
-            memory: { role: 'rangeAtker', targetRoom: 'E15N2', }
-        });
-    }
+    // if (room.name === 'E6S2' && Game.time % 1300 === 500) {
+    //     Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
+    //         name: 'rangeAtker',
+    //         body: [...new Array(7).fill(MOVE), ...new Array(4).fill(RANGED_ATTACK), ...new Array(3).fill(HEAL)],
+    //         memory: { role: 'rangeAtker', targetRoom: 'E10S1', }
+    //     });
+    //     Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
+    //         name: 'rangeAtker',
+    //         body: [...new Array(7).fill(MOVE), ...new Array(4).fill(RANGED_ATTACK), ...new Array(3).fill(HEAL)],
+    //         memory: { role: 'rangeAtker', targetRoom: 'E11S1', }
+    //     });
+    // }
+
+    // if (room.name === 'E16S2' && Game.time % 1300 === 500) {
+    //     Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
+    //         name: 'rangeAtker',
+    //         body: [...new Array(7).fill(MOVE), ...new Array(4).fill(RANGED_ATTACK), ...new Array(3).fill(HEAL)],
+    //         memory: { role: 'rangeAtker', targetRoom: 'E12S1', }
+    //     });
+
+    // }
 
     // return if no idle spawn
     let idleSpawn = _.find(room.find(FIND_MY_SPAWNS), spawn => spawn.spawning == null);
@@ -119,8 +126,8 @@ function createTaskCreep(room, spawn) {
 function roomDefenceCreeps(room, spawn) {
     // stop sending outSourcer if base room found enemy
     // todo: create active defence creeps
-    // let enemies = room.find(FIND_HOSTILE_CREEPS);
-    // if (enemies.length) return true;
+    let enemies = room.find(FIND_HOSTILE_CREEPS, { filter: c => c.owner.username !== 'Invader' && c.owner.username !== 'Source Keeper' });
+    if (enemies.length) return true;
 
     return false;
 }

@@ -1,13 +1,13 @@
-// duo 4450 + 5400
+// duo 5300 + 5400
 Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
     name: 'atkM',
-    body: [...new Array(5).fill(RANGED_ATTACK), ...new Array(15).fill(ATTACK), ...new Array(25).fill(MOVE), ...new Array(5).fill(HEAL)],
+    body: [...new Array(5).fill(RANGED_ATTACK), ...new Array(10).fill(ATTACK), ...new Array(25).fill(MOVE), ...new Array(10).fill(HEAL)],
     memory: {
         role: 'atkMelee',
-        targetRoom: 'E15N3',
-        duoNumber: 1,
+        targetRoom: 'E17N4',
+        duoNumber: 3,
         boost: true,
-        boostInfo: { LHO2: 5, KHO2: 5, UH: 15 }
+        boostInfo: { LHO2: 10, KHO2: 5, UH2O: 10 }
     }
 });
 
@@ -16,32 +16,39 @@ Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
     body: [...new Array(18).fill(MOVE), ...new Array(18).fill(HEAL)],
     memory: {
         role: 'atkMedic',
-        duoNumber: 1,
+        duoNumber: 3,
         boost: true,
         boostInfo: { LHO2: 18 }
     }
 });
 
 
-Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
+Game.rooms['E11S2'].memory.tasks.spawnTasks.push({
     name: 'atkMel',
     body: [...new Array(2).fill(RANGED_ATTACK), ...new Array(2).fill(ATTACK), ...new Array(4).fill(MOVE)],
     memory: {
         role: 'atkMelee',
-        targetRoom: 'E16N1',
+        targetRoom: 'E11S1',
         duoNumber: 1,
-        boost: true,
-        boostInfo: { KO: 2, UH: 2 }
     }
 });
 
-Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
+Game.rooms['E11S2'].memory.tasks.spawnTasks.push({
     name: 'atkMed',
-    body: [...new Array(2).fill(HEAL), ...new Array(2).fill(MOVE)],
+    body: [...new Array(8).fill(HEAL), ...new Array(2).fill(MOVE)],
     memory: {
         role: 'atkMedic',
         duoNumber: 1,
+    }
+});
+
+
+Game.rooms['E11S2'].memory.tasks.spawnTasks.push({
+    name: 'defM',
+    body: [...new Array(5).fill(ATTACK), ...new Array(5).fill(MOVE)],
+    memory: {
+        role: 'defMelee',
         boost: true,
-        boostInfo: { LO: 2 }
+        boostInfo: { XUH2O: 5 }
     }
 });

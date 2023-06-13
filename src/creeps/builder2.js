@@ -50,7 +50,6 @@ module.exports = {
                 let data = {};
                 creep.travelTo(target, { returnData: data, range: 3 });
                 if (data.path) { 
-                    creep.say(`${data.path.length} more!`);
                     creep.room.visual.circle(data.nextPos, {fill: 'transparent', radius: 0.55, stroke: 'red'});
                 }
             }

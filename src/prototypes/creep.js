@@ -175,36 +175,41 @@ Creep.prototype.harvestEnergy = function () {
         return ERR_NOT_FOUND;
     }
 
-    if (!this.pos.isNearTo(source)) {
-        this.moveToNoCreepInRoom(source);
-        result = ERR_NOT_IN_RANGE;
-    }
-    else {
-        let links = source.pos.findInRange(FIND_STRUCTURES, 2, { filter: struct => struct.structureType == STRUCTURE_LINK && struct.store.getFreeCapacity(RESOURCE_ENERGY) > 0 });
-        if (links.length > 0) {
-            result = this.harvest(source);
-            if (links.length > 0 && (this.store.getFreeCapacity() < 20 || this.ticksToLive < 2 || result == ERR_NOT_ENOUGH_RESOURCES)) {
-                if (this.transfer(links[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-                    this.moveTo(links[0]);
-                }
+    let link = source.pos.findClosestByRange(FIND_STRUCTURES, {
+        filter: struct => (
+            struct.structureType === STRUCTURE_LINK &&
+            struct.pos.inRangeTo(source.pos, 2)
+        )
+    });
+    let contianer = this.pos.findClosestByRange(FIND_STRUCTURES, {
+        filter: struct => (
+            struct.structureType === STRUCTURE_CONTAINER &&
+            struct.pos.inRangeTo(source.pos, 1)
+        )
+    });
+
+
+    if (link) {
+        result = this.harvest(source);
+        if (!source.pos.isNearTo(this.pos)) this.moveToNoCreepInRoom(source);
+        else if (this.store.getFreeCapacity() < 20 || this.ticksToLive < 2 || result == ERR_NOT_ENOUGH_RESOURCES) {
+            if (this.transfer(link, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+                this.moveToNoCreepInRoom(link);
             }
         }
-        // if not near link, move to container / check if container is full
+    }
+    else if (contianer) {
+        if (!contianer.pos.isEqualTo(this.pos)) this.moveToNoCreepInRoom(contianer);
+        if (contianer.store.getFreeCapacity() > 0) result = this.harvest(source);
+        else result = ERR_NOT_ENOUGH_RESOURCES;
+    }
+    else {
+        if (!this.pos.isNearTo(source)) {
+            this.moveToNoCreepInRoom(source);
+            result = ERR_NOT_IN_RANGE;
+        }
         else {
-            let contianer = this.pos.findClosestByRange(FIND_STRUCTURES, {
-                filter: struct => (
-                    struct.structureType == STRUCTURE_CONTAINER &&
-                    struct.pos.inRangeTo(source.pos, 1)
-                )
-            });
-            if (contianer) {
-                if (!contianer.pos.isEqualTo(this.pos)) this.moveTo(contianer);
-                if (contianer.store.getFreeCapacity() > 0) result = this.harvest(source);
-                else result = ERR_NOT_ENOUGH_RESOURCES;
-            }
-            else {
-                result = this.harvest(source);
-            }
+            result = this.harvest(source);
         }
     }
 
@@ -357,7 +362,7 @@ Creep.prototype.takeEnergyFromControllerLink = function () {
     }
 }
 
-Creep.prototype.toResPos = function toResPos(restTime = 5) {
+Creep.prototype.toResPos = function (restTime = 5) {
     if (roomInfo[this.room.name]) {
         if (this.pos.isNearTo(roomInfo[this.room.name].restPos)) {
             this.memory.restTime = restTime;
