@@ -3169,55 +3169,69 @@ module.exports = {
     },
 
     collectPower: function (creep) {
-                if (!creep.memory.taken) {
-                    if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
-                        creep.moveToRoomAdv(creep.memory.targetRoom);
-                        return;
-                    }
-                    let dropedPower = _.find(creep.room.find(FIND_DROPPED_RESOURCES), resource => resource.resourceType == RESOURCE_POWER);
-                    if (dropedPower) {
-                        let result = creep.pickup(dropedPower);
-                        if (result == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(dropedPower);
-                        }
-                        else if(result === OK) {
-                            creep.memory.taken = true;
-                        }
-                        return;
-                    }
+        if (!creep.memory.taken) {
+            if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
+                creep.moveToRoomAdv(creep.memory.targetRoom);
+                return;
+            }
 
-                    let powerBank = creep.room.find(FIND_STRUCTURES, {filter: struct => struct.structureType === STRUCTURE_POWER_BANK})[0];
-                    if(powerBank) creep.travelTo(powerBank, {range: 5});
+            let ruin = creep.room.find(FIND_RUINS, { filter: ruin => ruin.store[RESOURCE_POWER] > 0 })[0];
+            if (ruin) {
+                let result = creep.withdraw(ruin, RESOURCE_POWER);
+                if (result === ERR_NOT_IN_RANGE) {
+                    creep.moveTo(ruin);
                 }
-                else {
-                    if(creep.store.getUsedCapacity() === 0) {
-                        creep.suicide();
-                        return;
-                    }
-                    if (creep.memory.base && creep.memory.base != creep.room.name) {
-                        creep.moveToRoom(creep.memory.base);
-                        return;
-                    }
-                    let terminal = creep.room.terminal;
-                    let storage = creep.room.storage;
-        
-                    if (terminal && terminal.store.getFreeCapacity() > 0) {
-                        let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
-                        if (creep.transfer(storage, resourceType) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(storage);
-                        }
-                        return;
-                    }
-                    else if(storage && storage.store.getFreeCapacity() > 0) {
-                        let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
-                        if (creep.transfer(storage, resourceType) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(storage);
-                        }
-                    }
-                    else {
-                        creep.suicide();
-                    }
+                else if (result === OK) {
+                    creep.memory.taken = true;
                 }
+                return;
+            }
+            let dropedPower = _.find(creep.room.find(FIND_DROPPED_RESOURCES), resource => resource.resourceType == RESOURCE_POWER);
+            if (dropedPower) {
+                let result = creep.pickup(dropedPower);
+                if (result == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(dropedPower);
+                }
+                else if (result === OK) {
+                    creep.memory.taken = true;
+                }
+                return;
+            }
+
+            let powerBank = creep.room.find(FIND_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_POWER_BANK })[0];
+            if (powerBank) {
+                creep.travelTo(powerBank, { range: 5 });
+            }
+        }
+        else {
+            if (creep.store.getUsedCapacity() === 0) {
+                creep.suicide();
+                return;
+            }
+            if (creep.memory.base && creep.memory.base != creep.room.name) {
+                creep.moveToRoom(creep.memory.base);
+                return;
+            }
+            let terminal = creep.room.terminal;
+            let storage = creep.room.storage;
+
+            if (terminal && terminal.store.getFreeCapacity() > 0) {
+                let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
+                if (creep.transfer(storage, resourceType) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(storage);
+                }
+                return;
+            }
+            else if (storage && storage.store.getFreeCapacity() > 0) {
+                let resourceType = _.find(Object.keys(creep.store), resource => creep.store[resource] > 0);
+                if (creep.transfer(storage, resourceType) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(storage);
+                }
+            }
+            else {
+                creep.suicide();
+            }
+        }
     },
     spawn: function (room) {
         return false;
