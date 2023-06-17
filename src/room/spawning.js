@@ -16,13 +16,17 @@ module.exports = function (room) {
     //     });
     // }
 
-    // if (room.name === 'E16S2' && Game.time % 1300 === 500) {
-    //     Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
+    // if (room.name === 'E14N3' && Game.time % 1200 === 600) {
+    //     Game.rooms['E14N3'].memory.tasks.spawnTasks.push({
     //         name: 'rangeAtker',
-    //         body: [...new Array(7).fill(MOVE), ...new Array(4).fill(RANGED_ATTACK), ...new Array(3).fill(HEAL)],
-    //         memory: { role: 'rangeAtker', targetRoom: 'E12S1', }
+    //         body: [...new Array(2).fill(TOUGH), ...new Array(16).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(4).fill(HEAL)],
+    //         memory: {
+    //             role: 'rangeAtker',
+    //             targetRoom: 'E17N6',
+    //             boost: true,
+    //             boostInfo: { XLHO2: 4, XGHO2: 2, XKHO2: 10 }
+    //         }
     //     });
-
     // }
 
     // return if no idle spawn
@@ -32,7 +36,10 @@ module.exports = function (room) {
     // base creeps
     if (createCoreCreep(room, idleSpawn)) return;
     if (createTaskCreep(room, idleSpawn)) return;
-    if (roomDefenceCreeps(room, idleSpawn)) return;
+    //if (roomDefenceCreeps(room, idleSpawn)) return;
+
+    // reactor creeps
+    if (createReactorCreep(room, idleSpawn)) return;
 
     // remote room creeps
     for (const remoteRoomName of room.memory.outSourceRooms) {
@@ -102,6 +109,70 @@ function createCoreCreep(room, spawn) {
     return false;
 }
 
+function createReactorCreep(room, spawn) {
+    if (room.name !== 'E6S2') return false;
+
+    // scout && defender
+    let scoutNum = 0;
+    if (global.roomCensus['E5S5'] && global.roomCensus['E5S5']['scout']) scoutNum = global.roomCensus['E5S5']['scout'];
+    if (scoutNum < 1) {
+        let result = spawnCreep(room, spawn, creepLogic['scout'].spawnData(room, 'E5S5'));
+        if (result === OK) return true;
+    }
+
+    let defenderNum = 0;
+    if (global.roomCensus['E5S5'] && global.roomCensus['E5S5']['rangeAtker']) defenderNum = global.roomCensus['E5S5']['rangeAtker'];
+    if (defenderNum < 1) {
+        let result = spawnCreep(room, spawn, {
+            name: 'rA' + Game.time % 5000,
+            body: [...new Array(10).fill(RANGED_ATTACK), ...new Array(16).fill(MOVE), ...new Array(6).fill(HEAL)],
+            memory: { role: 'rangeAtker', targetRoom: 'E5S5', }
+        });
+        if (result === OK) return true;
+    }
+
+    // scout && defender
+    if (Game.time % 1200 === 500) {
+        room.memory.tasks.spawnTasks.push({
+            name: 'rangeAtker',
+            body: [...new Array(10).fill(RANGED_ATTACK), ...new Array(6).fill(HEAL), ...new Array(16).fill(MOVE)],
+            memory: { role: 'rangeAtker', targetRoom: 'E5S5', }
+        });
+    }
+
+    if (Game.time % 1200 === 1100) {
+        room.memory.tasks.spawnTasks.push(creepLogic['scout'].spawnData(room, 'E5S5'));
+    }
+
+    let targetRoom = Game.rooms['E5S5'];
+    if (!targetRoom) return false;
+
+    // claimer
+    let reactor = targetRoom.find(FIND_REACTORS)[0];
+    if (reactor && !reactor.my) {
+        let claimerNum = 0;
+        if (global.roomCensus['E5S5'] && global.roomCensus['E5S5']['claimer']) claimerNum = global.roomCensus['E5S5']['claimer'];
+
+        if (claimerNum < 1) {
+            let result = spawnCreep(room, spawn, {
+                name: 'claimer' + Game.time % 3000,
+                body: [MOVE, CLAIM],
+                memory: { role: 'claimer', targetRoom: 'E5S5', reactor: true }
+            });
+            if (result === OK) return true;
+        }
+    }
+
+    // reactorFiller
+    coreTypes = ['reactorFiller'];
+    let creepTypeNeeded = _.find(coreTypes, type => creepLogic[type].spawn(room, 'E5S5'));
+    let creepSpawnData = creepLogic[creepTypeNeeded] && creepLogic[creepTypeNeeded].spawnData(room, 'E5S5');
+    let result = spawnCreep(room, spawn, creepSpawnData);
+
+    if (result === OK) return true;
+    return false;
+}
+
 function createTaskCreep(room, spawn) {
     if (!room.memory.tasks.spawnTasks) room.memory.tasks.spawnTasks = [];
     let spawnTasks = room.memory.tasks.spawnTasks;
@@ -124,10 +195,21 @@ function createTaskCreep(room, spawn) {
 }
 
 function roomDefenceCreeps(room, spawn) {
-    // stop sending outSourcer if base room found enemy
-    // todo: create active defence creeps
-    let enemies = room.find(FIND_HOSTILE_CREEPS, { filter: c => c.owner.username !== 'Invader' && c.owner.username !== 'Source Keeper' });
-    if (enemies.length) return true;
+    // todo: measure threaten level
+    let enemies = room.find(FIND_HOSTILE_CREEPS, { filter: c => c.owner.username !== 'Invader' && c.owner.username !== 'Source Keeper' && c.body.length > 30 });
+
+    if (enemies.length) {
+        defTypes = ['defMelee'];
+        if (room.energyCapacityAvailable < 1300) defTypes = [];
+        let creepTypeNeeded = _.find(defTypes, type => creepLogic[type].spawn(room));
+        if (creepTypeNeeded) {
+            // get the data for spawning a new creep of creepTypeNeeded
+            let creepSpawnData = creepLogic[creepTypeNeeded].spawnData(room);
+            spawnCreep(room, spawn, creepSpawnData);
+        }
+        // stop sending outSourcer if base room found enemy
+        return true;
+    }
 
     return false;
 }
@@ -153,7 +235,7 @@ function remoteDefenceCreeps(room, spawn, roomName, roomMemory) {
     }
 
 
-    const hostileParts = [ATTACK, RANGED_ATTACK, WORK, HEAL, CLAIM]
+    const hostileParts = [ATTACK, RANGED_ATTACK, WORK, HEAL, CLAIM, CARRY]
     const hostileCreeps = remoteRoom.find(FIND_HOSTILE_CREEPS, {
         filter: c =>
             c.owner.username !== 'Source Keeper' &&

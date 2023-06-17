@@ -14,23 +14,14 @@ module.exports = {
     /** @param {Creep} creep **/
     run: function(creep) {
         // move to its target room if not in
-        if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
-            creep.moveToRoom(creep.memory.targetRoom);
+        if (creep.moveToRoomPassSK(creep.memory.targetRoom)) {
             return;
         }
 
-        if(creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
-            creep.memory.building = 0;
-            creep.say('🔄 harvest');
-        }
-        if(!creep.memory.building && creep.store.getFreeCapacity() == 0) {
-            creep.memory.building = 1;
-            creep.memory.target = Math.floor(Math.random() * creep.room.find(FIND_SOURCES_ACTIVE).length);
-            creep.say('🚧 build');
-        }
+        creep.workerSetStatus();
 
         // build
-        if(creep.memory.building == 1) {
+        if(creep.memory.status) {
             // 1. build
             var target = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
             if(target) {
@@ -135,7 +126,7 @@ module.exports = {
     spawnData: function(room) {
             let name = 'Builder' + Game.time;
             let body;
-            let memory = {role: 'builder', building: 1};
+            let memory = {role: 'builder', base: room.name};
 
             // creep creating example:
             // Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE], 'Builder' + Game.time, {memory: {role: 'builder', building: 1, targetRoom: 'W16S17'}});

@@ -81,8 +81,8 @@ module.exports = {
         // harvest
         else {
             if(!this.takeEnergyNeerController(creep, controller)) {
-                if(!creep.pos.inRangeTo(controller, 4)) {
-                    this.combineMove(creep, controller, 4);
+                if(!creep.pos.inRangeTo(controller, 3)) {
+                    this.combineMove(creep, controller, 3);
                 }
             }
         }
@@ -90,6 +90,8 @@ module.exports = {
 
     // checks if the room needs to spawn a creep
     spawn: function(room) {
+        if(room.find(FIND_MY_CONSTRUCTION_SITES) > 0) return false;
+
         let creepCount;
         if(global.roomCensus[room.name][this.properties.type]) creepCount = global.roomCensus[room.name][this.properties.type]
         else creepCount = 0;
@@ -100,7 +102,7 @@ module.exports = {
         // for level 8 room
         if(room.controller.level == 8){
             if(creepCount >= 1) return false
-            else if ((storage && storage.store[RESOURCE_ENERGY] > 400000) || room.controller.ticksToDowngrade < 50000) {
+            else if ((storage && storage.store[RESOURCE_ENERGY] > 300000) || room.controller.ticksToDowngrade < 50000) {
                 return true
             }
             else return false;

@@ -42,6 +42,13 @@ let creepLogic = {
 
     // defenders
     defMelee:       require('./defMelee'),
+
+    // reactor
+    reactorFiller:  require('./reactorFiller'),
+
+    // power
+    powerMiner: require('./powerMiner'),
+    powerMedic: require('./powerMedic'),
 }
 
 module.exports = creepLogic;

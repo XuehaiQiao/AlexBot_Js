@@ -1,4 +1,5 @@
 const { roomInfo } = require("../config");
+const { energy } = require("../config/roomResourceConfig");
 
 Room.prototype.addTransferTask = function (task) {
     if (!this.memory.tasks) this.memory.tasks = {};
@@ -76,7 +77,7 @@ Room.prototype.reduceFromBoostLab = function (labId, resourceType, amount) {
 
 // storage, storageContainer, controllerContainer
 Room.prototype.getStorage = function (amount) {
-    var storage = this.storage;
+    let storage = this.storage;
 
     // if no storage, change target to containers that near controller
     if (!storage) {
@@ -94,6 +95,20 @@ Room.prototype.getStorage = function (amount) {
                 storage = _.find(containers, con => con.pos.inRangeTo(this.controller.pos, 3));
             }
         };
+
+        return storage;
+    }
+
+    const linkInfo = this.memory.linkInfo;
+    if(linkInfo && (!linkInfo.controllerLink || !linkInfo.managerLink)) {
+        if(storage.store[RESOURCE_ENERGY] > 20000){
+            let containers = this.find(FIND_STRUCTURES, { filter: struct => 
+                struct.structureType === STRUCTURE_CONTAINER &&
+                struct.store.getFreeCapacity() >= amount
+            });
+            storage = _.find(containers, con => con.pos.inRangeTo(this.controller.pos, 3));
+            return storage;
+        }
     }
 
     return storage;

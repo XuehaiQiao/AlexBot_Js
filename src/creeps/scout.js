@@ -1,4 +1,5 @@
-const { roomUtil } = require("../util");
+const { KEEPER } = require("../constants/roomTypes");
+const { roomUtil, inRoomUtil } = require("../util");
 
 module.exports = {
     properties: {
@@ -6,10 +7,22 @@ module.exports = {
     },
     /** @param {Creep} creep **/
     run: function (creep) {
+        // record roomMatrix
+        let ifRepath;
+        if(!creep.room.memory.skMatrix && roomUtil.getRoomType(creep.room.name) === KEEPER) {
+            
+            inRoomUtil.getSKMatrix(creep.room.name);
+            ifRepath = 1;
+        }
+
         // directly move to pos if have one.
         if (creep.memory.targetPos) {
             let targetPos = creep.memory.targetPos;
-            creep.moveTo(new RoomPosition(targetPos.x, targetPos.y, targetPos.roomName), { reusePath: 50 });
+            creep.travelTo(new RoomPosition(targetPos.x, targetPos.y, targetPos.roomName), { 
+                allowSK: true, 
+                roomCallback: (roomName, costMatrix) => inRoomUtil.getSKMatrix(roomName),
+                repath: ifRepath,
+            });
             return;
         }
 
@@ -22,8 +35,13 @@ module.exports = {
         // move to targetRoom
         let targetRoomName = creep.memory.targetRoom
         // move to target room if not in
-        if (creep.moveToRoomAdv(targetRoomName)) {
-            return;
+        if (targetRoomName && creep.room.name !== targetRoomName) {
+            creep.travelTo(new RoomPosition(25, 25, targetRoomName), { 
+                allowSK: true, 
+                roomCallback: (roomName, costMatrix) => inRoomUtil.getSKMatrix(roomName),
+                repath: ifRepath,
+            });
+            return
         }
 
         if (creep.memory.target) {
@@ -32,6 +50,17 @@ module.exports = {
 
             return;
         }
+
+        if(targetRoomName) {
+            creep.travelTo(new RoomPosition(25, 25, targetRoomName), { 
+                allowSK: true, 
+                roomCallback: (roomName, costMatrix) => inRoomUtil.getSKMatrix(roomName),
+                repath: ifRepath,
+                range: 15,
+            });
+            return;
+        }
+
     },
 
     explorerLogic: function (creep) {
@@ -71,8 +100,8 @@ module.exports = {
     // returns an object with the data to spawn a new creep
     spawnData: function (room, targetRoomName) {
         let name = this.properties.role + Game.time;
-        let body = [WORK, CARRY, MOVE];
-        let memory = { role: this.properties.role, status: 0, base: room.name, targetRoom: targetRoomName };
+        let body = [MOVE];
+        let memory = { role: this.properties.role, base: room.name, targetRoom: targetRoomName };
 
         return { name, body, memory };
     },

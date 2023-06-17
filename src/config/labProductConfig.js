@@ -11,19 +11,19 @@ module.exports = {
     // LH2O: [5000, 12000],
     
 
-    XUH2O: [5000, 12000], // attack
-    XLH2O: [5000, 12000],  // repair & build
+    XUH2O: [6000, 17000], // attack
+    XLH2O: [6000, 17000],  // repair & build
 
-    XKHO2: [5000, 12000], // ranged_attack
-    XLHO2: [5000, 12000],  // heal
-    XGHO2: [5000, 12000], // tough
+    XKHO2: [6000, 17000], // ranged_attack
+    XLHO2: [6000, 17000],  // heal
+    XGHO2: [6000, 17000], // tough
+    XZHO2: [6000, 17000], // move
     
-    XKH2O: [5000, 12000],  // carry
-    XZHO2: [5000, 12000], // move
-    XGH2O: [5000, 12000],  // upgradeController
-    XZH2O: [5000, 12000],  // dismantle
-    XUHO2: [5000, 12000], // harvest
+    // XKH2O: [5000, 12000],  // carry
+    // XGH2O: [5000, 12000],  // upgradeController
+    // XZH2O: [5000, 12000],  // dismantle
+    // XUHO2: [5000, 12000], // harvest
 
-    G: [5000, 12000],
-    OH: [5000, 12000],
+    G: [6000, 17000],
+    OH: [6000, 17000],
 }

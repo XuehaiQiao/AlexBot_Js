@@ -30,8 +30,8 @@ const roomUtil = {
         if (roomPos[0] % 10 === 0 || roomPos[1] % 10 === 0) return roomTypes.HIGHWAY;
         else if (roomPos[0] % 10 === 5 && roomPos[1] % 10 === 5) return roomTypes.CENTER;
         else if (
-            (roomPos[0] % 10 === 4 || roomPos[0] % 10 === 6) &&
-            (roomPos[1] % 10 === 4 || roomPos[1] % 10 === 6)
+            (roomPos[0] % 10 >= 4 && roomPos[0] % 10 <= 6 && roomPos[1] % 10 >= 4 && roomPos[1] % 10 <= 6) &&
+            (roomPos[0] % 10 !== 5 || roomPos[1] % 10 !== 5)
         ) return roomTypes.KEEPER;
         else return roomTypes.NORMAL;
     },

@@ -1,3 +1,4 @@
+const { roomInfo } = require("../config");
 const { T3_HEAL, T3_TOUGH, T3_RANGE_ATTACK } = require("../constants/boostName");
 
 module.exports = {
@@ -16,6 +17,7 @@ module.exports = {
         // move to its target room if not in
         if (creep.moveToRoomAdv(creep.memory.targetRoom)) {
             if(creep.hits < creep.hitsMax) creep.heal(creep);
+            atkOnTheWay(creep);
             return;
         }
 
@@ -25,7 +27,7 @@ module.exports = {
             if (!hostile) creep.memory.target = null;
         }
         if (!hostile) {
-            hostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+            hostile = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
         }
         // if (!hostile && creep.memory.invader) {
         //     hostile = _.find(creep.room.find(FIND_HOSTILE_STRUCTURES), struct => struct.structureType == STRUCTURE_INVADER_CORE);
@@ -34,7 +36,7 @@ module.exports = {
         //     }
         // }
         if (!hostile) {
-            hostile = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
+            hostile = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
                 filter: struct => (
                     struct.structureType !== STRUCTURE_KEEPER_LAIR &&
                     struct.structureType !== STRUCTURE_INVADER_CORE &&
@@ -87,8 +89,17 @@ module.exports = {
 
         }
         else {
-            if(creep.hits < creep.hitsMax) creep.heal(creep);
-            creep.toResPos();
+            let damagedCreeps = creep.room.find(FIND_MY_CREEPS, {filter: c => c.hits < c.hitsMax});
+            if(creep.hits < creep.hitsMax) {
+                creep.heal(creep);
+            }
+            else if(damagedCreeps.length) {
+                let target = creep.pos.findClosestByRange(damagedCreeps);
+                creep.travelTo(target);
+                creep.heal(target);
+                creep.rangedHeal(target);
+            }
+            else if(roomInfo[creep.room.name]) creep.toResPos();
         }
 
     },
@@ -142,4 +153,15 @@ function attackInDistance(creep, hostile, range) {
 
     creep.rangedAttack(hostile);
     if(creep.pos.isNearTo(hostile)) creep.rangedMassAttack();
+}
+
+function atkOnTheWay(creep) {
+    let hostiles = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3);
+    if (hostiles.length) {
+        let target = creep.pos.findClosestByRange(hostiles);
+        if (target.pos.isNearTo(creep)) {
+            creep.rangedMassAttack();
+        }
+        else creep.rangedAttack(target);
+    }
 }

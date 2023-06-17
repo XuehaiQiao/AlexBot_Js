@@ -89,14 +89,14 @@ module.exports = {
         //this.atkPassingHostile(creep);
 
         creep.moveTo(partner);
-        if(partner.hits === partner.hitsMax && creep.hits === creep.hitsMax) {
-            let adjCreeps = creep.pos.findInRange(FIND_MY_CREEPS, 3, {filter: c => c.hits < c.hitsMax});
-            if(adjCreeps.length > 0) {
+        if (partner.hits === partner.hitsMax && creep.hits === creep.hitsMax) {
+            let adjCreeps = creep.pos.findInRange(FIND_MY_CREEPS, 3, { filter: c => c.hits < c.hitsMax });
+            if (adjCreeps.length > 0) {
                 let target = creep.pos.findClosestByRange(adjCreeps);
-                if(creep.heal(target) === ERR_NOT_IN_RANGE) creep.rangedHeal(target);
+                if (creep.heal(target) === ERR_NOT_IN_RANGE) creep.rangedHeal(target);
             }
         }
-        else if(partner.hits === partner.hitsMax && creep.hits < creep.hitsMax) {
+        else if (partner.hits === partner.hitsMax && creep.hits < creep.hitsMax) {
             creep.heal(creep);
         }
         else if (creep.hits <= creep.hitsMax - 12 * creep.getActiveBodyparts(HEAL)) {
@@ -104,12 +104,19 @@ module.exports = {
         }
         else {
             creep.heal(partner);
-            if(!creep.pos.isNearTo(partner)) creep.rangedHeal(partner);
+            if (!creep.pos.isNearTo(partner)) creep.rangedHeal(partner);
         }
     },
 
     atkPlayer: function (creep) {
-        let enemies = creep.room.find(FIND_HOSTILE_CREEPS, { filter: c => c.owner.username !== 'Invader' && c.owner.username !== 'Source Keeper' });
+        const hostileParts = [ATTACK, RANGED_ATTACK, WORK, HEAL, CLAIM, CARRY];
+        let enemies = creep.room.find(FIND_HOSTILE_CREEPS, {
+            filter: (
+                c => c.owner.username !== 'Invader' &&
+                    c.owner.username !== 'Source Keeper' &&
+                    _.find(hostileParts, partType => c.getActiveBodyparts(partType) > 0)
+            )
+        });
         if (enemies.length) {
             let invader;
             let medic = creep.pos.findClosestByRange(enemies, { filter: c => c.getActiveBodyparts(HEAL) > 0 });
@@ -123,11 +130,11 @@ module.exports = {
                 let result = creep.attack(invader);
                 creep.say(result);
                 creep.rangedAttack(invader);
-                if(result !== OK) {
+                if (result !== OK) {
                     creep.heal(creep);
                     creep.travelTo(invader, { allowSK: true, movingTarget: true });
                 }
-                
+
             }
             return true;
         }
@@ -149,7 +156,7 @@ module.exports = {
                 let result = creep.attack(invader);
                 creep.say(result);
                 creep.rangedAttack(invader);
-                if(result === ERR_NOT_IN_RANGE) {
+                if (result === ERR_NOT_IN_RANGE) {
                     creep.heal(creep);
                 }
                 creep.travelTo(invader, { allowSK: true, movingTarget: true });
@@ -162,7 +169,7 @@ module.exports = {
     atkSourceKeeper: function (creep) {
         let targetKeeper = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, { filter: c => c.owner.username === 'Source Keeper' });
         if (targetKeeper) {
-            if(creep.attack(targetKeeper) === ERR_NOT_IN_RANGE) {
+            if (creep.attack(targetKeeper) === ERR_NOT_IN_RANGE) {
                 creep.heal(creep);
                 creep.moveTo(targetKeeper);
             }
@@ -214,7 +221,7 @@ module.exports = {
         if (workingFront) return false
 
         let waitings = _.filter(creeps, c => c.memory.front == null && c.memory.back == null);
-        
+
         if (waitings.length < 2) {
             return true;
         }
@@ -232,7 +239,7 @@ module.exports = {
         let body;
         let memory;
 
-        if(waitings.length < 1) {
+        if (waitings.length < 1) {
             // create front
             name = this.properties.role + 'F' + Game.time % 10000;
             body = this.properties.type.front.body;

@@ -1,17 +1,17 @@
-const { baseUtil } = require("../util");
+const { inRoomUtil } = require("../util");
 
 module.exports = {
     properties: {
         role: "defMelee",
         stages: {
-            1: {maxEnergyCapacity: 300, bodyParts:[MOVE, ATTACK, MOVE, ATTACK], number: 1},
-            2: {maxEnergyCapacity: 550, bodyParts:[MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK], number: 1},
-            3: {maxEnergyCapacity: 800, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
-            4: {maxEnergyCapacity: 1300, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
-            5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(12).fill(ATTACK), ...new Array(12).fill(MOVE)], number: 1},
-            6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(15).fill(ATTACK), ...new Array(15).fill(MOVE)], number: 1},
-            7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(25).fill(ATTACK), ...new Array(25).fill(MOVE)], number: 1},
+            //1: {maxEnergyCapacity: 300, bodyParts:[MOVE, ATTACK, MOVE, ATTACK], number: 2},
+            //3: {maxEnergyCapacity: 800, bodyParts:[...new Array(6).fill(ATTACK), ...new Array(3).fill(MOVE)], number: 2}, // 630
+            4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(12).fill(ATTACK), ...new Array(6).fill(MOVE)], number: 2}, // 1260
+            5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(16).fill(ATTACK), ...new Array(8).fill(MOVE)], number: 2}, // 1680
+            6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(20).fill(ATTACK), ...new Array(10).fill(MOVE)], number: 2}, // 2100
+            7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(36).fill(ATTACK), ...new Array(18).fill(MOVE)], number: 2}, // 3460
         },
+        boostTypes: ['UH', 'UH2O', 'XUH2O'],
     },
     /** @param {Creep} creep **/
     run: function(creep) {
@@ -45,7 +45,7 @@ module.exports = {
             if(nearestRampart) {
                 creep.travelTo(nearestRampart, {roomCallback: (roomName, costMatrix) => {
                     if(Memory.rooms[roomName] && Game.rooms[roomName]) {
-                        return baseUtil.getEnclosureMatrix(Game.rooms[roomName]);
+                        return inRoomUtil.getEnclosureMatrix(Game.rooms[roomName]);
                     }
                     else return undefined;
                 }});
@@ -53,7 +53,7 @@ module.exports = {
             else {
                 creep.travelTo(hostile, {roomCallback: (roomName, costMatrix) => {
                     if(Memory.rooms[roomName] && Game.rooms[roomName]) {
-                        return baseUtil.getEnclosureMatrix(Game.rooms[roomName]);
+                        return inRoomUtil.getEnclosureMatrix(Game.rooms[roomName]);
                     }
                     else return undefined;
                 }});
@@ -67,9 +67,7 @@ module.exports = {
 
     // checks if the room needs to spawn a creep
     spawn: function(room, roomName) {
-        if(Memory.outSourceRooms[roomName] && Memory.outSourceRooms[roomName].neutral === true) {
-            return false;
-        }
+        if(!room || room.energyCapacityAvailable < 1300) return false;
 
         // check if need spawn
         let creepCount;
@@ -78,16 +76,18 @@ module.exports = {
         }
         else creepCount = 0;
 
-        if (creepCount < 1) {
+        if (creepCount < this.properties.stages[this.getStage(room)].number) {
             return true;
         }
     },
 
     // returns an object with the data to spawn a new creep
-    spawnData: function(room, targetRoomName, targetId = null) {
-        let name = this.properties.role + Game.time;
+    spawnData: function(room) {
+        // todo: check boost type
+        
+        let name = this.properties.role + Game.time % 10000;
         let body = this.properties.stages[this.getStage(room)].bodyParts;
-        let memory = {role: this.properties.role, status: 0, targetRoom: targetRoomName, target: targetId, base: room.name};
+        let memory = {role: this.properties.role, base: room.name};
 
         return {name, body, memory};
     },

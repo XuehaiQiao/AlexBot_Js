@@ -1,3 +1,6 @@
+const { KEEPER } = require("../constants/roomTypes");
+const { inRoomUtil, roomUtil } = require("../util");
+
 module.exports = {
     properties: {
         role: "claimer",
@@ -14,8 +17,39 @@ module.exports = {
 
     /** @param {Creep} creep **/
     run: function(creep) {
-        // move to its target room if not in
-        if (creep.moveToRoomAdv(creep.memory.targetRoom)) {
+        let ifRepath;
+        if(!creep.room.memory.skMatrix && roomUtil.getRoomType(creep.room.name) === KEEPER) {         
+            inRoomUtil.getSKMatrix(creep.room.name);
+            ifRepath = 1;
+        }
+
+        // move to target room if not in
+        if (creep.room.name !== creep.memory.targetRoom) {
+            if(!creep.memory.targetRoom) return;
+
+            creep.travelTo(new RoomPosition(25, 25, creep.memory.targetRoom), { 
+                allowSK: true, 
+                roomCallback: (roomName, costMatrix) => {
+                    if (roomUtil.getRoomType(roomName) === KEEPER) {
+                        let roomMemory = Memory.rooms[roomName];
+                        if(roomMemory && roomMemory.invaderCore && roomMemory.invaderCore.endTime > Game.time) {
+                            return false;
+                        }
+                        else return inRoomUtil.getSKMatrix(roomName);
+                    }
+                },
+                repath: ifRepath,
+                ensurePath: true,
+            });
+            return
+        }
+
+        if(creep.memory.reactor) {
+            let reactor = creep.room.find(FIND_REACTORS)[0];
+            if(reactor) {
+                let result = creep.claimReactor(reactor);
+                if(result === ERR_NOT_IN_RANGE) creep.travelTo(reactor);
+            }
             return;
         }
 

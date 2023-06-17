@@ -328,7 +328,12 @@ function takeNearResources(creep) {
 }
 
 function aviodHostiles(creep) {
-    let hostileCreep = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+    const hostileParts = [ATTACK, RANGED_ATTACK, WORK, HEAL, CLAIM, CARRY];
+    let hostileCreep = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+        filter: (
+            c => _.find(hostileParts, partType => c.getActiveBodyparts(partType) > 0)
+        )
+    });
     if (hostileCreep) {
         let distance = creep.pos.getRangeTo(hostileCreep);
 

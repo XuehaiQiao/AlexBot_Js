@@ -124,7 +124,10 @@ var noContainerMineLogic = function (creep, mine) {
                 if (creep.withdraw(tombs[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) creep.moveTo(tombs[0]);
             }
         }
-        creep.build(constSites[0]);
+        
+        if(creep.build(constSites[0]) === ERR_NOT_IN_RANGE) {
+            creep.moveTo(constSites[0]);
+        }
     }
     else {
         if (creep.pos.getRangeTo(mine) > 1) {

@@ -1,7 +1,7 @@
 // resourceType: {terminal: amount, storage: [ShortageLine, AbundantLine, ExceededLine]}
 // if resource below shrtageLine, it requires to other rooms, if its below abundantLine, 
 module.exports = {
-    energy: {terminal: 50000, storage: [200000, 500000, 600000]},
+    energy: {terminal: 50000, storage: [200000, 350000, 500000]},
 
     O: {terminal: 4000, storage: [10000, 20000, 30000]},
     H: {terminal: 4000, storage: [10000, 20000, 30000]},
@@ -11,7 +11,7 @@ module.exports = {
     Z: {terminal: 4000, storage: [5000, 10000, 20000]},
     X: {terminal: 4000, storage: [10000, 20000, 30000]},
     G: {terminal: 4000, storage: [5000, 10000, 20000]},
-    T: {terminal: 10000, storage: [10000, 20000, 30000]},
+    T: {terminal: 4000, storage: [1000, 4000, 10000]},
 
     XUH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // attack
     XUHO2: {terminal: 4000, storage: [5000, 10000, 20000]}, // harvest

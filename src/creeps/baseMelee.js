@@ -1,4 +1,4 @@
-const { baseUtil } = require("../util");
+const { inRoomUtil } = require("../util");
 
 module.exports = {
     properties: {
@@ -36,7 +36,7 @@ module.exports = {
             if(nearestRampart) {
                 creep.travelTo(nearestRampart, {roomCallback: (roomName, costMatrix) => {
                     if(Memory.rooms[roomName] && Game.rooms[roomName]) {
-                        return baseUtil.getEnclosureMatrix(Game.rooms[roomName]);
+                        return inRoomUtil.getEnclosureMatrix(Game.rooms[roomName]);
                     }
                     else return undefined;
                 }});
@@ -44,7 +44,7 @@ module.exports = {
             else {
                 creep.travelTo(hostile, {roomCallback: (roomName, costMatrix) => {
                     if(Memory.rooms[roomName] && Game.rooms[roomName]) {
-                        return baseUtil.getEnclosureMatrix(Game.rooms[roomName]);
+                        return inRoomUtil.getEnclosureMatrix(Game.rooms[roomName]);
                     }
                     else return undefined;
                 }});

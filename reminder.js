@@ -6,23 +6,23 @@ const { UH2O } = require("./src/config/labProductConfig");
 // claimer spawn
 Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(6).fill(CLAIM), ...new Array(6).fill(MOVE)], 'Claimer' + Game.time, { memory: { role: 'claimer', status: 1, targetRoom: 'E14N3', claim: true } });
 
-Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
+Game.rooms['E14N3'].memory.tasks.spawnTasks.push({
     name: 'claim',
     body: [...new Array(1).fill(CLAIM), ...new Array(1).fill(MOVE)],
-    memory: { role: 'claimer', status: 1, targetRoom: 'E11S2', claim: true }
+    memory: { role: 'claimer', status: 1, targetRoom: 'E18N6', claim: true }
 });
 // harvester2
 Game.spawns['Spawn1_W18S15'].spawnCreep([WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], 'harvester2' + Game.time, { memory: { role: 'harvester2', target: 0, targetRoom: 'W17S14' } });
 Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
     name: 'hav',
     body: [...new Array(6).fill(WORK), ...new Array(6).fill(MOVE)],
-    memory: { role: 'harvester2', status: 0, targetRoom: 'E11S2' }
+    memory: { role: 'harvester2', status: 0, targetRoom: 'E18S5' }
 });
 //builder2
 Game.rooms['E14N3'].memory.tasks.spawnTasks.push({
     name: 'builder',
     body: [...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)],
-    memory: { role: 'builder', status: 0, targetRoom: 'E15N3' }
+    memory: { role: 'builder', status: 0, targetRoom: 'E18N6' }
 });
 Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
     name: 'builder2',
@@ -54,7 +54,7 @@ Game.rooms['E14N4'].memory.tasks.spawnTasks.push({
 });
 
 // scout
-Game.rooms['W12S21'].memory.tasks.spawnTasks.push({ name: 'scout', body: [MOVE], memory: { role: 'scout', targetPos: { x: 42, y: 35, roomName: 'W10S20' } } });
+Game.rooms['E6S2'].memory.tasks.spawnTasks.push({ name: 'scout', body: [MOVE], memory: { role: 'scout', targetRoom: 'E5S5' } });
 // keeperAttacker
 Game.spawns['Spawn3_W16S17'].spawnCreep([...new Array(25).fill(MOVE), ...new Array(19).fill(RANGED_ATTACK), ...new Array(6).fill(HEAL)], 'keeperAttacker' + Game.time, { memory: { role: 'keeperAttacker', base: 'W16S17', targetRoom: 'W16S16' } });
 
@@ -166,7 +166,7 @@ Game.rooms.W19S17.memory.tasks.labTasks.push({ resourceType: 'OH', amount: 3000 
 
 // orders
 Game.rooms['E6S2'].terminal.send(RESOURCE_ENERGY, 30000, 'E2N6', 'From a remote friend');
-Game.rooms['E6S2'].terminal.send('L', 4000, 'E17N2', 'L');
+Game.rooms['E16S2'].terminal.send('XGHO2', 2000, 'E14N3', 'support');
 
 Game.market.deal('645bfc8403ae10376b827734', 4000, "W21S19");
 // purifier

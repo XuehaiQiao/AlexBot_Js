@@ -80,12 +80,22 @@ module.exports = {
 };
 
 var haveContainerLogic = function (creep, mine, container) {
-    if (!creep.pos.isEqualTo(container.pos)) {
+    if(!mine) return;
+    
+    if(mine.mineralType === RESOURCE_THORIUM && creep.pos.isEqualTo(container.pos)) {
+        creep.fleeFromAdv(container, 1);
+    }
+
+    if (creep.memory.countDown) {       
+        creep.memory.countDown -= 1;
+    }
+    else if (!creep.pos.isEqualTo(container.pos)) {
         creep.moveToNoCreepInRoom(container);
     }
     else {
         creep.harvest(mine);
-        creep.memory.rest = 4;
+        creep.memory.countDown = 4;
+        //creep.memory.rest = 4;
     }
 };
 

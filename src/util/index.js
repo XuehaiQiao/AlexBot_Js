@@ -1,6 +1,6 @@
 const util = {
     roomUtil: require('./roomUtil'),
-    baseUtil: require('./baseUtil'),
+    inRoomUtil: require('./inRoomUtil'),
 }
 
 module.exports = util;

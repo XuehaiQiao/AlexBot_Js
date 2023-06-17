@@ -52,3 +52,45 @@ Game.rooms['E11S2'].memory.tasks.spawnTasks.push({
         boostInfo: { XUH2O: 5 }
     }
 });
+
+// rangeAtker boosted/unboosted
+Game.rooms['E14N3'].memory.tasks.spawnTasks.push({
+    name: 'rangeAtker',
+    body: [...new Array(3).fill(TOUGH), ...new Array(25).fill(MOVE), ...new Array(15).fill(RANGED_ATTACK), ...new Array(7).fill(HEAL)],
+    memory: {
+        role: 'rangeAtker',
+        targetRoom: 'E18N6',
+        boost: true,
+        boostInfo: { XLHO2: 7, XGHO2: 3, XKHO2: 15 }
+    }
+});
+
+// power
+
+Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
+    name: 'powerMedic',
+    body: [...new Array(25).fill(MOVE), ...new Array(25).fill(HEAL)],
+    memory: {
+        role: 'powerMedic',
+    }
+});
+
+Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
+    name: 'powerMiner',
+    body: [...new Array(20).fill(MOVE), ...new Array(20).fill(ATTACK)],
+    memory: {
+        role: 'powerMiner',
+        targetRoom: 'E8S0',
+    }
+});
+
+Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
+    name: 'transporter',
+    body: [...new Array(25).fill(MOVE), ...new Array(25).fill(CARRY)],
+    memory: {
+        role: 'transporter',
+        workType: 3,
+        targetRoom: 'E8S0',
+        base: 'E16S2',
+    }
+});

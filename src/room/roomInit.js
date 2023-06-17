@@ -72,12 +72,15 @@ function roomInit(room) {
     });
     
     // create basic structs
-    if(roomInfo[room.name] && roomInfo[room.name].storagePos) {
-        room.createConstructionSite(roomInfo[room.name].storagePos, STRUCTURE_CONTAINER);
+    if(roomInfo[room.name]) {
+        if(roomInfo[room.name].storagePos) {
+            room.createConstructionSite(roomInfo[room.name].storagePos, STRUCTURE_CONTAINER);
+        }
+        else if(roomInfo[room.name].roomPlan) {
+            // todo
+        }
     }
-    else if(roomInfo[room.name].roomPlan) {
-        // todo
-    }
+    
 
 
     room.memory.init = false;

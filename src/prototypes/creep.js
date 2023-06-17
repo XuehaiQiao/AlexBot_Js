@@ -1,5 +1,8 @@
 const { roomInfo } = require("../config");
+const { KEEPER } = require("../constants/roomTypes");
+const { wall } = require("../structures");
 const { boostCreep } = require("../structures/lab");
+const { inRoomUtil, roomUtil } = require("../util");
 
 Creep.prototype.sayHello = function sayHello(words = "Hello") {
     this.say(words, true);
@@ -191,7 +194,18 @@ Creep.prototype.harvestEnergy = function () {
 
     if (link) {
         result = this.harvest(source);
-        if (!source.pos.isNearTo(this.pos)) this.moveToNoCreepInRoom(source);
+        let avaliablePoses = _.filter(inRoomUtil.getAdjPos(source.pos), pos => (
+            pos.isNearTo(link) &&
+            pos.lookFor(LOOK_TERRAIN)[0] !== 'wall' &&
+            _.filter(pos.lookFor(LOOK_STRUCTURES), struct => (
+                struct.structureType !== STRUCTURE_ROAD &&
+                struct.structureType !== STRUCTURE_CONTAINER &&
+                (struct.structureType !== STRUCTURE_RAMPART || !struct.my)
+            )).length === 0
+        ))
+
+        let target = this.pos.findClosestByPath(avaliablePoses);
+        if (!source.pos.isNearTo(this.pos)) this.moveToNoCreepInRoom(target);
         else if (this.store.getFreeCapacity() < 20 || this.ticksToLive < 2 || result == ERR_NOT_ENOUGH_RESOURCES) {
             if (this.transfer(link, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
                 this.moveToNoCreepInRoom(link);
@@ -521,6 +535,46 @@ Creep.prototype.travelToRoom = function (targetRoomName, allowSK = false) {
             this.travelTo(new RoomPosition(25, 25, targetRoomName), { allowSK: allowSK });
         }
 
+        return true;
+    }
+
+    return false;
+}
+
+Creep.prototype.moveToRoomPassSK = function (targetRoomName) {
+    if(!targetRoomName) return false;
+
+    let ifRepath;
+    if (roomUtil.getRoomType(this.room.name) === KEEPER) {
+        if (!this.room.memory.skMatrix) {
+            inRoomUtil.getSKMatrix(this.room.name);
+            ifRepath = 1;
+        }
+
+        let invaderCore = this.room.find(FIND_HOSTILE_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_INVADER_CORE })[0];
+        if (invaderCore) {
+            this.room.memory.invaderCore = { level: invaderCore.level, endTime: Game.time + 75000 };
+        }
+    }
+
+    if (this.room.name !== targetRoomName) {
+        this.travelTo(new RoomPosition(25, 25, targetRoomName), {
+            allowSK: true,
+            roomCallback: (roomName, costMatrix) => {
+                if (roomUtil.getRoomType(roomName) === KEEPER) {
+                    let roomMemory = Memory.rooms[roomName];
+                    if(roomMemory && roomMemory.invaderCore && roomMemory.invaderCore.endTime > Game.time) {
+                        return false;
+                    }
+                    else return inRoomUtil.getSKMatrix(roomName);
+                }
+                
+                return undefined;
+            },
+            repath: ifRepath,
+            ensurePath: true,
+        });
+        
         return true;
     }
 
