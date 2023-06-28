@@ -116,7 +116,7 @@ module.exports = {
             if (reactor && reactor.store[RESOURCE_THORIUM] >= 900) return false;
         }
 
-        if (carryAmount <= 400 && thisTypeCreeps.length < 6) {
+        if (carryAmount <= 400 && thisTypeCreeps.length < 7) {
             return true
         }
     },

@@ -1,5 +1,6 @@
 const { roomInfo } = require("../config");
 const creepLogic = require("../creeps");
+const { roomBoost } = require("../season5");
 // const creepTypes2 = ['carrier2', 'harvester2', 'upgrader2', 'builder2']; // 'mineralCarrier'
 
 module.exports = function (room) {
@@ -7,24 +8,35 @@ module.exports = function (room) {
     //     Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
     //         name: 'rangeAtker',
     //         body: [...new Array(7).fill(MOVE), ...new Array(4).fill(RANGED_ATTACK), ...new Array(3).fill(HEAL)],
-    //         memory: { role: 'rangeAtker', targetRoom: 'E10S1', }
-    //     });
-    //     Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
-    //         name: 'rangeAtker',
-    //         body: [...new Array(7).fill(MOVE), ...new Array(4).fill(RANGED_ATTACK), ...new Array(3).fill(HEAL)],
-    //         memory: { role: 'rangeAtker', targetRoom: 'E11S1', }
+    //         memory: { role: 'rangeAtker', targetRoom: 'E9S2', }
     //     });
     // }
 
-    // if (room.name === 'E14N3' && Game.time % 1200 === 600) {
-    //     Game.rooms['E14N3'].memory.tasks.spawnTasks.push({
+    // if (room.name === 'E6S2' && Game.time % 250 === 150) {
+    //     Game.rooms['E6S2'].memory.tasks.spawnTasks.push({ 
+    //         name: 't', 
+    //         body: [...new Array(25).fill(CARRY), ...new Array(25).fill(MOVE)], 
+    //         memory: { role: 'transporter', base: 'E6S2', targetRoom: 'E9S2' } 
+    //     });
+    // }
+
+    // if (room.name === 'E17N2' && Game.time % 1200 === 0) {
+    //     Game.rooms['E17N2'].memory.tasks.spawnTasks.push({
     //         name: 'rangeAtker',
-    //         body: [...new Array(2).fill(TOUGH), ...new Array(16).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(4).fill(HEAL)],
+    //         body: [...new Array(20).fill(RANGED_ATTACK), ...new Array(25).fill(MOVE), ...new Array(5).fill(HEAL)],
     //         memory: {
     //             role: 'rangeAtker',
-    //             targetRoom: 'E17N6',
-    //             boost: true,
-    //             boostInfo: { XLHO2: 4, XGHO2: 2, XKHO2: 10 }
+    //             targetRoom: 'E22N2',
+    //         }
+    //     });
+    // }
+    // if (room.name === 'E17N2' && Game.time % 1000 === 0) {
+    //     Game.rooms['E17N2'].memory.tasks.spawnTasks.push({
+    //         name: 'rangeAtker',
+    //         body: [...new Array(20).fill(RANGED_ATTACK), ...new Array(25).fill(MOVE), ...new Array(5).fill(HEAL)],
+    //         memory: {
+    //             role: 'rangeAtker',
+    //             targetRoom: 'E26N2',
     //         }
     //     });
     // }
@@ -36,10 +48,12 @@ module.exports = function (room) {
     // base creeps
     if (createCoreCreep(room, idleSpawn)) return;
     if (createTaskCreep(room, idleSpawn)) return;
-    //if (roomDefenceCreeps(room, idleSpawn)) return;
+    if (roomDefenceCreeps(room, idleSpawn)) return;
 
     // reactor creeps
-    if (createReactorCreep(room, idleSpawn)) return;
+    //if (createReactorCreep(room, idleSpawn)) return;
+    // roomBoost
+    if (roomBoost.spawn(room, idleSpawn, spawnCreep)) return;
 
     // remote room creeps
     for (const remoteRoomName of room.memory.outSourceRooms) {
@@ -131,7 +145,7 @@ function createReactorCreep(room, spawn) {
         if (result === OK) return true;
     }
 
-    // scout && defender
+    //scout && defender
     if (Game.time % 1200 === 500) {
         room.memory.tasks.spawnTasks.push({
             name: 'rangeAtker',
@@ -196,9 +210,9 @@ function createTaskCreep(room, spawn) {
 
 function roomDefenceCreeps(room, spawn) {
     // todo: measure threaten level
-    let enemies = room.find(FIND_HOSTILE_CREEPS, { filter: c => c.owner.username !== 'Invader' && c.owner.username !== 'Source Keeper' && c.body.length > 30 });
+    let enemies = room.find(FIND_HOSTILE_CREEPS, { filter: c => c.owner.username !== 'Invader' && c.body.length > 30 });
 
-    if (enemies.length) {
+    if (enemies.length > 1) {
         defTypes = ['defMelee'];
         if (room.energyCapacityAvailable < 1300) defTypes = [];
         let creepTypeNeeded = _.find(defTypes, type => creepLogic[type].spawn(room));
@@ -229,7 +243,11 @@ function remoteDefenceCreeps(room, spawn, roomName, roomMemory) {
             }
         }
         else if (invaderCore.ticksToDeploy < 1500 || invaderCore.ticksToDeploy === undefined) {
-            roomMemory.invaderCore = { level: invaderCore.level, endTime: Game.time + 70000 + invaderCore.ticksToDeploy };
+            roomMemory.invaderCore = { level: invaderCore.level, endTime: Game.time + 80000 + invaderCore.ticksToDeploy };
+            return false;
+        }
+        else if (invaderCore.ticksToDecay) {
+            roomMemory.invaderCore = { level: invaderCore.level, endTime: Game.time + invaderCore.ticksToDecay };
             return false;
         }
     }

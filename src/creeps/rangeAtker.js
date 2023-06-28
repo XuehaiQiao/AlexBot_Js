@@ -5,7 +5,7 @@ module.exports = {
     properties: {
         role: 'rangeAtker',
         body: [...new Array(5).fill(TOUGH), ...new Array(25).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(10).fill(HEAL)],
-        boostInfo: {[T3_HEAL]: 10, [T3_TOUGH]: 5, [T3_RANGE_ATTACK]: 10},
+        boostInfo: { [T3_HEAL]: 10, [T3_TOUGH]: 5, [T3_RANGE_ATTACK]: 10 },
     },
     /** @param {Creep} creep **/
     run: function (creep) {
@@ -16,8 +16,13 @@ module.exports = {
 
         // move to its target room if not in
         if (creep.moveToRoomAdv(creep.memory.targetRoom)) {
-            if(creep.hits < creep.hitsMax) creep.heal(creep);
+            if (creep.hits < creep.hitsMax) creep.heal(creep);
             atkOnTheWay(creep);
+            return;
+        }
+
+        // flee flag logic
+        if (this.redFlagLogic(creep)) {
             return;
         }
 
@@ -70,14 +75,14 @@ module.exports = {
             else {
                 creep.say('creep')
                 let haveAttack = false;
-                for(const part of hostile.body) {
-                    if(part.type === ATTACK) {
+                for (const part of hostile.body) {
+                    if (part.type === ATTACK) {
                         haveAttack = true;
                         break;
                     }
                 }
 
-                if(haveAttack) {
+                if (haveAttack) {
                     attackInDistance(creep, hostile, 3);
                 }
                 else {
@@ -89,19 +94,30 @@ module.exports = {
 
         }
         else {
-            let damagedCreeps = creep.room.find(FIND_MY_CREEPS, {filter: c => c.hits < c.hitsMax});
-            if(creep.hits < creep.hitsMax) {
+            let damagedCreeps = creep.room.find(FIND_MY_CREEPS, { filter: c => c.hits < c.hitsMax });
+            if (creep.hits < creep.hitsMax) {
                 creep.heal(creep);
             }
-            else if(damagedCreeps.length) {
+            else if (damagedCreeps.length) {
                 let target = creep.pos.findClosestByRange(damagedCreeps);
                 creep.travelTo(target);
                 creep.heal(target);
                 creep.rangedHeal(target);
             }
-            else if(roomInfo[creep.room.name]) creep.toResPos();
+            else if (roomInfo[creep.room.name]) creep.toResPos();
+        }
+    },
+
+    redFlagLogic: function (creep) {
+        let redFlag = creep.pos.findClosestByRange(FIND_FLAGS, { filter: { color: COLOR_RED } });
+        if (redFlag && (creep.hits < creep.hitsMax)) {
+            creep.say('flee');
+            creep.fleeFromAdv(redFlag, creep.pos.getRangeTo(redFlag) + 5);
+            this.atkOnTheWay(creep);
+            return true;
         }
 
+        return false;
     },
 
     // checks if the room needs to spawn a creep
@@ -152,7 +168,7 @@ function attackInDistance(creep, hostile, range) {
     else if (creep.pos.getRangeTo(hostile) < range) creep.fleeFromAdv(hostile, 5);
 
     creep.rangedAttack(hostile);
-    if(creep.pos.isNearTo(hostile)) creep.rangedMassAttack();
+    if (creep.pos.isNearTo(hostile)) creep.rangedMassAttack();
 }
 
 function atkOnTheWay(creep) {

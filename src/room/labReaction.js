@@ -28,21 +28,26 @@ module.exports = function (room) {
 
     // For every 200 ticks, check & assign tasks if no tasks
     if (Game.time % 200 === 123 && room.memory.tasks.labTasks.length === 0) {
-        if (!room.memory.compondLevel) {
-            let compoundIsShort = createTask(room, 0);
-            if (!compoundIsShort) room.memory.compondLevel = 1;
-        }
-        else if (room.memory.compondLevel === 1) {
-            let compoundIsShort = createTask(room, 1);
-            if (!compoundIsShort) room.memory.compondLevel = 2;
+        // if (!room.memory.compondLevel) {
+        //     let compoundIsShort = createTask(room, 0);
+        //     if (!compoundIsShort) room.memory.compondLevel = 1;
+        // }
+        // else if (room.memory.compondLevel === 1) {
+        //     let compoundIsShort = createTask(room, 1);
+        //     if (!compoundIsShort) room.memory.compondLevel = 2;
+        // }
+
+        let compoundIsShort = createTask(room, 0);
+        if (!compoundIsShort) {
+            compoundIsShort = createTask(room, 1);
         }
     }
 
-    // If all compounds reached AbundantLine, check shortage every 3000 ticks
-    if (Game.time % 5000 === 123 && room.memory.compondLevel === 2 && room.memory.tasks.labTasks.length === 0) {
-        let compoundIsShort = createTask(room, 1);
-        if (compoundIsShort) room.memory.compondLevel = 0;
-    }
+    // // If all compounds reached AbundantLine, check shortage every 3000 ticks
+    // if (Game.time % 5000 === 123 && room.memory.compondLevel === 2 && room.memory.tasks.labTasks.length === 0) {
+    //     let compoundIsShort = createTask(room, 1);
+    //     if (compoundIsShort) room.memory.compondLevel = 0;
+    // }
 
 
 

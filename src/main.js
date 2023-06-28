@@ -3,6 +3,7 @@ const roomLogic = require('./room');
 const test = require('./test');
 const tools = require('./tools');
 const util = require('./util');
+const season5 = require('./season5');
 require('./prototypes');
 
 module.exports.loop = function () {
@@ -50,6 +51,9 @@ module.exports.loop = function () {
         roomLogic.powerOperation(r);
         roomLogic.factorayLogic(r);
         // tools.myRoomPlanner(r.name, { render: true });
+
+        // season logic
+        season5.obLogic.run(r);
     });
     roomLogic.resourceBalancing(Game.myRooms);
     roomLogic.marketLogic();

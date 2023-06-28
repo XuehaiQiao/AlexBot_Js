@@ -12,7 +12,7 @@ module.exports = {
             5: { maxEnergyCapacity: 1800, bodyParts: [...new Array(9).fill(WORK), ...new Array(9).fill(CARRY), ...new Array(9).fill(MOVE)], number: 1 },
             6: { maxEnergyCapacity: 2300, bodyParts: [...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)], number: 1 },
             7: { maxEnergyCapacity: 5600, bodyParts: [...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], number: 1 },
-            8: { maxEnergyCapacity: 10000, bodyParts: [...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], number: 1 },
+            8: { maxEnergyCapacity: 10000, bodyParts: [...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], number: 2 },
         }
     },
 

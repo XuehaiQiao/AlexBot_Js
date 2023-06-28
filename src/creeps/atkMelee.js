@@ -60,7 +60,6 @@ module.exports = {
 
         // on the way to targetRoom
         if (creep.moveToRoomAdv(creep.memory.targetRoom)) {
-            console.log('to')
             this.atkOnTheWay(creep, state);
             this.checkAndHeal(creep, state);
             return;
@@ -84,7 +83,7 @@ module.exports = {
             return;
         }
 
-        // attack wall/rampart flag logic
+        // attack all struct flag logic
         if (this.yellowFlagLogic(creep, state)) {
             this.checkAndHeal(creep, state);
             return;
@@ -184,6 +183,7 @@ module.exports = {
     blueFlagLogic: function (creep, state) {
         let blueFlag = creep.pos.findClosestByPath(FIND_FLAGS, { filter: { color: COLOR_BLUE } });
         if (blueFlag) {
+            creep.say('toBlue');
             creep.moveTo(blueFlag, { maxRooms: 1 });
             this.atkOnTheWay(creep, state);
             return true;
@@ -195,6 +195,7 @@ module.exports = {
     greenFlagLogic: function (creep, state) {
         let greenFlag = creep.pos.findClosestByPath(FIND_FLAGS, { filter: { color: COLOR_GREEN } });
         if (greenFlag) {
+            creep.say('green');
             let target = _.find(greenFlag.pos.lookFor(LOOK_STRUCTURES), struct => (
                 struct.structureType === STRUCTURE_WALL ||
                 struct.structureType === STRUCTURE_RAMPART
@@ -205,6 +206,7 @@ module.exports = {
                 creep.rangedAttack(target);
                 if (result === ERR_NOT_IN_RANGE) {
                     creep.moveTo(target, { maxRooms: 1 });
+                    this.atkOnTheWay(creep, state);
                 }
                 else if (result === OK) {
                     state.attackResult = OK;
@@ -230,13 +232,14 @@ module.exports = {
     yellowFlagLogic: function (creep, state) {
         let yellowFlag = creep.pos.findClosestByPath(FIND_FLAGS, { filter: { color: COLOR_YELLOW } });
         if (yellowFlag) {
+            creep.say('yellow')
             let target = _.find(yellowFlag.pos.lookFor(LOOK_STRUCTURES));
-
             if (target) {
                 let result = creep.attack(target);
                 creep.rangedAttack(target);
                 if (result === ERR_NOT_IN_RANGE) {
                     creep.moveTo(target, { maxRooms: 1 });
+                    this.atkOnTheWay(creep, state);
                 }
                 else if (result === OK) {
                     state.attackResult = OK;
@@ -260,10 +263,10 @@ module.exports = {
     },
 
     redFlagLogic: function (creep, state) {
-        let redFlag = creep.pos.findClosestByPath(FIND_FLAGS, { filter: { color: COLOR_RED } });
-        if (redFlag && (creep.hits < creep.hitsMax)) {
+        let redFlag = creep.pos.findClosestByRange(FIND_FLAGS, { filter: { color: COLOR_RED } });
+        if (redFlag && (creep.hits <= creep.hitsMax - 500)) {
             creep.say('flee');
-            creep.fleeFromAdv(redFlag, creep.pos.getRangeTo(redFlag) + 5);
+            creep.fleeFromAdv(redFlag, creep.pos.getRangeTo(redFlag) + 3);
             this.atkOnTheWay(creep, state);
             return true;
         }
@@ -298,6 +301,8 @@ module.exports = {
     },
 
     checkAndHeal: function (creep, state) {
+        if(!state.heal) return;
+
         if (state.partner && creep.hits > creep.hitsMax - 500 && state.partner.hits < state.partner.hitsMax - 500) {
             creep.heal(state.partner);
             return;

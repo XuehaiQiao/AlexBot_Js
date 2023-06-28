@@ -440,6 +440,8 @@ Creep.prototype.getBoosts = function () {
         }
     }
 
+    this.say('boost!!');
+
     // getBoost
     for (const resourceType in boostInfo) {
         let lab = Game.getObjectById(_.find(Object.keys(boostLabs), labId => boostLabs[labId].resourceType === resourceType));
@@ -449,7 +451,7 @@ Creep.prototype.getBoosts = function () {
         }
 
         let result = boostCreep(lab, this, resourceType, boostInfo[resourceType]);
-
+        console.log(result, resourceType, lab.pos);
         if (result === ERR_NOT_IN_RANGE) this.moveTo(lab);
         else if (result === OK) {
             delete boostInfo[resourceType];

@@ -18,7 +18,7 @@ module.exports = {
             creep.say('find');
             let partner = creep.room.find(FIND_MY_CREEPS, {
                 filter: c => c.memory.duoNumber === creep.memory.duoNumber
-            })[0]
+            })[0];
 
             if (partner) {
                 creep.memory.front = partner.id;
@@ -33,7 +33,19 @@ module.exports = {
         console.log('medic partner', partner)
         if (!partner) {
             // todo: heal surronding creeps
-            creep.heal(creep);
+            let damagedCreeps = creep.room.find(FIND_MY_CREEPS, { filter: c => c.hits < c.hitsMax });
+            if (creep.hits < creep.hitsMax) {
+                creep.heal(creep);
+            }
+            else if (damagedCreeps.length) {
+                let target = creep.pos.findClosestByRange(damagedCreeps);
+                creep.travelTo(target);
+                creep.heal(target);
+                creep.rangedHeal(target);
+            }
+            else {
+                creep.heal(creep);
+            }
             return;
         }
 
@@ -48,7 +60,7 @@ module.exports = {
         if (partner.hits === partner.hitsMax && creep.hits < creep.hitsMax) {
             creep.heal(creep);
         }
-        else if (creep.hits <= creep.hitsMax - 12 * creep.getActiveBodyparts(HEAL)) {
+        else if (creep.hits <= creep.hitsMax - 500) {
             creep.heal(creep);
         }
         else {

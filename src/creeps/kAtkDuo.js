@@ -159,7 +159,7 @@ module.exports = {
                 if (result === ERR_NOT_IN_RANGE) {
                     creep.heal(creep);
                 }
-                creep.travelTo(invader, { allowSK: true, movingTarget: true });
+                creep.travelTo(invader, { allowSK: true });
             }
             return true;
         }

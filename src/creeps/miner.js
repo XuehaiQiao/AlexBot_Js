@@ -9,15 +9,26 @@ module.exports = {
     },
     /** @param {Creep} creep **/
     run: function (creep) {
+        if(creep.memory.boost && !creep.memory.boosted && creep.memory.boostInfo) {
+            creep.getBoosts();
+            return;
+        }
+
         if (creep.memory.rest) {
             creep.memory.rest -= 1;
         }
 
-        let extractor = creep.room.find(FIND_MY_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_EXTRACTOR })[0];
-        if (!extractor) return;
-        let mine = creep.room.find(FIND_MINERALS, { filter: mine => mine.pos.isEqualTo(extractor.pos) })[0];
+        if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
+            creep.moveToRoom(creep.memory.targetRoom);
+            return;
+        }
 
-        let container = Game.getObjectById(creep.memory.container);
+        const extractor = creep.room.find(FIND_MY_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_EXTRACTOR })[0];
+        if (!extractor) return;
+        const mine = creep.room.find(FIND_MINERALS, { filter: mine => mine.pos.isEqualTo(extractor.pos) })[0];
+        if(!mine) return;
+
+        const container = mine.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType === STRUCTURE_CONTAINER})[0];
         if (container) {
             haveContainerLogic(creep, mine, container);
         }
@@ -54,7 +65,7 @@ module.exports = {
         let stage = this.getStage(room);
 
         let extractor = room.find(FIND_MY_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_EXTRACTOR })[0];
-        let container = extractor.pos.findInRange(room.find(FIND_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_CONTAINER }), 1)[0];
+        let container = extractor.pos.findInRange(FIND_STRUCTURES, 1, { filter: struct => struct.structureType === STRUCTURE_CONTAINER })[0];
         if (container) {
             memory.container = container.id;
             body = this.properties.stages[stage].cBodyParts;
@@ -80,8 +91,6 @@ module.exports = {
 };
 
 var haveContainerLogic = function (creep, mine, container) {
-    if(!mine) return;
-    
     if(mine.mineralType === RESOURCE_THORIUM && creep.pos.isEqualTo(container.pos)) {
         creep.fleeFromAdv(container, 1);
     }
@@ -93,9 +102,10 @@ var haveContainerLogic = function (creep, mine, container) {
         creep.moveToNoCreepInRoom(container);
     }
     else {
-        creep.harvest(mine);
-        creep.memory.countDown = 4;
-        //creep.memory.rest = 4;
+        let result = creep.harvest(mine);
+        if(result === OK) {
+            creep.memory.countDown = 4;
+        }
     }
 };
 

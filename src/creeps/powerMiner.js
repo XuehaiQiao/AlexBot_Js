@@ -6,6 +6,13 @@ module.exports = {
 
     /** @param {Creep} creep **/
     run: function (creep) {
+        // boost
+        if (creep.memory.boost && !creep.memory.boosted && creep.memory.boostInfo) {
+            creep.say('boost')
+            creep.getBoosts();
+            return;
+        }
+
         // partner haven't spawn
         if (!creep.memory.back) {
             creep.toResPos(0);
@@ -30,11 +37,40 @@ module.exports = {
             return;
         }
 
+        const hostileParts = [ATTACK, RANGED_ATTACK, HEAL, CARRY];
+        const hostiles = creep.room.find(FIND_HOSTILE_CREEPS, {
+            filter: c => _.find(hostileParts, partType => c.getActiveBodyparts(partType) > 0)
+        });
+
+        if(hostiles.length) {
+            let target;
+            let medic = creep.pos.findClosestByRange(hostiles, { filter: hostile => hostile.getActiveBodyparts(HEAL) > 0 && hostile.getActiveBodyparts(RANGED_ATTACK) === 0 });
+            if (medic) target = medic;
+            else target = creep.pos.findClosestByRange(hostiles);
+            if(creep.attack(target) === ERR_NOT_IN_RANGE) {
+                creep.moveTo(target);
+            }
+            return;
+        }
+
         // harvest
         let powerBank = creep.room.find(FIND_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_POWER_BANK })[0];
         if(powerBank) {
             if (creep.attack(powerBank) === ERR_NOT_IN_RANGE) {
                 creep.moveTo(powerBank);
+            }
+        }
+        else {
+            let hostile = creep.room.find(FIND_HOSTILE_CREEPS)[0];
+            if(hostile) {
+                if(creep.attack(hostile) === ERR_NOT_IN_RANGE) {
+                    creep.moveTo(hostile);
+                }
+            }
+            else {
+                // suicide if finished all works
+                if(partner) partner.suicide();
+                creep.suicide();
             }
         }
     },

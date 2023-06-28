@@ -58,7 +58,7 @@ module.exports = {
             return;
         }
         else if (creep.memory.claim) {
-            if(controller && !controller.my && (controller.reservation || controller.level)) {
+            if(controller && !controller.my && ((controller.reservation && creep.owner.username !== controller.reservation.username) || controller.level)) {
                 if(creep.attackController(controller) == ERR_NOT_IN_RANGE) {
                     creep.moveToNoCreepInRoom(controller);
                 }
@@ -92,6 +92,7 @@ module.exports = {
             if(controller.reservation && controller.reservation.username == room.controller.owner.username && controller.reservation.ticksToEnd > 2000) {
                 return false
             }
+            if(controller.my) return false;
         }
 
         let creepCount = 0;

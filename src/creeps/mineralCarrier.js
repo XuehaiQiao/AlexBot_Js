@@ -147,7 +147,10 @@ module.exports = {
                 if (!lab || !lab.isActive()) return;
                 if (!lab.mineralType || lab.store[lab.mineralType] < 5) {
                     let resourceType = reactionResources[task.resourceType][i];
-                    labTransfer(creep, lab, resourceType);
+                    let transResult = labTransfer(creep, lab, resourceType);
+                    if(transResult === ERR_NOT_ENOUGH_RESOURCES) {
+                        creep.room.memory.tasks.labTasks[0].amount = 0;
+                    }
                     return;
                 }
             }
@@ -183,7 +186,10 @@ module.exports = {
             if (!lab.mineralType || (lab.mineralType === resourceType && lab.store[resourceType] < amount)) {
                 console.log(lab.store[resourceType], amount)
                 if (lab.store.getFreeCapacity(resourceType) === 0) continue;
-                labTransfer(creep, lab, resourceType);
+                let transResult = labTransfer(creep, lab, resourceType);
+                if(transResult === ERR_NOT_ENOUGH_RESOURCES) {
+                    delete boostLab[labId];
+                }
                 return true;
             }
             else if (lab.mineralType !== resourceType) {
@@ -238,7 +244,7 @@ var labTransfer = function (creep, targetLab, resourceType) {
             if (creep.transfer(creep.room.storage, creepResourceTypes[0]) == ERR_NOT_IN_RANGE) {
                 creep.moveToNoCreepInRoom(creep.room.storage);
             }
-            return;
+            return OK;
         }
     }
 
@@ -266,16 +272,16 @@ var labTransfer = function (creep, targetLab, resourceType) {
         if (creep.room.terminal && creep.room.terminal.store[resourceType] > 0) target = creep.room.terminal;
         else if (creep.room.storage && creep.room.storage.store[resourceType] > 0) target = creep.room.storage;
         else {
-            creep.room.memory.tasks.labTasks[0].amount = 0;
             console.log(creep.room, "mineral " + resourceType + " not enough");
-            return;
+            return ERR_NOT_ENOUGH_RESOURCES;
         }
 
         let result = creep.withdraw(target, resourceType);
         if (result == ERR_NOT_IN_RANGE) creep.moveToNoCreepInRoom(target);
         else if (result == OK) creep.memory.status = 1;
-
     }
+
+    return OK;
 };
 
 var mineralContainerWithdraw = function (creep) {

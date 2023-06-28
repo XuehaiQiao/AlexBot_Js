@@ -18,6 +18,10 @@ module.exports = {
     XLHO2: [6000, 17000],  // heal
     XGHO2: [6000, 17000], // tough
     XZHO2: [6000, 17000], // move
+
+    UO: [6000, 17000],
+    GH: [6000, 17000],  // upgradeController
+    //GH2O: [6000, 17000],  // upgradeController
     
     // XKH2O: [5000, 12000],  // carry
     // XGH2O: [5000, 12000],  // upgradeController

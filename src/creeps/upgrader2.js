@@ -7,7 +7,7 @@ module.exports = {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, MOVE], number: 1},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 6},
             3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 6},
-            4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(8).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(4).fill(MOVE)], number: 4},
+            4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(8).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(4).fill(MOVE)], number: 8},
             5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(10).fill(WORK), ...new Array(3).fill(CARRY), ...new Array(5).fill(MOVE)], mBodyParts: [...new Array(12).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
             6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(14).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(7).fill(MOVE)], mBodyParts: [...new Array(14).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(7).fill(MOVE)], number: 1},
             7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(30).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(15).fill(MOVE)], number: 0},
@@ -93,7 +93,7 @@ module.exports = {
         if(room.find(FIND_MY_CONSTRUCTION_SITES) > 0) return false;
 
         let creepCount;
-        if(global.roomCensus[room.name][this.properties.type]) creepCount = global.roomCensus[room.name][this.properties.type]
+        if(global.roomCensus[room.name][this.properties.type]) creepCount = global.roomCensus[room.name][this.properties.type];
         else creepCount = 0;
 
         let storage = room.storage;
@@ -157,39 +157,43 @@ module.exports = {
 
     takeEnergyNeerController: function (creep, controller) {
         // first find droped resource
-        let dropedResource = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES, {
+        let dropedEnergys = creep.room.find(FIND_DROPPED_RESOURCES, {
             filter: resource =>
                 resource.resourceType == RESOURCE_ENERGY &&
                 resource.pos.inRangeTo(controller, 4)
         });
-        if (dropedResource) {
-            let result = creep.pickup(dropedResource)
-            if (result === ERR_NOT_IN_RANGE) {
-                this.combineMove(creep, dropedResource, 1);
-                //creep.moveTo(dropedResource);
-            }
-            else if (result === OK) {
-                creep.memory.status = 1;
-            }
-            return true;
-        }
-    
         // container
-        let container = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+        let containers = creep.room.find(FIND_STRUCTURES, {
             filter: struct =>
                 struct.structureType === STRUCTURE_CONTAINER &&
                 struct.pos.inRangeTo(controller, 3) &&
                 struct.store.getUsedCapacity(RESOURCE_ENERGY) > 0
-        })
-        if (container) {
-            let result = creep.withdraw(container, RESOURCE_ENERGY);
-            if (result === ERR_NOT_IN_RANGE) {
-                this.combineMove(creep, container, 1)
-                //creep.moveTo(container);
-            }
-            else if (result === OK) {
+        });
+
+        let nearEnergy = _.find(dropedEnergys, r => r.pos.isNearTo(creep));
+        if(nearEnergy) {
+            let result = creep.pickup(nearEnergy);
+            if(result === OK) creep.memory.status = 1;
+            return true;
+        }
+        let nearContainer = _.find(containers, c => c.pos.isNearTo(creep));
+        if(nearContainer) {
+            let result = creep.withdraw(nearContainer, RESOURCE_ENERGY);
+            if (result === OK) {
                 creep.memory.status = 1;
             }
+            return true;
+        }
+
+        // not near to resources, move to closest one.
+        if (dropedEnergys.length) {
+            let dropedEnergy = creep.pos.findClosestByRange(dropedEnergys);
+            this.combineMove(creep, dropedEnergy, 1);
+            return true;
+        }
+        if (containers.length) {
+            let container = creep.pos.findClosestByRange(containers);
+            this.combineMove(creep, container, 1)
             return true;
         }
     

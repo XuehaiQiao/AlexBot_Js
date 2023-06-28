@@ -6,12 +6,18 @@ module.exports = {
 
     /** @param {Creep} creep **/
     run: function (creep) {
-        if (creep.spawning) return;
+        // boost
+        if (creep.memory.boost && !creep.memory.boosted && creep.memory.boostInfo) {
+            creep.say('boost')
+            creep.getBoosts();
+            return;
+        }
+
 
         if (!creep.memory.front) {
             creep.say('find');
             let partner = creep.room.find(FIND_MY_CREEPS, {
-                filter: c => c.memory.role === 'powerMiner'
+                filter: c => c.memory.role === 'powerMiner' && !c.memory.back
             })[0];
 
             if (partner) {
@@ -26,13 +32,13 @@ module.exports = {
         let partner = Game.getObjectById(creep.memory.front);
 
         if (!partner) {
-            if(creep.hits < creep.hitsMax) creep.heal(creep);
+            if (creep.hits < creep.hitsMax) creep.heal(creep);
             else {
-                let damagedCreeps = creep.room.find(FIND_MY_CREEPS, {filter: c => c.hits < c.hitsMax});
+                let damagedCreeps = creep.room.find(FIND_MY_CREEPS, { filter: c => c.hits < c.hitsMax });
                 let target = creep.pos.findClosestByRange(damagedCreeps);
-                if(creep.heal(target) === ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target)
-                }
+                creep.moveTo(target);
+                creep.heal(target);
+                creep.rangedHeal(target);
             }
 
             return;

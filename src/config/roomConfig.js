@@ -29,4 +29,14 @@ module.exports = {
         managerPos: new RoomPosition(37, 23, "E18N6"),
         storagePos: new RoomPosition(37, 23, "E18N6"),
     },
+    E9S2: {
+        restPos: new RoomPosition(16, 34, "E9S2"),
+        managerPos: new RoomPosition(19, 31, "E9S2"),
+        storagePos: new RoomPosition(19, 31, "E9S2"),
+    },
+    E21N8: {
+        restPos: new RoomPosition(44, 14, "E21N8"),
+        managerPos: new RoomPosition(41, 17, "E21N8"),
+        storagePos: new RoomPosition(41, 17, "E21N8"),
+    },
 }
