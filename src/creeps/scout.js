@@ -56,7 +56,7 @@ module.exports = {
                 allowSK: true, 
                 roomCallback: (roomName, costMatrix) => inRoomUtil.getSKMatrix(roomName),
                 repath: ifRepath,
-                range: 15,
+                range: 18,
             });
             return;
         }

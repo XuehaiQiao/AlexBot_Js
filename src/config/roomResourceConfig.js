@@ -14,7 +14,7 @@ module.exports = {
     
     // season
     T: {terminal: 4000, storage: [1000, 4000, 70000]},
-    GH: {terminal: 4000, storage: [1000, 4000, 20000]}, // attack
+    GH: {terminal: 4000, storage: [1000, 3500, 20000]}, // attack
     UO: {terminal: 4000, storage: [1000, 4000, 20000]}, // harvest
 
     XUH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // attack

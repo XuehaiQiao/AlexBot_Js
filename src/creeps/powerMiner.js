@@ -39,7 +39,10 @@ module.exports = {
 
         const hostileParts = [ATTACK, RANGED_ATTACK, HEAL, CARRY];
         const hostiles = creep.room.find(FIND_HOSTILE_CREEPS, {
-            filter: c => _.find(hostileParts, partType => c.getActiveBodyparts(partType) > 0)
+            filter: c => (
+                _.find(hostileParts, partType => c.getActiveBodyparts(partType) > 0) ||
+                c.body.length >= 10
+            )
         });
 
         if(hostiles.length) {

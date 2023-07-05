@@ -22,8 +22,8 @@ module.exports = {
         }
 
         if (hostileStruct) {
-            creep.say(creep.dismantle(hostileStruct));
-            if(creep.dismantle(hostileStruct) == ERR_NOT_IN_RANGE) {
+            let result = creep.dismantle(hostileStruct);
+            if(result === ERR_NOT_IN_RANGE) {
                 creep.moveTo(hostileStruct, {visualizePathStyle: {stroke: '#ff0000'}});
             }
             return;

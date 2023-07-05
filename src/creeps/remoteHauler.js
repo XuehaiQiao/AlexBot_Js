@@ -29,7 +29,7 @@ module.exports = {
         creep.workerSetStatus();
 
         // harvest
-        if (creep.memory.status == 0) {
+        if (!creep.memory.status) {
             // rest
             if (creep.memory.rest) {
                 creep.memory.rest -= 1;

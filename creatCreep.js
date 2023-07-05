@@ -78,20 +78,31 @@ Game.rooms['E11S2'].memory.tasks.spawnTasks.push({
 });
 
 // rangeAtker boosted/unboosted
-Game.rooms['E17N2'].memory.tasks.spawnTasks.push({
+Game.rooms['E18N6'].memory.tasks.spawnTasks.push({
     name: 'rangeAtker',
     body: [...new Array(2).fill(TOUGH), ...new Array(17).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(5).fill(HEAL)],
     memory: {
         role: 'rangeAtker',
-        targetRoom: 'E26N2',
+        targetRoom: 'E17N7',
         boost: true,
         boostInfo: { XLHO2: 5, XGHO2: 2, XKHO2: 10 }
     }
 });
 
+Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
+    name: 'rangeAtker',
+    body: [...new Array(1).fill(TOUGH), ...new Array(8).fill(MOVE), ...new Array(5).fill(RANGED_ATTACK), ...new Array(2).fill(HEAL)],
+    memory: {
+        role: 'rangeAtker',
+        targetRoom: 'E8S3',
+        boost: true,
+        boostInfo: { XLHO2: 2, XGHO2: 1, XKHO2: 5 }
+    }
+});
+
 // power =====================
 
-Game.rooms['E17N2'].memory.tasks.spawnTasks.push({
+Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
     name: 'powerMedic',
     body: [...new Array(25).fill(MOVE), ...new Array(25).fill(HEAL)],
     memory: {
@@ -99,12 +110,12 @@ Game.rooms['E17N2'].memory.tasks.spawnTasks.push({
     }
 });
 
-Game.rooms['E17N2'].memory.tasks.spawnTasks.push({
+Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
     name: 'powerMiner',
     body: [...new Array(20).fill(MOVE), ...new Array(20).fill(ATTACK)],
     memory: {
         role: 'powerMiner',
-        targetRoom: 'E16N0',
+        targetRoom: 'E3S0',
     }
 });
 

@@ -9,7 +9,7 @@ module.exports = {
     },
     /** @param {Creep} creep **/
     run: function (creep) {
-        if(creep.memory.boost && !creep.memory.boosted && creep.memory.boostInfo) {
+        if (creep.memory.boost && !creep.memory.boosted && creep.memory.boostInfo) {
             creep.getBoosts();
             return;
         }
@@ -26,9 +26,9 @@ module.exports = {
         const extractor = creep.room.find(FIND_MY_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_EXTRACTOR })[0];
         if (!extractor) return;
         const mine = creep.room.find(FIND_MINERALS, { filter: mine => mine.pos.isEqualTo(extractor.pos) })[0];
-        if(!mine) return;
+        if (!mine) return;
 
-        const container = mine.pos.findInRange(FIND_STRUCTURES, 1, {filter: struct => struct.structureType === STRUCTURE_CONTAINER})[0];
+        const container = mine.pos.findInRange(FIND_STRUCTURES, 1, { filter: struct => struct.structureType === STRUCTURE_CONTAINER })[0];
         if (container) {
             haveContainerLogic(creep, mine, container);
         }
@@ -45,6 +45,9 @@ module.exports = {
         if (!extractor) return false;
         let mineral = room.find(FIND_MINERALS, { filter: mineral => mineral.pos.isEqualTo(extractor.pos) })[0];
         if (!mineral || !mineral.mineralAmount) return false;
+        if (mineral.mineralType === RESOURCE_THORIUM) {
+            if (mineral.mineralAmount < 200) return false;
+        }
 
         if (room.storage && room.storage.store[mineral.mineralType] >= 50000) return false;
 
@@ -91,11 +94,17 @@ module.exports = {
 };
 
 var haveContainerLogic = function (creep, mine, container) {
-    if(mine.mineralType === RESOURCE_THORIUM && creep.pos.isEqualTo(container.pos)) {
-        creep.fleeFromAdv(container, 1);
+    if (mine.mineralType === RESOURCE_THORIUM) {
+        if (creep.pos.isEqualTo(container.pos)) {
+            creep.fleeFromAdv(container, 1);
+        }
+        else if (mine.mineralAmount < 200 && !creep.memory.stripMine) {
+            creep.suicide();
+            return;
+        }
     }
 
-    if (creep.memory.countDown) {       
+    if (creep.memory.countDown) {
         creep.memory.countDown -= 1;
     }
     else if (!creep.pos.isEqualTo(container.pos)) {
@@ -103,13 +112,19 @@ var haveContainerLogic = function (creep, mine, container) {
     }
     else {
         let result = creep.harvest(mine);
-        if(result === OK) {
+        if (result === OK) {
             creep.memory.countDown = 4;
         }
     }
 };
 
 var noContainerLogic = function (creep, mine) {
+    // season 
+    if (mine.mineralType === RESOURCE_THORIUM && mine.mineralAmount < 200) {
+        creep.suicide();
+        return;
+    }
+
     creep.workerSetStatus();
 
     // transfer

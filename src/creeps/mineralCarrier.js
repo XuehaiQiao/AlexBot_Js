@@ -145,7 +145,7 @@ module.exports = {
             for (const i in centerLabs) {
                 let lab = centerLabs[i];
                 if (!lab || !lab.isActive()) return;
-                if (!lab.mineralType || lab.store[lab.mineralType] < 5) {
+                if (!lab.mineralType || lab.store[lab.mineralType] < 15) {
                     let resourceType = reactionResources[task.resourceType][i];
                     let transResult = labTransfer(creep, lab, resourceType);
                     if(transResult === ERR_NOT_ENOUGH_RESOURCES) {

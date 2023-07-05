@@ -20,7 +20,7 @@ module.exports = {
     XZHO2: [6000, 17000], // move
 
     UO: [6000, 17000],
-    GH: [6000, 17000],  // upgradeController
+    GH: [8000, 17000],  // upgradeController
     //GH2O: [6000, 17000],  // upgradeController
     
     // XKH2O: [5000, 12000],  // carry

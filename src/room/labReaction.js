@@ -163,19 +163,43 @@ function runLab(room) {
     }
     // 2 center feed
     else if (room.memory.labStatus == 2) {
-        if (task.amount <= 0) {
-            room.memory.labStatus = 0;
-            return;
-        }
-
+        // check if mineral type is correct for all labs
         for (const i in centerLabs) {
-            let lab = centerLabs[i];
-            if (!lab.mineralType || lab.store[lab.mineralType] < 5) {
+            if (centerLabs[i].mineralType && centerLabs[i].mineralType != reactionResources[task.resourceType][i]) {
+                room.memory.labStatus = 0;
                 return;
             }
         }
+        for (const i in outterLabs) {
+            if (task.amount <= 0) {
+                room.memory.labStatus = 0;
+                return;
+            }
 
-        room.memory.labStatus = 1;
+            if (outterLabs[i].mineralType && outterLabs[i].mineralType != task.resourceType) {
+                room.memory.labStatus = 3;
+                return;
+            }
+
+            const result = outterLabs[i].runReaction(...centerLabs);
+            if (result === ERR_FULL || result === ERR_INVALID_ARGS) {
+                room.memory.labStatus = 3;
+                return;
+            }
+            else if (result == ERR_NOT_ENOUGH_RESOURCES) {
+                return;
+            }
+            else if (result == OK) {
+                task.amount -= 5;
+            }
+            else {
+                //else (cooldown)
+            }
+
+            room.memory.labStatus = 1;
+        }
+
+        
     }
     // 3 outter withdraw 
     else if (room.memory.labStatus == 3) {

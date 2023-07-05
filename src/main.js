@@ -4,6 +4,7 @@ const test = require('./test');
 const tools = require('./tools');
 const util = require('./util');
 const season5 = require('./season5');
+const runPowerCreep = require('./powerCreep/runPowerCreep');
 require('./prototypes');
 
 module.exports.loop = function () {
@@ -80,11 +81,22 @@ module.exports.loop = function () {
     }
 
     totalCreepCpu += Game.cpu.getUsed();
-    
 
-    if (Game.shard.name === 'shard2' && Game.cpu.bucket === 10000) {
-        Game.cpu.generatePixel();
+    /**
+     * =====================================
+     *        POWER CREEP LOGICS
+     * =====================================
+     */
+
+    for(var name in Game.powerCreeps) {
+        // if(name !== 'p1') continue;
+        var pc = Game.powerCreeps[name];
+        runPowerCreep(pc);
     }
+
+    // if (Game.shard.name === 'shard2' && Game.cpu.bucket === 10000) {
+    //     Game.cpu.generatePixel();
+    // }
 
     /**
      * ====================================

@@ -2,10 +2,10 @@ const creepLogic = require("../creeps");
 
 module.exports = {
     creepCounts: {
-        energyTransporter: 10,
-        thoriumTransporter: 26,
-        upgrader2: 4,
-        builder2: 2,
+        energyTransporter: 12,
+        thoriumTransporter: 25,
+        upgrader2: 5,
+        builder2: 1,
     },
 
     assignBoostRoom: function () {
@@ -33,7 +33,7 @@ module.exports = {
                 c => _.find(hostileParts, partType => c.getActiveBodyparts(partType) > 0)
             )
         });
-        if(hostileCreeps.length) return false;
+        if (hostileCreeps.length) return false;
 
         const boostRoom = Game.rooms[boostRoomName];
         // claimer
@@ -54,7 +54,10 @@ module.exports = {
         }
 
         const thorium = boostRoom.find(FIND_MINERALS, { filter: mine => mine.mineralType === RESOURCE_THORIUM })[0];
-        if (!thorium) return false;
+        if (!thorium) {
+            delete room.memory.boostRoom;
+            return false;
+        }
 
         // builder2
         let builderCount;
@@ -98,6 +101,14 @@ module.exports = {
 
         const controller = boostRoom.controller;
         if (controller.level < 6) {
+            // roadRepairer
+            if (creepLogic.roadRepairer.spawn(room, boostRoomName)) {
+                let creepSpawnData = creepLogic.roadRepairer.spawnData(room, boostRoomName);
+                let result = spawnCreep(room, spawn, creepSpawnData);
+                if (result === OK) return true;
+                else return false;
+            }
+
             // upgrader2
             let upgraderCount;
             if (global.roomCensus[boostRoomName] && global.roomCensus[boostRoomName]['upgrader2']) upgraderCount = global.roomCensus[boostRoomName]['upgrader2'];
@@ -105,7 +116,7 @@ module.exports = {
             if (upgraderCount < this.creepCounts.upgrader2) {
                 let boostInfo = { GH: 30 };
                 let totalGH2O = baseTerminal.store['GH2O'] + baseStorage.store['GH2O'];
-                if(totalGH2O > 900) boostInfo = { GH2O: 30 };
+                if (totalGH2O > 900) boostInfo = { GH2O: 30 };
 
                 let creepSpawnData = {
                     name: 'upgrader2' + Game.time % 10000,
@@ -140,30 +151,31 @@ module.exports = {
             }
         }
         else {
-            const extractor = boostRoom.find(FIND_MY_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_EXTRACTOR })[0];
-            if (extractor) {
-                // miner
-                let minerCount;
-                if (global.roomCensus[boostRoomName] && global.roomCensus[boostRoomName]['miner']) minerCount = global.roomCensus[boostRoomName]['miner'];
-                else minerCount = 0;
-                if (minerCount < 1) {
-                    let creepSpawnData = {
-                        name: 'miner' + Game.time % 10000,
-                        body: [...new Array(33).fill(WORK), ...new Array(17).fill(MOVE)],
-                        memory: {
-                            role: 'miner',
-                            targetRoom: boostRoomName,
-                            base: room.name,
-                            boost: true,
-                            boostInfo: { UO: 33 }
-                        }
+            // miner
+            let minerCount;
+            if (global.roomCensus[boostRoomName] && global.roomCensus[boostRoomName]['miner']) minerCount = global.roomCensus[boostRoomName]['miner'];
+            else minerCount = 0;
+            if (minerCount < 1) {
+                let creepSpawnData = {
+                    name: 'miner' + Game.time % 10000,
+                    body: [...new Array(33).fill(WORK), ...new Array(17).fill(MOVE)],
+                    memory: {
+                        role: 'miner',
+                        targetRoom: boostRoomName,
+                        base: room.name,
+                        boost: true,
+                        boostInfo: { UO: 33 },
+                        stripMine: true,
                     }
-
-                    let result = spawnCreep(room, spawn, creepSpawnData);
-                    if (result === OK) return true;
-                    else return false;
                 }
 
+                let result = spawnCreep(room, spawn, creepSpawnData);
+                if (result === OK) return true;
+                else return false;
+            }
+
+            const extractor = boostRoom.find(FIND_MY_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_EXTRACTOR })[0];
+            if (extractor) {
                 // transporter
                 let transCount;
                 if (global.roomCensus[boostRoomName] && global.roomCensus[boostRoomName]['transporter']) transCount = global.roomCensus[boostRoomName]['transporter'];
@@ -177,6 +189,12 @@ module.exports = {
                     let result = spawnCreep(room, spawn, creepSpawnData);
                     if (result === OK) return true;
                     else return false;
+                }
+            }
+            else {
+                const extractorConstruct = boostRoom.find(FIND_MY_CONSTRUCTION_SITES, { filter: construct => construct.structureType === STRUCTURE_EXTRACTOR })[0];
+                if(!extractorConstruct) {
+                    boostRoom.createConstructionSite(thorium.pos, STRUCTURE_EXTRACTOR);
                 }
             }
         }

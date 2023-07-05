@@ -105,6 +105,12 @@ module.exports = {
                 creep.rangedHeal(target);
             }
             else if (roomInfo[creep.room.name]) creep.toResPos();
+            else {
+                creep.travelTo(new RoomPosition(25, 25, creep.room.name), { 
+                    allowSK: true, 
+                    range: 20,
+                });
+            }
         }
     },
 

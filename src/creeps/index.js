@@ -43,8 +43,9 @@ let creepLogic = {
     // defenders
     defMelee:       require('./defMelee'),
 
-    // reactor
+    // season
     reactorFiller:  require('./reactorFiller'),
+    roadRepairer: require('./roadRepairer'),
 
     // power
     powerMiner: require('./powerMiner'),

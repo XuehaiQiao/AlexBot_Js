@@ -1,15 +1,14 @@
-// E6S2
-// E14N3
+// E13N8
 
 const { UH2O } = require("./src/config/labProductConfig");
 
 // claimer spawn
 Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(6).fill(CLAIM), ...new Array(6).fill(MOVE)], 'Claimer' + Game.time, { memory: { role: 'claimer', status: 1, targetRoom: 'E14N3', claim: true } });
 
-Game.rooms['E11S2'].memory.tasks.spawnTasks.push({
+Game.rooms['E18N6'].memory.tasks.spawnTasks.push({
     name: 'claim',
     body: [...new Array(1).fill(CLAIM), ...new Array(1).fill(MOVE)],
-    memory: { role: 'claimer', status: 1, targetRoom: 'E9S2', claim: true }
+    memory: { role: 'claimer', status: 1, targetRoom: 'E21N8', claim: true }
 });
 // harvester2
 Game.spawns['Spawn1_W18S15'].spawnCreep([WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], 'harvester2' + Game.time, { memory: { role: 'harvester2', target: 0, targetRoom: 'W17S14' } });
@@ -19,10 +18,10 @@ Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
     memory: { role: 'harvester2', status: 0, targetRoom: 'E18S5' }
 });
 //builder2
-Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
+Game.rooms['E18N6'].memory.tasks.spawnTasks.push({
     name: 'builder',
     body: [...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)],
-    memory: { role: 'builder', status: 0, targetRoom: 'E6S1' }
+    memory: { role: 'builder', status: 0, targetRoom: 'E21N8' }
 });
 Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
     name: 'builder2',
@@ -58,7 +57,7 @@ Game.rooms['E11N4'].memory.tasks.spawnTasks.push({
 });
 
 // scout
-Game.rooms['E6S2'].memory.tasks.spawnTasks.push({ name: 'scout', body: [MOVE], memory: { role: 'scout', targetRoom: 'E5S5' } });
+Game.rooms['E6S2'].memory.tasks.spawnTasks.push({ name: 'scout', body: [MOVE], memory: { role: 'scout', targetRoom: 'E7N2' } });
 // keeperAttacker
 Game.spawns['Spawn3_W16S17'].spawnCreep([...new Array(25).fill(MOVE), ...new Array(19).fill(RANGED_ATTACK), ...new Array(6).fill(HEAL)], 'keeperAttacker' + Game.time, { memory: { role: 'keeperAttacker', base: 'W16S17', targetRoom: 'W16S16' } });
 
@@ -100,8 +99,16 @@ Game.rooms['W16S17'].memory.tasks.spawnTasks.push({
 });
 
 // wrecker
-Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(25).fill(WORK), ...new Array(25).fill(MOVE)], 'wrecker' + Game.time, { memory: { role: 'wrecker', targetRoom: 'W17S14' } });
+Game.spawns['Spawn'].spawnCreep([...new Array(5).fill(WORK), ...new Array(5).fill(MOVE)], 'wrecker' + Game.time, { memory: { role: 'wrecker', targetRoom: 'W17S14' } });
 
+Game.rooms['E18N6'].memory.tasks.spawnTasks.push({
+    name: 'wrecker',
+    body: [...new Array(5).fill(WORK), ...new Array(5).fill(MOVE)],
+    memory: {
+        role: 'wrecker',
+        targetRoom: 'E16N7',
+    }
+});
 _.forEach(_.filter(Game.rooms['W18S15'].find(FIND_STRUCTURES), structure => structure.structureType == STRUCTURE_TOWER), function (object) {
     object.destroy();
 });
@@ -163,7 +170,7 @@ JSON.stringify(obj);
 Game.rooms['W18S15'].memory.tasks.managerTasks.push({ from: STRUCTURE_FACTORY, to: STRUCTURE_STORAGE, resourceType: 'X', volume: 40000 });
 Game.rooms['E6S2'].memory.tasks.managerTasks.push({ from: STRUCTURE_STORAGE, to: STRUCTURE_TERMINAL, resourceType: 'LHO2', volume: 2000 });
 Game.rooms['E16S2'].memory.tasks.managerTasks.push({ from: STRUCTURE_STORAGE, to: STRUCTURE_TERMINAL, resourceType: 'GH', volume: 6000 });
-Game.rooms['E16S2'].memory.tasks.managerTasks.push({ from: STRUCTURE_STORAGE, to: STRUCTURE_NUKER, resourceType: 'energy', volume: 100000 });
+Game.rooms['E18N6'].memory.tasks.managerTasks.push({ from: STRUCTURE_STORAGE, to: STRUCTURE_NUKER, resourceType: 'energy', volume: 100000 });
 // create reaction task
 Game.rooms.W19S17.memory.tasks.labTasks.push({ resourceType: 'OH', amount: 3000 });
 
@@ -174,12 +181,12 @@ Game.rooms['E17N2'].terminal.send('GH', 4000, 'E6S2', 'support');
 
 Game.market.deal('645bfc8403ae10376b827734', 4000, "W21S19");
 // purifier
-Game.market.deal('6465dacf03ae1047f9c239df', 10000, 'W18S15');
+Game.market.deal('649fab116ee77a6e75c40c5f', 25000, 'W18S15');
 
 Game.market.cancelOrder('644046f346d8195c5404a845');
 
 Game.market.createOrder({
-    type: ORDER_BUY,
+    type: ORDER_SELL,
     resourceType: RESOURCE_ENERGY,
     price: 8.37,
     totalAmount: 400000,
@@ -187,13 +194,23 @@ Game.market.createOrder({
 });
 
 
-Game.rooms['E18N6'].memory.tasks.powerTasks.push({
-    roomName: 'E20N5',
+Game.rooms['E16S2'].memory.tasks.powerTasks.push({
+    roomName: 'E17S0',
     status: 1, 
     space: 3, 
-    decayTime: Game.time + 2600,
-    amount: 7447,
+    decayTime: Game.time + 4800,
+    amount: 7241,
 });
+
+Game.rooms.E6S2.memory.powerRooms.rooms = [
+    'E3S0',
+    'E4S0',
+    'E5S0',
+    'E6S0',
+    'E7S0',
+    'E8S0',
+    'E9S0',
+]
 
 /*
 Todo list:

@@ -6,13 +6,14 @@ module.exports = {
 
     /** @param {Creep} creep **/
     run: function (creep) {
+        if(creep.spawning) return;
+        
         // boost
         if (creep.memory.boost && !creep.memory.boosted && creep.memory.boostInfo) {
             creep.say('boost')
             creep.getBoosts();
             return;
         }
-
 
         if (!creep.memory.front) {
             creep.say('find');

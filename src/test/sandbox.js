@@ -39,7 +39,7 @@ const sandbox = {
         //tools.visual(Game.rooms['E14N3']);
 
         // E18N6
-        room = Game.rooms['E18N6'];
+        let room = Game.rooms['E18N6'];
         if(room) {
             let enemies = room.find(FIND_HOSTILE_CREEPS);
             // let myCreeps = room.find(FIND_MY_CREEPS);
@@ -48,6 +48,16 @@ const sandbox = {
                 visual.viewTowerDamage(room, enemies);
             }
         }
+
+        let myRooms = _.filter(Game.rooms, r => r.controller && r.controller.my);
+        let ultraRooms = [];
+        myRooms.forEach(r => {
+            if(r.memory.thoriumDetection) {
+                ultraRooms.push(...r.memory.thoriumDetection.observedRooms.ultra);
+            }
+        })
+
+        console.log(`ultraRooms: ${ultraRooms}`);
     },
 }
 

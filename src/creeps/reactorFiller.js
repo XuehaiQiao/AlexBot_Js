@@ -26,13 +26,42 @@ module.exports = {
         creep.workerSetStatus();
 
         if (creep.memory.status) {
-            // move to target room if not in
-            if (creep.room.name !== creep.memory.targetRoom) {
-                if(!creep.memory.targetRoom) {
-                    creep.say('!tR');
-                    return;
+            if(!creep.memory.targetRoom) {
+                creep.say('!tR');
+                return;
+            }
+
+            // Directly move targetRoom if have vision
+            let targetRoom = Game.rooms[creep.memory.targetRoom];
+            if(targetRoom) {
+                let reactor = targetRoom.find(FIND_REACTORS)[0];
+                if (reactor) {
+                    if(creep.transfer(reactor, RESOURCE_THORIUM) === ERR_NOT_IN_RANGE) {
+                        creep.travelTo(reactor, {
+                            allowSK: true,
+                            roomCallback: (roomName, costMatrix) => {
+                                if (roomUtil.getRoomType(roomName) === KEEPER) {
+                                    let roomMemory = Memory.rooms[roomName];
+                                    if(roomMemory && roomMemory.invaderCore && roomMemory.invaderCore.endTime > Game.time) {
+                                        return false;
+                                    }
+                                    else return inRoomUtil.getSKMatrix(roomName);
+                                }
+                                
+                                return undefined;
+                            },
+                            repath: ifRepath,
+                            ensurePath: true,
+                            ignoreCreeps: false,
+                        });
+                    }
                 }
 
+                return;
+            }
+
+            // move to target room if not in
+            if (creep.room.name !== creep.memory.targetRoom) {
                 creep.travelTo(new RoomPosition(25, 25, creep.memory.targetRoom), {
                     allowSK: true,
                     roomCallback: (roomName, costMatrix) => {
@@ -90,8 +119,16 @@ module.exports = {
                 return;
             }
 
+            let storage = creep.room.storage;
             let terminal = creep.room.terminal;
-            if(terminal && terminal.store[RESOURCE_THORIUM] > 99) {
+            if(storage && storage.store[RESOURCE_THORIUM] > 99) {
+                let result = creep.withdraw(storage, RESOURCE_THORIUM, 99);
+                if(result === ERR_NOT_IN_RANGE) {
+                    creep.travelTo(storage);
+                }
+                else if(result === OK || creep.store[RESOURCE_THORIUM] >= 10) creep.memory.status = 1;
+            }
+            else if(terminal && terminal.store[RESOURCE_THORIUM] > 99) {
                 let result = creep.withdraw(terminal, RESOURCE_THORIUM, 99);
                 if(result === ERR_NOT_IN_RANGE) {
                     creep.travelTo(terminal);
@@ -104,7 +141,7 @@ module.exports = {
     // checks if the room needs to spawn a creep
     spawn: function (room, targetRoomName) {
         if(!room.storage || !room.terminal) return false
-        if(room.storage.store[RESOURCE_THORIUM] < 500) return false;
+        if(room.terminal.store[RESOURCE_THORIUM] < 500) return false;
 
         const thisTypeCreeps = _.filter(Game.creeps, (creep) => creep.memory.role === this.properties.role && creep.memory.targetRoom === targetRoomName);
 
@@ -116,7 +153,7 @@ module.exports = {
             if (reactor && reactor.store[RESOURCE_THORIUM] >= 900) return false;
         }
 
-        if (carryAmount <= 400 && thisTypeCreeps.length < 7) {
+        if (carryAmount <= 300 && thisTypeCreeps.length < 5) {
             return true
         }
     },

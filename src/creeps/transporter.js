@@ -55,18 +55,7 @@ module.exports = {
             }
 
             // first find droped recources
-            let dropedRecource;
-            if (creep.memory.targetResourceType) {
-                dropedRecource = _.find(creep.room.find(FIND_DROPPED_RESOURCES), resource => resource.resourceType == creep.memory.targetResourceType);
-            }
-            else dropedRecource = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES);
-
-            if (dropedRecource) {
-                if (creep.pickup(dropedRecource) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(dropedRecource, { visualizePathStyle: { stroke: '#ffffff' } });
-                }
-                return;
-            }
+            if(creep.takeEnergyFromClosest()) return;
 
             // find tomstone
             let tomstone = _.find(creep.room.find(FIND_TOMBSTONES), ts => ts.store.getUsedCapacity() >= creep.store.getCapacity());
@@ -78,9 +67,10 @@ module.exports = {
                 }
                 return;
             }
+            
 
             if (creep.store.getUsedCapacity() > 0) creep.memory.status = 1;
-            //else creep.suicide();
+            else creep.suicide();
         }
         // transfer
         else {
@@ -411,16 +401,22 @@ module.exports = {
 
     takeThoriumHomeTest: function (creep) {
         let targetRoom = Game.rooms[creep.memory.targetRoom];
-        if (!targetRoom || !targetRoom.controller || targetRoom.controller.level < 6) {
+        if (!targetRoom || (targetRoom.controller && targetRoom.controller.my && targetRoom.controller.level < 6)) {
             this.tranEnergyBetweenMyRooms(creep);
             return;
+        }
+        else if (targetRoom.controller && !targetRoom.controller.my) {
+            this.collectDropedResources(creep);
         }
 
         if (creep.store[RESOURCE_ENERGY] > 0) {
             creep.drop(RESOURCE_ENERGY);
         }
 
-
+        let thorium = targetRoom.find(FIND_MINERALS, { filter: mine => mine.mineralType === RESOURCE_THORIUM })[0];
+        if(!thorium) {
+            this.collectDropedResources(creep);
+        }
         let extractor = targetRoom.find(FIND_MY_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_EXTRACTOR })[0];
         if (!extractor) {
             if (creep.memory.status) this.collectDropedResources(creep);
@@ -623,7 +619,7 @@ function takeNearResource(creep, resourceType) {
     });
     if (nearResouce.length > 0) {
         let result = creep.pickup(nearResouce[0]);
-        if (result === OK && nearResouce[0].resourceType === resourceType) creep.memory.status = 1;
+        if (result === OK && nearResouce[0].amount > creep.store.getCapacity() * 0.5) creep.memory.status = 1;
     }
 
     // tomstone
