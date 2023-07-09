@@ -2,10 +2,10 @@ const creepLogic = require("../creeps");
 
 module.exports = {
     creepCounts: {
-        energyTransporter: 12,
-        thoriumTransporter: 25,
+        energyTransporter: 13,
+        thoriumTransporter: 30,
         upgrader2: 5,
-        builder2: 1,
+        builder2: 2,
     },
 
     assignBoostRoom: function () {
@@ -125,8 +125,8 @@ module.exports = {
                         role: 'upgrader2',
                         targetRoom: boostRoomName,
                         base: room.name,
-                        boost: true,
-                        boostInfo: boostInfo,
+                        // boost: true,
+                        // boostInfo: boostInfo,
                     }
                 }
 

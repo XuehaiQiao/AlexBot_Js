@@ -12,6 +12,11 @@ module.exports = {
     },
     /** @param {Creep} creep **/
     run: function (creep) {
+        if (creep.memory.boost && !creep.memory.boosted && creep.memory.boostInfo) {
+            creep.getBoosts();
+            return;
+        }
+        
         // move to its target room if not in
         if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
             creep.moveToRoomAdv(creep.memory.targetRoom);

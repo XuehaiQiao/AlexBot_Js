@@ -12,7 +12,7 @@ module.exports = function (room) {
 
 function usePower(room) {
     let storage = room.storage;
-    if (!storage || storage.store[RESOURCE_ENERGY] < 410000) return;
+    if (!storage || storage.store[RESOURCE_ENERGY] < 420000) return;
 
     let pSpawn = room.find(FIND_MY_STRUCTURES, {
         filter: struct => (

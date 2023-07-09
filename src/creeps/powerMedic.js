@@ -52,6 +52,17 @@ module.exports = {
         else if (creep.hits <= creep.hitsMax - 12 * creep.getActiveBodyparts(HEAL)) {
             creep.heal(creep);
         }
+        else if(partner.hits === partner.hitsMax && creep.hits === creep.hitsMax) {
+            let adjCreeps = creep.pos.findInRange(FIND_MY_CREEPS, 3, { filter: c => c.hits < c.hitsMax });
+            if (adjCreeps.length > 0) {
+                let target = creep.pos.findClosestByRange(adjCreeps);
+                if (creep.heal(target) === ERR_NOT_IN_RANGE) creep.rangedHeal(target);
+            }
+            else {
+                creep.heal(partner);
+                creep.rangedHeal(partner);
+            }
+        }
         else {
             creep.heal(partner);
             creep.rangedHeal(partner);

@@ -97,7 +97,10 @@ module.exports = {
                 }
             }            
 
-            if(creep.ticksToLive < 550) creep.suicide();
+            if(creep.ticksToLive < 1400) {
+                creep.suicide();
+                return;
+            }
 
             if (creep.room.name !== creep.memory.base) {
                 creep.travelTo(new RoomPosition(25, 25, creep.memory.base), {
@@ -153,7 +156,7 @@ module.exports = {
             if (reactor && reactor.store[RESOURCE_THORIUM] >= 900) return false;
         }
 
-        if (carryAmount <= 300 && thisTypeCreeps.length < 5) {
+        if (carryAmount <= 300 && thisTypeCreeps.length < 6) {
             return true
         }
     },

@@ -4,21 +4,27 @@ const { roomBoost } = require("../season5");
 // const creepTypes2 = ['carrier2', 'harvester2', 'upgrader2', 'builder2']; // 'mineralCarrier'
 
 module.exports = function (room) {
-    // if (room.name === 'E6S2' && Game.time % 1300 === 500) {
-    //     Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
-    //         name: 'rangeAtker',
-    //         body: [...new Array(7).fill(MOVE), ...new Array(4).fill(RANGED_ATTACK), ...new Array(3).fill(HEAL)],
-    //         memory: { role: 'rangeAtker', targetRoom: 'E9S2', }
-    //     });
-    // }
+    if (room.name === 'E16S2' && Game.time % 1500 === 500) {
+        // Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
+        //     name: 'rangeAtker',
+        //     body: [...new Array(2).fill(TOUGH), ...new Array(11).fill(MOVE), ...new Array(5).fill(RANGED_ATTACK), ...new Array(4).fill(HEAL)],
+        //     memory: {
+        //         role: 'rangeAtker',
+        //         targetRoom: 'E15S5',
+        //         boost: true,
+        //         boostInfo: { XLHO2: 4, XGHO2: 2, XKHO2: 5 }
+        //     }
+        // });
+        Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
+            name: 'rangeAtker',
+            body: [...new Array(5).fill(RANGED_ATTACK), ...new Array(25).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(10).fill(HEAL)],
+            memory: {
+                role: 'rangeAtker',
+                targetRoom: 'E18S1',
+            }
+        });
 
-    // if (room.name === 'E18N6' && Game.time % 200 === 0) {
-    //     Game.rooms['E18N6'].memory.tasks.spawnTasks.push({ 
-    //         name: 't', 
-    //         body: [...new Array(25).fill(CARRY), ...new Array(25).fill(MOVE)], 
-    //         memory: { role: 'transporter', base: 'E18N6', targetRoom: 'E21N8' } 
-    //     });
-    // }
+    }
 
     // if (room.name === 'E18N6' && Game.time % 1200 === 0) {
     //     Game.rooms['E18N6'].memory.tasks.spawnTasks.push({
@@ -30,14 +36,39 @@ module.exports = function (room) {
     //         }
     //     });
     // }
-    // if (room.name === 'E17N2' && Game.time % 1000 === 0) {
-    //     Game.rooms['E17N2'].memory.tasks.spawnTasks.push({
+
+    // if (room.name === 'E16S2' && Game.time % 150 === 0) {
+    //     Game.rooms['E16S2'].memory.tasks.spawnTasks.push({ 
+    //         name: 't', 
+    //         body: [...new Array(25).fill(CARRY), ...new Array(25).fill(MOVE)], 
+    //         memory: { role: 'transporter', base: 'E16S2', targetRoom: 'E18S5' } 
+    //     });
+    // }
+
+    // if (room.name === 'E16S2' && Game.time % 1000 === 300) {
+    //     Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
     //         name: 'rangeAtker',
-    //         body: [...new Array(20).fill(RANGED_ATTACK), ...new Array(25).fill(MOVE), ...new Array(5).fill(HEAL)],
+    //         body: [...new Array(5).fill(RANGED_ATTACK), ...new Array(25).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(10).fill(HEAL)],
     //         memory: {
     //             role: 'rangeAtker',
-    //             targetRoom: 'E26N2',
+    //             targetRoom: 'E17S5',
     //         }
+    //     });
+    //     Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
+    //         name: 'rangeAtker',
+    //         body: [...new Array(5).fill(RANGED_ATTACK), ...new Array(25).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(10).fill(HEAL)],
+    //         memory: {
+    //             role: 'rangeAtker',
+    //             targetRoom: 'E17S5',
+    //         }
+    //     });
+    // }
+
+    // if (room.name === 'E9S2' && Game.time % 1000 === 0) {
+    //     Game.rooms['E9S2'].memory.tasks.spawnTasks.push({
+    //         name: 't',
+    //         body: [...new Array(25).fill(CARRY), ...new Array(25).fill(MOVE)],
+    //         memory: { role: 'transporter', base: 'E16S2', targetRoom: 'E18S5' }
     //     });
     // }
 
@@ -52,6 +83,7 @@ module.exports = function (room) {
 
     // reactor creeps
     if (createReactorCreep(room, idleSpawn, 'E14N3', 'E15N5')) return;
+    //if (createReactorCreep(room, idleSpawn, 'E6S2', 'E5S5')) return;
     // roomBoost
     if (roomBoost.spawn(room, idleSpawn, spawnCreep)) return;
 
@@ -139,8 +171,8 @@ function createReactorCreep(room, spawn, baseRoomName, targetRoomName) {
     if (defenderNum < 1) {
         let result = spawnCreep(room, spawn, {
             name: 'rA' + Game.time % 5000,
-            body: [...new Array(10).fill(RANGED_ATTACK), ...new Array(16).fill(MOVE), ...new Array(6).fill(HEAL)],
-            memory: { role: 'rangeAtker', targetRoom: targetRoomName, }
+            body: [...new Array(5).fill(RANGED_ATTACK), ...new Array(25).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(10).fill(HEAL)],
+            memory: { role: 'rangeAtker', targetRoom: targetRoomName, base: room.name}
         });
         if (result === OK) return true;
     }
@@ -254,14 +286,40 @@ function remoteDefenceCreeps(room, spawn, roomName, roomMemory) {
 
 
     const hostileParts = [ATTACK, RANGED_ATTACK, WORK, HEAL, CLAIM, CARRY]
-    const hostileCreeps = remoteRoom.find(FIND_HOSTILE_CREEPS, {
+
+    const enemies = remoteRoom.find(FIND_HOSTILE_CREEPS, {
         filter: c =>
             c.owner.username !== 'Source Keeper' &&
+            c.owner.username !== 'Invader' &&
             _.find(hostileParts, partType => c.getActiveBodyparts(partType) > 0)
     });
-    if (hostileCreeps.length) {
+
+    const hostileCreeps = remoteRoom.find(FIND_HOSTILE_CREEPS, {
+        filter: c =>
+            c.owner.username === 'Source Keeper' &&
+            _.find(hostileParts, partType => c.getActiveBodyparts(partType) > 0)
+    });
+
+    if(enemies.length) {
+        console.log(roomName, 'found enemy!');
+        if (creepLogic['rangeAtker'].spawn(room, roomName)) {
+            let creepSpawnData = {
+                name: 'rangeAtker' + Game.time % 10000,
+                body: [...new Array(5).fill(RANGED_ATTACK), ...new Array(25).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(10).fill(HEAL)],
+                memory: {
+                    role: 'rangeAtker',
+                    base: room.name,
+                    targetRoom: roomName,
+                }
+            }
+            //spawnCreep(room, spawn, creepLogic['rangeAtker'].spawnData(room, roomName));
+            spawnCreep(room, spawn, creepSpawnData);
+            return true;
+        }
+    }
+    else if (hostileCreeps.length) {
         if (!roomMemory.neutral) {
-            console.log(roomName, 'found enemy!');
+            console.log(roomName, 'found hostile!');
             if (creepLogic['defender'].spawn(room, roomName)) {
                 spawnCreep(room, spawn, creepLogic['defender'].spawnData(room, roomName));
                 return true;

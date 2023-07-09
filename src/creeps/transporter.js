@@ -105,7 +105,7 @@ module.exports = {
 
             // move to its base room if not in
             if (creep.memory.base && creep.memory.base != creep.room.name) {
-                creep.moveToRoom(creep.memory.base);
+                creep.travelTo(new RoomPosition(25, 25, creep.memory.base));
                 return;
             }
 
@@ -115,7 +115,7 @@ module.exports = {
         else {
             // move to its target room if not in
             if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
-                creep.moveToRoom(creep.memory.targetRoom);
+                creep.travelTo(new RoomPosition(25, 25, creep.memory.targetRoom));
                 return;
             }
 
@@ -405,18 +405,18 @@ module.exports = {
             this.tranEnergyBetweenMyRooms(creep);
             return;
         }
-        else if (targetRoom.controller && !targetRoom.controller.my) {
-            this.collectDropedResources(creep);
-        }
+        // else if (targetRoom.controller && !targetRoom.controller.my) {
+        //     this.collectDropedResources(creep);
+        // }
 
         if (creep.store[RESOURCE_ENERGY] > 0) {
             creep.drop(RESOURCE_ENERGY);
         }
 
-        let thorium = targetRoom.find(FIND_MINERALS, { filter: mine => mine.mineralType === RESOURCE_THORIUM })[0];
-        if(!thorium) {
-            this.collectDropedResources(creep);
-        }
+        // let thorium = targetRoom.find(FIND_MINERALS, { filter: mine => mine.mineralType === RESOURCE_THORIUM })[0];
+        // if(!thorium) {
+        //     this.collectDropedResources(creep);
+        // }
         let extractor = targetRoom.find(FIND_MY_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_EXTRACTOR })[0];
         if (!extractor) {
             if (creep.memory.status) this.collectDropedResources(creep);

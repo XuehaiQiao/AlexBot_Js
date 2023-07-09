@@ -29,16 +29,37 @@ Creep.prototype.moveToNoCreepInRoom = function (target) {
 }
 
 Creep.prototype.moveToRoom = function (roomName) {
-    return this.travelTo(new RoomPosition(25, 25, roomName), { allowHostile: true, allowSK: true });
+    return this.travelTo(new RoomPosition(25, 25, roomName), { allowHostile: true, allowSK: true, ensurePath: true, });
 }
 
 Creep.prototype.moveToRoomAdv = function (roomName) {
     // return true if its moving to the target room
     if (roomName && roomName != this.room.name) {
-        this.travelTo(new RoomPosition(25, 25, roomName), { allowSK: true });
+        this.travelTo(new RoomPosition(25, 25, roomName), { allowSK: true, ensurePath: true, });
         return true;
     }
     // move 1 more step to leave the room edge
+    if (this.pos.x == 0) {
+        this.move(RIGHT);
+        return true;
+    }
+    if (this.pos.x == 49) {
+        this.move(LEFT);
+        return true;
+    }
+    if (this.pos.y == 0) {
+        this.move(BOTTOM);
+        return true;
+    }
+    if (this.pos.y == 49) {
+        this.move(TOP);
+        return true;
+    }
+
+    return false;
+}
+
+Creep.prototype.leaveEdge = function () {
     if (this.pos.x == 0) {
         this.move(RIGHT);
         return true;

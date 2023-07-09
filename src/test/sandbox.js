@@ -54,6 +54,16 @@ const sandbox = {
         myRooms.forEach(r => {
             if(r.memory.thoriumDetection) {
                 ultraRooms.push(...r.memory.thoriumDetection.observedRooms.ultra);
+
+                const ultras = r.memory.thoriumDetection.observedRooms.ultra;
+                const highs = r.memory.thoriumDetection.observedRooms.high;
+
+                ultras.forEach(rN => {
+                    Game.map.visual.text("Ultra", new RoomPosition(11,14,rN), {color: '#FFFFFF', fontSize: 10}); 
+                })
+                highs.forEach(rN => {
+                    Game.map.visual.text("High", new RoomPosition(11,14,rN), {color: '#FFFFFF', fontSize: 10}); 
+                })
             }
         })
 

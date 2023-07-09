@@ -275,14 +275,6 @@ function runPowerCreep(pc) {
             if (ps) pc.spawn(ps);
         }
     }
-
-    if (pc.store.getFreeCapacity() > 0) {
-        pc.usePower(PWR_GENERATE_OPS);
-    }
-    else if (pc.room.storage && pc.room.storage.my && pc.room.storage.store[RESOURCE_OPS] < 10000) {
-        pc.moveTo(pc.room.storage);
-        pc.transfer(pc.room.storage, RESOURCE_OPS);
-    }
     if (pc.ticksToLive < 300) {
         if (pc.memory.base && pc.room.name !== pc.memory.base) {
             pc.moveTo(new RoomPosition(25, 25, pc.memory.base));
@@ -324,11 +316,12 @@ function runPowerCreep(pc) {
     }
     if (pc.powers[PWR_OPERATE_SPAWN] &&
         pc.powers[PWR_OPERATE_SPAWN].cooldown === 0 &&
-        pc.store[RESOURCE_OPS] >= 100 &&
-        pc.room.memory.boostRoom
+        (pc.room.memory.boostRoom || pc.room.memory.powerSpawn)
     ) {
-        const spawn = pc.room.find(FIND_MY_SPAWNS, {filter: spawn => !spawn.effects || !spawn.effects.length})[0];
-        if(spawn) {
+        if (pc.store[RESOURCE_OPS] < 100) pc.memory.status = 0;
+
+        const spawn = pc.room.find(FIND_MY_SPAWNS, { filter: spawn => !spawn.effects || !spawn.effects.length })[0];
+        if (spawn) {
             let result = pc.usePower(PWR_OPERATE_SPAWN, spawn);
             if (result === ERR_NOT_IN_RANGE) pc.moveTo(spawn);
             return;
@@ -350,6 +343,24 @@ function runPowerCreep(pc) {
         if (lab) {
             let result = pc.usePower(PWR_OPERATE_LAB, lab);
             if (result === ERR_NOT_IN_RANGE) pc.moveTo(lab);
+            return;
+        }
+    }
+    if (pc.memory.status) {
+        if (pc.store.getFreeCapacity() > 0) {
+            pc.usePower(PWR_GENERATE_OPS);
+        }
+        else if (pc.room.storage && pc.room.storage.my && pc.room.storage.store[RESOURCE_OPS] < 10000) {
+            pc.moveTo(pc.room.storage);
+            pc.transfer(pc.room.storage, RESOURCE_OPS, pc.store[RESOURCE_OPS] / 2);
+            return;
+        }
+    }
+    else {
+        if (pc.level >= 5 && pc.room.terminal && pc.room.terminal.my && pc.room.terminal.store[RESOURCE_OPS] > 0) {
+            pc.moveTo(pc.room.terminal);
+            let result = pc.withdraw(pc.room.terminal, RESOURCE_OPS, Math.min([pc.room.terminal.store[RESOURCE_OPS], pc.store.getFreeCapacity()]));
+            if(result === OK) pc.memory.status = 1;
             return;
         }
     }
@@ -919,8 +930,8 @@ module.exports = {
         type: 'carrier2',
         stages: {
             1: { maxEnergyCapacity: 300, bodyParts: [CARRY, MOVE, CARRY, MOVE], number: 4 },
-            2: { maxEnergyCapacity: 550, bodyParts: [CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2 },
-            3: { maxEnergyCapacity: 800, bodyParts: [CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 2 },
+            2: { maxEnergyCapacity: 550, bodyParts: [CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 4 },
+            3: { maxEnergyCapacity: 800, bodyParts: [CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 3 },
             4: { maxEnergyCapacity: 1300, bodyParts: [...new Array(16).fill(CARRY), ...new Array(8).fill(MOVE)], number: 2 },
             5: { maxEnergyCapacity: 1800, bodyParts: [...new Array(20).fill(CARRY), ...new Array(10).fill(MOVE)], number: 2 },
             7: { maxEnergyCapacity: 10000, bodyParts: [...new Array(32).fill(CARRY), ...new Array(16).fill(MOVE)], number: 1 },
@@ -1184,7 +1195,7 @@ module.exports = {
         let num = this.properties.stages[this.getStage(room)].number;
         if(room.controller.level == 8){
             if(creepCount >= 1) return false
-            else if ((storage && storage.store[RESOURCE_ENERGY] > 300000) || room.controller.ticksToDowngrade < 50000) {
+            else if ((storage && storage.store[RESOURCE_ENERGY] > 450000) || room.controller.ticksToDowngrade < 50000) {
                 return true
             }
             else return false;
@@ -1320,8 +1331,7 @@ module.exports = {
         if (creep.memory.status) {
             var target = this.assignTarget(creep);
             if (!target) {
-                creep.say('!Target')
-                creep.memory.role = 'upgrader2';
+                creep.toResPos();
                 return;
             }
             if (!target.hits) {
@@ -2488,7 +2498,8 @@ module.exports = {
     },
     /** @param {Creep} creep **/
     run: function (creep) {
-        if (creep.moveToRoomAdv(creep.memory.targetRoom)) {
+        if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
+            creep.moveToRoom(creep.memory.targetRoom);
             return;
         }
         if (Memory.outSourceRooms[creep.memory.targetRoom] && Memory.outSourceRooms[creep.memory.targetRoom].sourceKeeper === true) {
@@ -3235,7 +3246,7 @@ module.exports = {
 
             if (takeNearResource(creep, RESOURCE_ENERGY)) return;
             if (creep.memory.base && creep.memory.base != creep.room.name) {
-                creep.moveToRoom(creep.memory.base);
+                creep.travelTo(new RoomPosition(25, 25, creep.memory.base));
                 return;
             }
 
@@ -3243,7 +3254,7 @@ module.exports = {
         }
         else {
             if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
-                creep.moveToRoom(creep.memory.targetRoom);
+                creep.travelTo(new RoomPosition(25, 25, creep.memory.targetRoom));
                 return;
             }
             let storage = creep.room.storage;
@@ -3501,17 +3512,9 @@ module.exports = {
             this.tranEnergyBetweenMyRooms(creep);
             return;
         }
-        else if (targetRoom.controller && !targetRoom.controller.my) {
-            this.collectDropedResources(creep);
-        }
 
         if (creep.store[RESOURCE_ENERGY] > 0) {
             creep.drop(RESOURCE_ENERGY);
-        }
-
-        let thorium = targetRoom.find(FIND_MINERALS, { filter: mine => mine.mineralType === RESOURCE_THORIUM })[0];
-        if(!thorium) {
-            this.collectDropedResources(creep);
         }
         let extractor = targetRoom.find(FIND_MY_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_EXTRACTOR })[0];
         if (!extractor) {
@@ -3737,6 +3740,10 @@ module.exports = {
     },
     /** @param {Creep} creep **/
     run: function (creep) {
+        if (creep.memory.boost && !creep.memory.boosted && creep.memory.boostInfo) {
+            creep.getBoosts();
+            return;
+        }
         if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
             creep.moveToRoomAdv(creep.memory.targetRoom);
             return;
@@ -4233,8 +4240,8 @@ module.exports = {
     },
     /** @param {Creep} creep **/
     run: function(creep) {
-        if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
-            creep.moveToRoom(creep.memory.targetRoom);
+        if (creep.memory.targetRoom && creep.room.name !== creep.memory.targetRoom) {
+            creep.travelTo(new RoomPosition(25, 25, creep.memory.targetRoom), {preferHighway: true});
             return;
         }
 
@@ -4242,11 +4249,16 @@ module.exports = {
         if (creep.memory.target) {
             hostileStruct = Game.getObjectById(creep.memory.target);
         } else {
-            hostileStruct = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES);
+            hostileStruct = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
+                filter: struct => (
+                    struct.structureType != STRUCTURE_CONTROLLER &&
+                    struct.structureType != STRUCTURE_RAMPART
+                )
+            });
         }
 
         if(!hostileStruct && creep.memory.wall) {
-            hostileStruct = creep.pos.findClosestByRange(FIND_STRUCTURES, {filter: struct => struct.structureType === STRUCTURE_WALL});
+            hostileStruct = creep.pos.findClosestByRange(FIND_STRUCTURES, {filter: struct => struct.structureType === STRUCTURE_WALL && struct.structureType === STRUCTURE_RAMPART});
         }
 
         if (hostileStruct) {
@@ -4454,10 +4466,19 @@ module.exports = {
             creep.getBoosts();
             return;
         }
-        if (creep.moveToRoomAdv(creep.memory.targetRoom)) {
-            if (creep.hits < creep.hitsMax) creep.heal(creep);
+        if (creep.memory.targetRoom && creep.room.name !== creep.memory.targetRoom) {
             atkOnTheWay(creep);
-            return;
+
+            if(creep.hits < creep.hitsMax) {
+                if(creep.isAtEdge()) creep.leaveEdge();
+                creep.heal(creep);
+            }
+            else {
+                creep.travelTo(new RoomPosition(25, 25, creep.memory.targetRoom), {preferHighway: true});
+                if (creep.hits < creep.hitsMax) creep.heal(creep);
+                return;
+            }
+
         }
         if (this.redFlagLogic(creep)) {
             return;
@@ -4486,6 +4507,16 @@ module.exports = {
 
         if (hostile) {
             creep.heal(creep);
+
+            const moveParts = creep.body.reduce((count, part) => {
+                if (part.type === MOVE) return count + 1;
+                else return count;
+            }, 0);
+            if (creep.getActiveBodyparts(MOVE) < moveParts) {
+                damagedFlee(creep);
+                atkOnTheWay(creep);
+                return;
+            }
             if (hostile.structureType) {
                 creep.say('struct')
                 let atkers = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3);
@@ -4533,9 +4564,9 @@ module.exports = {
             }
             else if (roomInfo[creep.room.name]) creep.toResPos();
             else {
-                creep.travelTo(new RoomPosition(25, 25, creep.room.name), { 
-                    allowSK: true, 
-                    range: 20,
+                creep.travelTo(new RoomPosition(25, 25, creep.room.name), {
+                    allowSK: true,
+                    range: 22,
                 });
             }
         }
@@ -4594,19 +4625,47 @@ function attackInDistance(creep, hostile, range) {
     if (creep.pos.getRangeTo(hostile) > range) creep.moveTo(hostile);
     else if (creep.pos.getRangeTo(hostile) < range) creep.fleeFromAdv(hostile, 5);
 
-    creep.rangedAttack(hostile);
+    let result = creep.rangedAttack(hostile);
     if (creep.pos.isNearTo(hostile)) creep.rangedMassAttack();
+    if(result = ERR_NOT_IN_RANGE) atkOnTheWay(creep);
 }
 
 function atkOnTheWay(creep) {
-    let hostiles = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3);
-    if (hostiles.length) {
-        let target = creep.pos.findClosestByRange(hostiles);
-        if (target.pos.isNearTo(creep)) {
+    let hostile = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3)[0];
+    if (!hostile) {
+        hostile = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
+            filter: struct => (
+                struct.structureType !== STRUCTURE_KEEPER_LAIR &&
+                struct.structureType !== STRUCTURE_INVADER_CORE &&
+                struct.structureType !== STRUCTURE_CONTROLLER &&
+                struct.structureType !== STRUCTURE_TERMINAL
+            )
+        });
+    }
+
+    if (hostile) {
+        if (hostile.pos.isNearTo(creep)) {
             creep.rangedMassAttack();
         }
-        else creep.rangedAttack(target);
+        else creep.rangedAttack(hostile);
     }
+}
+
+function damagedFlee(creep) {
+    if(!creep.memory.base) {
+        let hostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        creep.fleeFromAdv(hostile, 6);
+        return;
+    }
+
+    if (creep.memory.exitDirection == null) {
+        creep.memory.exitDirection = creep.room.findExitTo(creep.memory.base);
+    }
+
+    creep.say(creep.memory.exitDirection);
+    
+    let target = creep.pos.findClosestByRange(creep.memory.exitDirection);
+    creep.travelTo(target, {ignoreCreeps: false});
 }
 return module.exports;
 }
@@ -4659,7 +4718,8 @@ module.exports = {
             this.checkAndHeal(creep, state);
             return;
         }
-        if (creep.moveToRoomAdv(creep.memory.targetRoom)) {
+        if (creep.memory.targetRoom && creep.room.name !== creep.memory.targetRoom) {
+            creep.travelTo(new RoomPosition(25, 25, creep.memory.targetRoom), {preferHighway: true});
             this.atkOnTheWay(creep, state);
             this.checkAndHeal(creep, state);
             return;
@@ -4680,11 +4740,34 @@ module.exports = {
             this.checkAndHeal(creep, state);
             return;
         }
+
+        let noRampartStruct = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
+            filter: struct => (
+                !(_.find(struct.pos.lookFor(LOOK_STRUCTURES), struct => struct.structureType === STRUCTURE_RAMPART)) &&
+                struct.structureType !== STRUCTURE_CONTROLLER &&
+                struct.structureType !== STRUCTURE_RAMPART
+            )
+        });
+
+        if (noRampartStruct) {
+            let result = creep.attack(noRampartStruct);
+
+            if (result === ERR_NOT_IN_RANGE) {
+                creep.moveTo(noRampartStruct, { maxRooms: 1 });
+                creep.rangedAttack(noRampartStruct);
+            }
+            else if (result === OK) {
+                creep.rangedMassAttack();
+                state.attackResult = OK;
+            }
+            this.atkOnTheWay(creep, state);
+            this.checkAndHeal(creep, state);
+            return;
+        }
         let target = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
             filter: struct => (
-                struct.structureType != STRUCTURE_CONTROLLER &&
-                struct.structureType != STRUCTURE_RAMPART &&
-                struct.structureType != STRUCTURE_TERMINAL
+                struct.structureType !== STRUCTURE_CONTROLLER &&
+                struct.structureType !== STRUCTURE_RAMPART
             )
         });
 
@@ -4760,7 +4843,6 @@ module.exports = {
     blueFlagLogic: function (creep, state) {
         let blueFlag = creep.pos.findClosestByPath(FIND_FLAGS, { filter: { color: COLOR_BLUE } });
         if (blueFlag) {
-            creep.say('toBlue');
             creep.moveTo(blueFlag, { maxRooms: 1 });
             this.atkOnTheWay(creep, state);
             return true;
@@ -4772,7 +4854,6 @@ module.exports = {
     greenFlagLogic: function (creep, state) {
         let greenFlag = creep.pos.findClosestByPath(FIND_FLAGS, { filter: { color: COLOR_GREEN } });
         if (greenFlag) {
-            creep.say('green');
             let target = _.find(greenFlag.pos.lookFor(LOOK_STRUCTURES), struct => (
                 struct.structureType === STRUCTURE_WALL ||
                 struct.structureType === STRUCTURE_RAMPART
@@ -4789,10 +4870,16 @@ module.exports = {
                     state.attackResult = OK;
                 }
 
-                let closeHostiles = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3);
+                let closeHostiles = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3, {
+                    filter: c => !(_.find(c.pos.lookFor(LOOK_STRUCTURES), struct => struct.structureType === STRUCTURE_RAMPART))
+                });
                 if (closeHostiles.length) {
                     let targetCreep = creep.pos.findClosestByRange(closeHostiles);
                     creep.rangedAttack(targetCreep);
+                    let result = creep.attack(target);
+                    if (result === OK) {
+                        state.attackResult = OK;
+                    }
                 }
                 else {
                     if (state.attackResult === OK) creep.rangedMassAttack();
@@ -4809,7 +4896,6 @@ module.exports = {
     yellowFlagLogic: function (creep, state) {
         let yellowFlag = creep.pos.findClosestByPath(FIND_FLAGS, { filter: { color: COLOR_YELLOW } });
         if (yellowFlag) {
-            creep.say('yellow')
             let target = _.find(yellowFlag.pos.lookFor(LOOK_STRUCTURES));
             if (target) {
                 let result = creep.attack(target);
@@ -4966,9 +5052,20 @@ module.exports = {
         else if (creep.hits <= creep.hitsMax - 500) {
             creep.heal(creep);
         }
+        else if(partner.hits === partner.hitsMax && creep.hits === creep.hitsMax) {
+            let adjCreeps = creep.pos.findInRange(FIND_MY_CREEPS, 3, { filter: c => c.hits < c.hitsMax });
+            if (adjCreeps.length > 0) {
+                let target = creep.pos.findClosestByRange(adjCreeps);
+                if (creep.heal(target) === ERR_NOT_IN_RANGE) creep.rangedHeal(target);
+            }
+            else {
+                creep.heal(partner);
+                creep.rangedHeal(partner);
+            }
+        }
         else {
-            let result = creep.heal(partner);
-            if (!creep.pos.isNearTo(partner)) creep.rangedHeal(partner);
+            creep.heal(partner);
+            creep.rangedHeal(partner);
         }
     },
     spawn: function (room, targetRoomName, opt) {
@@ -4998,9 +5095,9 @@ module.exports = {
             4: { maxEnergyCapacity: 1300, bodyParts: [...new Array(12).fill(ATTACK), ...new Array(6).fill(MOVE)], number: 4 }, // 1260
             5: { maxEnergyCapacity: 1800, bodyParts: [...new Array(16).fill(ATTACK), ...new Array(8).fill(MOVE)], number: 4 }, // 1680
             6: { maxEnergyCapacity: 2300, bodyParts: [...new Array(20).fill(ATTACK), ...new Array(10).fill(MOVE)], number: 2 }, // 2100
-            7: { maxEnergyCapacity: 5600, bodyParts: [...new Array(36).fill(ATTACK), ...new Array(18).fill(MOVE)], number: 2 }, // 3460
+            7: { maxEnergyCapacity: 5600, bodyParts: [...new Array(32).fill(ATTACK), ...new Array(16).fill(MOVE)], number: 1 }, // 3460
         },
-        boostTypes: ['UH', 'UH2O', 'XUH2O'],
+        boostTypes: ['XUH2O', 'UH2O', 'UH'],
     },
     /** @param {Creep} creep **/
     run: function (creep) {
@@ -5016,51 +5113,27 @@ module.exports = {
             return
         }
 
-        let hostile;
+        let target;
         if (creep.memory.target) {
-            hostile = Game.getObjectById(creep.memory.target);
-        }
-        if (!hostile) {
-            hostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-        }
-
-        if (hostile) {
-            creep.rangedAttack(hostile);
-            creep.attack(hostile);
-
-            let nearestRampart = hostile.pos.findClosestByRange(FIND_MY_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_RAMPART });
-            if (nearestRampart) {
-                let data = {};
-                creep.travelTo(nearestRampart, {
-                    roomCallback: (roomName, costMatrix) => {
-                        if (Memory.rooms[roomName] && Game.rooms[roomName]) {
-                            return inRoomUtil.getEnclosureMatrix(Game.rooms[roomName]);
-                        }
-                        else return undefined;
-                    },
-                    returnData: data,
-                });
-
-                if(data.nextPos) {
-                    let nextPosCreep = data.nextPos.lookFor(LOOK_CREEPS)[0];
-                    if(nextPosCreep && nextPosCreep.my && nextPosCreep.memory.role !== this.properties.type) {
-                        nextPosCreep.moveTo(creep);
-                    }
-                }
-
-            }
-            else {
-                creep.travelTo(hostile);
-            }
-
+            this.haveTargetLogic(creep);
         }
         else {
-            creep.toResPos();
+            this.findTarget(creep);
+            this.noTargetLogic(creep);
         }
     },
     /** @param {Room} room **/
     spawn: function (room) {
         if (!room || room.energyCapacityAvailable < 1300) return false;
+
+        const enemies = room.find(FIND_HOSTILE_CREEPS, {
+            filter: c => (
+                c.owner.username !== 'Invader' &&
+                c.body.length >= 30 &&
+                c.pos.findInRange(FIND_MY_STRUCTURES, struct => struct.structureType === STRUCTURE_RAMPART).length > 0
+            )
+        });
+        if(!enemies.length) return false;
         let creepCount;
         if (global.roomCensus[room.name] && global.roomCensus[room.name][this.properties.role]) {
             creepCount = global.roomCensus[room.name][this.properties.role]
@@ -5068,14 +5141,30 @@ module.exports = {
         else creepCount = 0;
 
         if (creepCount < this.properties.stages[this.getStage(room)].number) {
+            room.memory.lastDefMeleeST = Game.time;
             return true;
+        }
+        else {
+            if (room.memory.lastDefMeleeST < Game.time - 250) {
+                room.memory.lastDefMeleeST = Game.time;
+                return true;
+            }
         }
     },
     spawnData: function (room) {
-
         let name = this.properties.role + Game.time % 10000;
         let body = this.properties.stages[this.getStage(room)].bodyParts;
         let memory = { role: this.properties.role, base: room.name };
+        let attackPartsCount = body.reduce((prev, curr) => (curr === ATTACK ? prev + 1 : prev), 0);
+        const boostTypes = this.properties.boostTypes;
+        for (let compound of boostTypes) {
+            let compoundAmount = room.getResourceAmount(compound);
+            if (compoundAmount >= attackPartsCount * 30) {
+                memory.boost = true;
+                memory.boostInfo = { [compound]: attackPartsCount };
+                break;
+            }
+        }
 
         return { name, body, memory };
     },
@@ -5090,6 +5179,129 @@ module.exports = {
         }
         return stage;
     },
+
+    haveTargetLogic: function (creep) {
+        let target;
+        if (creep.memory.target) {
+            target = Game.getObjectById(creep.memory.target);
+        }
+        else {
+            this.noTargetLogic(creep);
+        }
+
+        if (!target) {
+            this.noTargetLogic(creep);
+            if (creep.memory.targetBuffer > 0) {
+                creep.memory.targetBuffer--;
+            }
+            else {
+                creep.memory.target = null;
+            }
+
+            return;
+        }
+
+        const hostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+
+        if (hostile) {
+            if (creep.pos.isNearTo(target)) {
+                creep.attack(target);
+            }
+            else {
+                creep.attack(hostile);
+            }
+
+
+            let nearestRampart = target.pos.findClosestByRange(FIND_MY_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_RAMPART });
+            if (nearestRampart) {
+                let data = {};
+                creep.travelTo(nearestRampart, {
+                    roomCallback: (roomName, costMatrix) => {
+                        if (Memory.rooms[roomName] && Game.rooms[roomName]) {
+                            return inRoomUtil.getEnclosureMatrix(Game.rooms[roomName]);
+                        }
+                        else return undefined;
+                    },
+                    returnData: data,
+                });
+
+                if (data.nextPos) {
+                    let nextPosCreep = data.nextPos.lookFor(LOOK_CREEPS)[0];
+                    if (nextPosCreep && nextPosCreep.my && nextPosCreep.memory.role !== creep.memory.role) {
+                        nextPosCreep.moveTo(creep);
+                    }
+                }
+
+            }
+            else {
+                creep.travelTo(target);
+            }
+
+        }
+        else {
+            creep.toResPos();
+        }
+
+        this.resetTargetBuffer(creep);
+    },
+
+    noTargetLogic: function (creep) {
+        const hostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        if (hostile) {
+            creep.attack(hostile)
+
+            let nearestRampart = hostile.pos.findClosestByRange(FIND_MY_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_RAMPART });
+            if (nearestRampart) {
+                let data = {};
+                creep.travelTo(nearestRampart, {
+                    roomCallback: (roomName, costMatrix) => {
+                        if (Memory.rooms[roomName] && Game.rooms[roomName]) {
+                            return inRoomUtil.getEnclosureMatrix(Game.rooms[roomName]);
+                        }
+                        else return undefined;
+                    },
+                    returnData: data,
+                });
+
+                if (data.nextPos) {
+                    let nextPosCreep = data.nextPos.lookFor(LOOK_CREEPS)[0];
+                    if (nextPosCreep && nextPosCreep.my && nextPosCreep.memory.role !== creep.memory.role) {
+                        nextPosCreep.moveTo(creep);
+                    }
+                }
+
+            }
+            else {
+                creep.travelTo(hostile);
+            }
+
+        }
+        else {
+            creep.toResPos();
+        }
+    },
+
+
+
+    findTarget: function (creep) {
+        const hostiles = creep.room.find(FIND_HOSTILE_CREEPS, {
+            filter: creep => {
+                let nearestRampart = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_RAMPART });
+                if (creep.pos.isNearTo(nearestRampart)) return true;
+                else return false;
+            }
+        });
+
+        if (hostiles.length) {
+            let target = hostiles[Math.floor(Math.random() * hostiles.length)];
+            creep.memory.target = target.id;
+            this.resetTargetBuffer(creep);
+        }
+    },
+
+    resetTargetBuffer: (creep) => {
+        creep.memory.targetBuffer = 100;
+    }
 };
 return module.exports;
 }
@@ -5190,7 +5402,10 @@ module.exports = {
                 }
             }            
 
-            if(creep.ticksToLive < 550) creep.suicide();
+            if(creep.ticksToLive < 1400) {
+                creep.suicide();
+                return;
+            }
 
             if (creep.room.name !== creep.memory.base) {
                 creep.travelTo(new RoomPosition(25, 25, creep.memory.base), {
@@ -5244,7 +5459,7 @@ module.exports = {
             if (reactor && reactor.store[RESOURCE_THORIUM] >= 900) return false;
         }
 
-        if (carryAmount <= 300 && thisTypeCreeps.length < 5) {
+        if (carryAmount <= 300 && thisTypeCreeps.length < 6) {
             return true
         }
     },
@@ -5372,9 +5587,7 @@ module.exports = {
                 creep.pull(partner);
             }
         }
-        if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
-            creep.moveToRoom(creep.memory.targetRoom);
-            return;
+        else {
         }
 
         const hostileParts = [ATTACK, RANGED_ATTACK, HEAL, CARRY];
@@ -5385,32 +5598,40 @@ module.exports = {
             )
         });
 
-        if(hostiles.length) {
+        if (hostiles.length) {
             let target;
             let medic = creep.pos.findClosestByRange(hostiles, { filter: hostile => hostile.getActiveBodyparts(HEAL) > 0 && hostile.getActiveBodyparts(RANGED_ATTACK) === 0 });
             if (medic) target = medic;
             else target = creep.pos.findClosestByRange(hostiles);
-            if(creep.attack(target) === ERR_NOT_IN_RANGE) {
+            if (creep.attack(target) === ERR_NOT_IN_RANGE) {
                 creep.moveTo(target);
             }
             return;
         }
+        if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
+            creep.moveToRoom(creep.memory.targetRoom);
+            return;
+        }
         let powerBank = creep.room.find(FIND_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_POWER_BANK })[0];
-        if(powerBank) {
+        if (powerBank) {
             if (creep.attack(powerBank) === ERR_NOT_IN_RANGE) {
                 creep.moveTo(powerBank);
             }
         }
         else {
             let hostile = creep.room.find(FIND_HOSTILE_CREEPS)[0];
-            if(hostile) {
-                if(creep.attack(hostile) === ERR_NOT_IN_RANGE) {
+            if (hostile) {
+                if (creep.attack(hostile) === ERR_NOT_IN_RANGE) {
                     creep.moveTo(hostile);
                 }
             }
             else {
-                if(partner) partner.suicide();
-                creep.suicide();
+                if(creep.room.name !== creep.memory.base) creep.memory.targetRoom = creep.memory.base;
+                else {
+                    if (partner) partner.suicide();
+                    creep.suicide();
+                }
+
             }
         }
     },
@@ -5482,6 +5703,17 @@ module.exports = {
         else if (creep.hits <= creep.hitsMax - 12 * creep.getActiveBodyparts(HEAL)) {
             creep.heal(creep);
         }
+        else if(partner.hits === partner.hitsMax && creep.hits === creep.hitsMax) {
+            let adjCreeps = creep.pos.findInRange(FIND_MY_CREEPS, 3, { filter: c => c.hits < c.hitsMax });
+            if (adjCreeps.length > 0) {
+                let target = creep.pos.findClosestByRange(adjCreeps);
+                if (creep.heal(target) === ERR_NOT_IN_RANGE) creep.rangedHeal(target);
+            }
+            else {
+                creep.heal(partner);
+                creep.rangedHeal(partner);
+            }
+        }
         else {
             creep.heal(partner);
             creep.rangedHeal(partner);
@@ -5508,6 +5740,17 @@ const creepLogic = __require(1,42);
 const { roomBoost } = __require(6,42);
 
 module.exports = function (room) {
+    if (room.name === 'E16S2' && Game.time % 1500 === 500) {
+        Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
+            name: 'rangeAtker',
+            body: [...new Array(5).fill(RANGED_ATTACK), ...new Array(25).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(10).fill(HEAL)],
+            memory: {
+                role: 'rangeAtker',
+                targetRoom: 'E18S1',
+            }
+        });
+
+    }
     let idleSpawn = _.find(room.find(FIND_MY_SPAWNS), spawn => spawn.spawning == null);
     if (!idleSpawn) return;
     if (createCoreCreep(room, idleSpawn)) return;
@@ -5584,8 +5827,8 @@ function createReactorCreep(room, spawn, baseRoomName, targetRoomName) {
     if (defenderNum < 1) {
         let result = spawnCreep(room, spawn, {
             name: 'rA' + Game.time % 5000,
-            body: [...new Array(10).fill(RANGED_ATTACK), ...new Array(16).fill(MOVE), ...new Array(6).fill(HEAL)],
-            memory: { role: 'rangeAtker', targetRoom: targetRoomName, }
+            body: [...new Array(5).fill(RANGED_ATTACK), ...new Array(25).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(10).fill(HEAL)],
+            memory: { role: 'rangeAtker', targetRoom: targetRoomName, base: room.name}
         });
         if (result === OK) return true;
     }
@@ -5685,14 +5928,39 @@ function remoteDefenceCreeps(room, spawn, roomName, roomMemory) {
 
 
     const hostileParts = [ATTACK, RANGED_ATTACK, WORK, HEAL, CLAIM, CARRY]
-    const hostileCreeps = remoteRoom.find(FIND_HOSTILE_CREEPS, {
+
+    const enemies = remoteRoom.find(FIND_HOSTILE_CREEPS, {
         filter: c =>
             c.owner.username !== 'Source Keeper' &&
+            c.owner.username !== 'Invader' &&
             _.find(hostileParts, partType => c.getActiveBodyparts(partType) > 0)
     });
-    if (hostileCreeps.length) {
+
+    const hostileCreeps = remoteRoom.find(FIND_HOSTILE_CREEPS, {
+        filter: c =>
+            c.owner.username === 'Source Keeper' &&
+            _.find(hostileParts, partType => c.getActiveBodyparts(partType) > 0)
+    });
+
+    if(enemies.length) {
+        console.log(roomName, 'found enemy!');
+        if (creepLogic['rangeAtker'].spawn(room, roomName)) {
+            let creepSpawnData = {
+                name: 'rangeAtker' + Game.time % 10000,
+                body: [...new Array(5).fill(RANGED_ATTACK), ...new Array(25).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(10).fill(HEAL)],
+                memory: {
+                    role: 'rangeAtker',
+                    base: room.name,
+                    targetRoom: roomName,
+                }
+            }
+            spawnCreep(room, spawn, creepSpawnData);
+            return true;
+        }
+    }
+    else if (hostileCreeps.length) {
         if (!roomMemory.neutral) {
-            console.log(roomName, 'found enemy!');
+            console.log(roomName, 'found hostile!');
             if (creepLogic['defender'].spawn(room, roomName)) {
                 spawnCreep(room, spawn, creepLogic['defender'].spawnData(room, roomName));
                 return true;
@@ -6168,7 +6436,7 @@ module.exports = function (room) {
 
 function usePower(room) {
     let storage = room.storage;
-    if (!storage || storage.store[RESOURCE_ENERGY] < 410000) return;
+    if (!storage || storage.store[RESOURCE_ENERGY] < 420000) return;
 
     let pSpawn = room.find(FIND_MY_STRUCTURES, {
         filter: struct => (
@@ -6482,6 +6750,8 @@ return module.exports;
 __modules[51] = function(module, exports) {
 const { wall, rampart } = __require(66,51);
 
+const towerRestTime = 5;
+
 module.exports = function (room) {
     const towers = room.find(FIND_MY_STRUCTURES, {filter: struct => struct.structureType == STRUCTURE_TOWER && struct.store[RESOURCE_ENERGY] >= 10});
     if(!towers.length) return;
@@ -6492,12 +6762,49 @@ module.exports = function (room) {
     }
     let enemies = room.find(FIND_HOSTILE_CREEPS);
     if (enemies.length) {
+        if(room.memory.towerTarget) {
+            let target = Game.getObjectById(room.memory.towerTarget);
+            if(target) {
+                if(target.hits === target.hitsMax) {
+                    room.memory.towerTarget = null;
+                    room.memory.towerRest = towerRestTime;
+                }
+                else {
+                    _.forEach(towers, tower => {
+                        tower.attack(target);
+                    });
+                }
+            }
+            else {
+                room.memory.towerTarget = null;
+                room.memory.towerRest = towerRestTime;
+            }
+        }
+        else {
+            if(room.memory.towerRest > 0) {
+                room.memory.towerRest--;
+            }
+            else {
+                let target;
+                const defMelees = room.find(FIND_MY_CREEPS, {filter: c => c.memory.role === 'defMelee'});
+                const nearDefMelees = [];
+                _.forEach(defMelees, c => {
+                    nearDefMelees.push(...c.pos.findInRange(FIND_HOSTILE_CREEPS, 1))
+                });
+                if(nearDefMelees.length) {
+                    target = nearDefMelees[Math.floor(Math.random() * nearDefMelees.length)];
+                }
+                else {
+                    target = enemies[Math.floor(Math.random() * enemies.length)];
+                }
+                
+                room.memory.towerTarget = target.id;
+                _.forEach(towers, tower => {
+                    tower.attack(target);
+                })
+            }
+        }
         console.log(room, "Found Enemies!");
-        _.forEach(towers, tower => {
-            let target = tower.pos.findClosestByRange(enemies);
-            tower.attack(target);
-        })
-        return;
     }
     function isNeedRepair(structure) {
         return (
@@ -6679,6 +6986,16 @@ const sandbox = {
         myRooms.forEach(r => {
             if(r.memory.thoriumDetection) {
                 ultraRooms.push(...r.memory.thoriumDetection.observedRooms.ultra);
+
+                const ultras = r.memory.thoriumDetection.observedRooms.ultra;
+                const highs = r.memory.thoriumDetection.observedRooms.high;
+
+                ultras.forEach(rN => {
+                    Game.map.visual.text("Ultra", new RoomPosition(11,14,rN), {color: '#FFFFFF', fontSize: 10}); 
+                })
+                highs.forEach(rN => {
+                    Game.map.visual.text("High", new RoomPosition(11,14,rN), {color: '#FFFFFF', fontSize: 10}); 
+                })
             }
         })
 
@@ -9420,10 +9737,10 @@ const creepLogic = __require(1,62);
 
 module.exports = {
     creepCounts: {
-        energyTransporter: 12,
-        thoriumTransporter: 25,
+        energyTransporter: 13,
+        thoriumTransporter: 30,
         upgrader2: 5,
-        builder2: 1,
+        builder2: 2,
     },
 
     assignBoostRoom: function () {
@@ -9530,8 +9847,6 @@ module.exports = {
                         role: 'upgrader2',
                         targetRoom: boostRoomName,
                         base: room.name,
-                        boost: true,
-                        boostInfo: boostInfo,
                     }
                 }
 
@@ -9645,14 +9960,35 @@ Creep.prototype.moveToNoCreepInRoom = function (target) {
 }
 
 Creep.prototype.moveToRoom = function (roomName) {
-    return this.travelTo(new RoomPosition(25, 25, roomName), { allowHostile: true, allowSK: true });
+    return this.travelTo(new RoomPosition(25, 25, roomName), { allowHostile: true, allowSK: true, ensurePath: true, });
 }
 
 Creep.prototype.moveToRoomAdv = function (roomName) {
     if (roomName && roomName != this.room.name) {
-        this.travelTo(new RoomPosition(25, 25, roomName), { allowSK: true });
+        this.travelTo(new RoomPosition(25, 25, roomName), { allowSK: true, ensurePath: true, });
         return true;
     }
+    if (this.pos.x == 0) {
+        this.move(RIGHT);
+        return true;
+    }
+    if (this.pos.x == 49) {
+        this.move(LEFT);
+        return true;
+    }
+    if (this.pos.y == 0) {
+        this.move(BOTTOM);
+        return true;
+    }
+    if (this.pos.y == 49) {
+        this.move(TOP);
+        return true;
+    }
+
+    return false;
+}
+
+Creep.prototype.leaveEdge = function () {
     if (this.pos.x == 0) {
         this.move(RIGHT);
         return true;
@@ -10205,9 +10541,10 @@ Room.prototype.reduceFromBoostLab = function (labId, resourceType, amount) {
 Room.prototype.getStorage = function (amount) {
     let storage = this.storage;
     if (!storage) {
-        let containers = this.find(FIND_STRUCTURES, { filter: struct => 
-            struct.structureType === STRUCTURE_CONTAINER &&
-            struct.store.getFreeCapacity() >= amount
+        let containers = this.find(FIND_STRUCTURES, {
+            filter: struct =>
+                struct.structureType === STRUCTURE_CONTAINER &&
+                struct.store.getFreeCapacity() >= amount
         });
 
         if (containers.length) {
@@ -10224,11 +10561,12 @@ Room.prototype.getStorage = function (amount) {
     }
 
     const linkInfo = this.memory.linkInfo;
-    if(linkInfo && (!linkInfo.controllerLink || !linkInfo.managerLink)) {
-        if(storage.store[RESOURCE_ENERGY] > 20000){
-            let containers = this.find(FIND_STRUCTURES, { filter: struct => 
-                struct.structureType === STRUCTURE_CONTAINER &&
-                struct.store.getFreeCapacity() >= amount
+    if (linkInfo && (!linkInfo.controllerLink || !linkInfo.managerLink)) {
+        if (storage.store[RESOURCE_ENERGY] > 20000) {
+            let containers = this.find(FIND_STRUCTURES, {
+                filter: struct =>
+                    struct.structureType === STRUCTURE_CONTAINER &&
+                    struct.store.getFreeCapacity() >= amount
             });
             storage = _.find(containers, con => con.pos.inRangeTo(this.controller.pos, 3));
             return storage;
@@ -10236,6 +10574,14 @@ Room.prototype.getStorage = function (amount) {
     }
 
     return storage;
+}
+
+
+Room.prototype.getResourceAmount = function (resourceType) {
+    let totalResourceAmount = 0
+    if (this.storage) totalResourceAmount += this.storage.store[resourceType];
+    if (this.terminal) totalResourceAmount += this.terminal.store[resourceType];
+    return totalResourceAmount;
 }
 return module.exports;
 }
@@ -22509,15 +22855,15 @@ module.exports = {
     GH: {terminal: 4000, storage: [1000, 3500, 20000]}, // attack
     UO: {terminal: 4000, storage: [1000, 4000, 20000]}, // harvest
 
-    XUH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // attack
+    XUH2O: {terminal: 4000, storage: [3000, 6000, 20000]}, // attack
     XUHO2: {terminal: 4000, storage: [5000, 10000, 20000]}, // harvest
     XKH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // carry
     XKHO2: {terminal: 4000, storage: [5000, 10000, 20000]}, // ranged_attack
-    XLH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // repair & build
+    XLH2O: {terminal: 4000, storage: [3000, 6000, 20000]}, // repair & build
     XLHO2: {terminal: 4000, storage: [5000, 10000, 20000]}, // heal
     XZH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // dismantle
     XZHO2: {terminal: 4000, storage: [5000, 10000, 20000]}, // move
-    XGH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // upgradeController
+    XGH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // upgradeController    
     XGHO2: {terminal: 4000, storage: [5000, 10000, 20000]}, // tough
     
     power: {terminal: 2000, storage: [5000, 10000, 20000]},
@@ -22605,6 +22951,17 @@ module.exports = {
         restPos: new RoomPosition(44, 14, "E21N8"),
         managerPos: new RoomPosition(41, 17, "E21N8"),
         storagePos: new RoomPosition(41, 17, "E21N8"),
+        powerCreepPos: new RoomPosition(10, 9, "E21N8"),
+    },
+    E18S5: {
+        restPos: new RoomPosition(22, 29, "E18S5"),
+        managerPos: new RoomPosition(27, 28, "E18S5"),
+        storagePos: new RoomPosition(27, 28, "E18S5"),
+    },
+    E7N1: {
+        restPos: new RoomPosition(19, 24, "E7N1"),
+        managerPos: new RoomPosition(21, 28, "E7N1"),
+        storagePos: new RoomPosition(21, 28, "E7N1"),
     },
 }
 return module.exports;
@@ -22616,8 +22973,8 @@ __modules[74] = function(module, exports) {
 module.exports = {
     
 
-    XUH2O: [6000, 17000], // attack
-    XLH2O: [6000, 17000],  // repair & build
+    XUH2O: [6000, 12000], // attack
+    XLH2O: [6000, 12000],  // repair & build
 
     XKHO2: [6000, 17000], // ranged_attack
     XLHO2: [6000, 17000],  // heal

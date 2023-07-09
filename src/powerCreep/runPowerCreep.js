@@ -14,14 +14,6 @@ function runPowerCreep(pc) {
         }
     }
 
-    if (pc.store.getFreeCapacity() > 0) {
-        pc.usePower(PWR_GENERATE_OPS);
-    }
-    else if (pc.room.storage && pc.room.storage.my && pc.room.storage.store[RESOURCE_OPS] < 10000) {
-        pc.moveTo(pc.room.storage);
-        pc.transfer(pc.room.storage, RESOURCE_OPS);
-    }
-
     // renew if dying
     if (pc.ticksToLive < 300) {
         // moveTo base
@@ -75,11 +67,12 @@ function runPowerCreep(pc) {
     // spawn
     if (pc.powers[PWR_OPERATE_SPAWN] &&
         pc.powers[PWR_OPERATE_SPAWN].cooldown === 0 &&
-        pc.store[RESOURCE_OPS] >= 100 &&
-        pc.room.memory.boostRoom
+        (pc.room.memory.boostRoom || pc.room.memory.powerSpawn)
     ) {
-        const spawn = pc.room.find(FIND_MY_SPAWNS, {filter: spawn => !spawn.effects || !spawn.effects.length})[0];
-        if(spawn) {
+        if (pc.store[RESOURCE_OPS] < 100) pc.memory.status = 0;
+
+        const spawn = pc.room.find(FIND_MY_SPAWNS, { filter: spawn => !spawn.effects || !spawn.effects.length })[0];
+        if (spawn) {
             let result = pc.usePower(PWR_OPERATE_SPAWN, spawn);
             if (result === ERR_NOT_IN_RANGE) pc.moveTo(spawn);
             return;
@@ -104,6 +97,27 @@ function runPowerCreep(pc) {
         if (lab) {
             let result = pc.usePower(PWR_OPERATE_LAB, lab);
             if (result === ERR_NOT_IN_RANGE) pc.moveTo(lab);
+            return;
+        }
+    }
+
+    // transfer
+    if (pc.memory.status) {
+        if (pc.store.getFreeCapacity() > 0) {
+            pc.usePower(PWR_GENERATE_OPS);
+        }
+        else if (pc.room.storage && pc.room.storage.my && pc.room.storage.store[RESOURCE_OPS] < 10000) {
+            pc.moveTo(pc.room.storage);
+            pc.transfer(pc.room.storage, RESOURCE_OPS, pc.store[RESOURCE_OPS] / 2);
+            return;
+        }
+    }
+    // withdraw
+    else {
+        if (pc.level >= 5 && pc.room.terminal && pc.room.terminal.my && pc.room.terminal.store[RESOURCE_OPS] > 0) {
+            pc.moveTo(pc.room.terminal);
+            let result = pc.withdraw(pc.room.terminal, RESOURCE_OPS, Math.min([pc.room.terminal.store[RESOURCE_OPS], pc.store.getFreeCapacity()]));
+            if(result === OK) pc.memory.status = 1;
             return;
         }
     }

@@ -41,5 +41,16 @@ module.exports = {
         restPos: new RoomPosition(44, 14, "E21N8"),
         managerPos: new RoomPosition(41, 17, "E21N8"),
         storagePos: new RoomPosition(41, 17, "E21N8"),
+        powerCreepPos: new RoomPosition(10, 9, "E21N8"),
+    },
+    E18S5: {
+        restPos: new RoomPosition(22, 29, "E18S5"),
+        managerPos: new RoomPosition(27, 28, "E18S5"),
+        storagePos: new RoomPosition(27, 28, "E18S5"),
+    },
+    E7N1: {
+        restPos: new RoomPosition(19, 24, "E7N1"),
+        managerPos: new RoomPosition(21, 28, "E7N1"),
+        storagePos: new RoomPosition(21, 28, "E7N1"),
     },
 }

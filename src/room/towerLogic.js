@@ -1,5 +1,7 @@
 const { wall, rampart } = require("../structures");
 
+const towerRestTime = 5;
+
 module.exports = function (room) {
     //if(room.name === 'E16S2') return;
     const towers = room.find(FIND_MY_STRUCTURES, {filter: struct => struct.structureType == STRUCTURE_TOWER && struct.store[RESOURCE_ENERGY] >= 10});
@@ -15,12 +17,51 @@ module.exports = function (room) {
     // defending
     let enemies = room.find(FIND_HOSTILE_CREEPS);
     if (enemies.length) {
+        if(room.memory.towerTarget) {
+            let target = Game.getObjectById(room.memory.towerTarget);
+            if(target) {
+                if(target.hits === target.hitsMax) {
+                    room.memory.towerTarget = null;
+                    room.memory.towerRest = towerRestTime;
+                }
+                else {
+                    _.forEach(towers, tower => {
+                        tower.attack(target);
+                    });
+                }
+            }
+            else {
+                room.memory.towerTarget = null;
+                room.memory.towerRest = towerRestTime;
+            }
+        }
+        else {
+            if(room.memory.towerRest > 0) {
+                room.memory.towerRest--;
+            }
+            else {
+                // todo: target creep with highest attack damage
+                // find enemy
+                let target;
+                const defMelees = room.find(FIND_MY_CREEPS, {filter: c => c.memory.role === 'defMelee'});
+                const nearDefMelees = [];
+                _.forEach(defMelees, c => {
+                    nearDefMelees.push(...c.pos.findInRange(FIND_HOSTILE_CREEPS, 1))
+                });
+                if(nearDefMelees.length) {
+                    target = nearDefMelees[Math.floor(Math.random() * nearDefMelees.length)];
+                }
+                else {
+                    target = enemies[Math.floor(Math.random() * enemies.length)];
+                }
+                
+                room.memory.towerTarget = target.id;
+                _.forEach(towers, tower => {
+                    tower.attack(target);
+                })
+            }
+        }
         console.log(room, "Found Enemies!");
-        _.forEach(towers, tower => {
-            let target = tower.pos.findClosestByRange(enemies);
-            tower.attack(target);
-        })
-        return;
     }
 
     // repair (no enemy)

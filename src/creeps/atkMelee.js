@@ -59,7 +59,8 @@ module.exports = {
         }
 
         // on the way to targetRoom
-        if (creep.moveToRoomAdv(creep.memory.targetRoom)) {
+        if (creep.memory.targetRoom && creep.room.name !== creep.memory.targetRoom) {
+            creep.travelTo(new RoomPosition(25, 25, creep.memory.targetRoom), {preferHighway: true});
             this.atkOnTheWay(creep, state);
             this.checkAndHeal(creep, state);
             return;
@@ -89,13 +90,39 @@ module.exports = {
             return;
         }
 
+        let noRampartStruct = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
+            filter: struct => (
+                !(_.find(struct.pos.lookFor(LOOK_STRUCTURES), struct => struct.structureType === STRUCTURE_RAMPART)) &&
+                struct.structureType !== STRUCTURE_CONTROLLER &&
+                struct.structureType !== STRUCTURE_RAMPART
+                //struct.structureType != STRUCTURE_STORAGE &&
+                //struct.structureType != STRUCTURE_TERMINAL
+            )
+        });
+
+        if (noRampartStruct) {
+            let result = creep.attack(noRampartStruct);
+
+            if (result === ERR_NOT_IN_RANGE) {
+                creep.moveTo(noRampartStruct, { maxRooms: 1 });
+                creep.rangedAttack(noRampartStruct);
+            }
+            else if (result === OK) {
+                creep.rangedMassAttack();
+                state.attackResult = OK;
+            }
+            this.atkOnTheWay(creep, state);
+            this.checkAndHeal(creep, state);
+            return;
+        }
+
         // attack structs
         let target = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
             filter: struct => (
-                struct.structureType != STRUCTURE_CONTROLLER &&
-                struct.structureType != STRUCTURE_RAMPART &&
+                struct.structureType !== STRUCTURE_CONTROLLER &&
+                struct.structureType !== STRUCTURE_RAMPART
                 //struct.structureType != STRUCTURE_STORAGE &&
-                struct.structureType != STRUCTURE_TERMINAL
+                //struct.structureType != STRUCTURE_TERMINAL
             )
         });
 
@@ -183,7 +210,7 @@ module.exports = {
     blueFlagLogic: function (creep, state) {
         let blueFlag = creep.pos.findClosestByPath(FIND_FLAGS, { filter: { color: COLOR_BLUE } });
         if (blueFlag) {
-            creep.say('toBlue');
+            //creep.say('b');
             creep.moveTo(blueFlag, { maxRooms: 1 });
             this.atkOnTheWay(creep, state);
             return true;
@@ -195,7 +222,7 @@ module.exports = {
     greenFlagLogic: function (creep, state) {
         let greenFlag = creep.pos.findClosestByPath(FIND_FLAGS, { filter: { color: COLOR_GREEN } });
         if (greenFlag) {
-            creep.say('green');
+            //creep.say('g');
             let target = _.find(greenFlag.pos.lookFor(LOOK_STRUCTURES), struct => (
                 struct.structureType === STRUCTURE_WALL ||
                 struct.structureType === STRUCTURE_RAMPART
@@ -212,10 +239,16 @@ module.exports = {
                     state.attackResult = OK;
                 }
 
-                let closeHostiles = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3);
+                let closeHostiles = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3, {
+                    filter: c => !(_.find(c.pos.lookFor(LOOK_STRUCTURES), struct => struct.structureType === STRUCTURE_RAMPART))
+                });
                 if (closeHostiles.length) {
                     let targetCreep = creep.pos.findClosestByRange(closeHostiles);
                     creep.rangedAttack(targetCreep);
+                    let result = creep.attack(target);
+                    if (result === OK) {
+                        state.attackResult = OK;
+                    }
                 }
                 else {
                     if (state.attackResult === OK) creep.rangedMassAttack();
@@ -232,7 +265,7 @@ module.exports = {
     yellowFlagLogic: function (creep, state) {
         let yellowFlag = creep.pos.findClosestByPath(FIND_FLAGS, { filter: { color: COLOR_YELLOW } });
         if (yellowFlag) {
-            creep.say('yellow')
+            //creep.say('y')
             let target = _.find(yellowFlag.pos.lookFor(LOOK_STRUCTURES));
             if (target) {
                 let result = creep.attack(target);

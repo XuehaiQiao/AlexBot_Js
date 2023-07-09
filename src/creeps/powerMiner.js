@@ -30,12 +30,15 @@ module.exports = {
                 creep.pull(partner);
             }
         }
-
-        // move to its target room if not in
-        if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
-            creep.moveToRoom(creep.memory.targetRoom);
-            return;
+        else {
+            // todo
         }
+
+        // // move to its target room if not in
+        // if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
+        //     creep.moveToRoom(creep.memory.targetRoom);
+        //     return;
+        // }
 
         const hostileParts = [ATTACK, RANGED_ATTACK, HEAL, CARRY];
         const hostiles = creep.room.find(FIND_HOSTILE_CREEPS, {
@@ -45,35 +48,45 @@ module.exports = {
             )
         });
 
-        if(hostiles.length) {
+        if (hostiles.length) {
             let target;
             let medic = creep.pos.findClosestByRange(hostiles, { filter: hostile => hostile.getActiveBodyparts(HEAL) > 0 && hostile.getActiveBodyparts(RANGED_ATTACK) === 0 });
             if (medic) target = medic;
             else target = creep.pos.findClosestByRange(hostiles);
-            if(creep.attack(target) === ERR_NOT_IN_RANGE) {
+            if (creep.attack(target) === ERR_NOT_IN_RANGE) {
                 creep.moveTo(target);
             }
             return;
         }
 
+        // move to its target room if not in
+        if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
+            creep.moveToRoom(creep.memory.targetRoom);
+            return;
+        }
+
         // harvest
         let powerBank = creep.room.find(FIND_STRUCTURES, { filter: struct => struct.structureType === STRUCTURE_POWER_BANK })[0];
-        if(powerBank) {
+        if (powerBank) {
             if (creep.attack(powerBank) === ERR_NOT_IN_RANGE) {
                 creep.moveTo(powerBank);
             }
         }
         else {
             let hostile = creep.room.find(FIND_HOSTILE_CREEPS)[0];
-            if(hostile) {
-                if(creep.attack(hostile) === ERR_NOT_IN_RANGE) {
+            if (hostile) {
+                if (creep.attack(hostile) === ERR_NOT_IN_RANGE) {
                     creep.moveTo(hostile);
                 }
             }
             else {
-                // suicide if finished all works
-                if(partner) partner.suicide();
-                creep.suicide();
+                if(creep.room.name !== creep.memory.base) creep.memory.targetRoom = creep.memory.base;
+                else {
+                    // suicide if finished all works
+                    if (partner) partner.suicide();
+                    creep.suicide();
+                }
+
             }
         }
     },

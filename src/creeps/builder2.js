@@ -34,8 +34,7 @@ module.exports = {
             var target = this.assignTarget(creep);
             //no tasks
             if (!target) {
-                creep.say('!Target')
-                creep.memory.role = 'upgrader2';
+                creep.toResPos();
                 return;
             }
             // constructionsite (build)

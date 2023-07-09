@@ -102,7 +102,7 @@ module.exports = {
         // for level 8 room
         if(room.controller.level == 8){
             if(creepCount >= 1) return false
-            else if ((storage && storage.store[RESOURCE_ENERGY] > 300000) || room.controller.ticksToDowngrade < 50000) {
+            else if ((storage && storage.store[RESOURCE_ENERGY] > 450000) || room.controller.ticksToDowngrade < 50000) {
                 return true
             }
             else return false;

@@ -81,9 +81,10 @@ Room.prototype.getStorage = function (amount) {
 
     // if no storage, change target to containers that near controller
     if (!storage) {
-        let containers = this.find(FIND_STRUCTURES, { filter: struct => 
-            struct.structureType === STRUCTURE_CONTAINER &&
-            struct.store.getFreeCapacity() >= amount
+        let containers = this.find(FIND_STRUCTURES, {
+            filter: struct =>
+                struct.structureType === STRUCTURE_CONTAINER &&
+                struct.store.getFreeCapacity() >= amount
         });
 
         if (containers.length) {
@@ -100,11 +101,12 @@ Room.prototype.getStorage = function (amount) {
     }
 
     const linkInfo = this.memory.linkInfo;
-    if(linkInfo && (!linkInfo.controllerLink || !linkInfo.managerLink)) {
-        if(storage.store[RESOURCE_ENERGY] > 20000){
-            let containers = this.find(FIND_STRUCTURES, { filter: struct => 
-                struct.structureType === STRUCTURE_CONTAINER &&
-                struct.store.getFreeCapacity() >= amount
+    if (linkInfo && (!linkInfo.controllerLink || !linkInfo.managerLink)) {
+        if (storage.store[RESOURCE_ENERGY] > 20000) {
+            let containers = this.find(FIND_STRUCTURES, {
+                filter: struct =>
+                    struct.structureType === STRUCTURE_CONTAINER &&
+                    struct.store.getFreeCapacity() >= amount
             });
             storage = _.find(containers, con => con.pos.inRangeTo(this.controller.pos, 3));
             return storage;
@@ -112,4 +114,13 @@ Room.prototype.getStorage = function (amount) {
     }
 
     return storage;
+}
+
+
+Room.prototype.getResourceAmount = function (resourceType) {
+    // check resource amount;
+    let totalResourceAmount = 0
+    if (this.storage) totalResourceAmount += this.storage.store[resourceType];
+    if (this.terminal) totalResourceAmount += this.terminal.store[resourceType];
+    return totalResourceAmount;
 }

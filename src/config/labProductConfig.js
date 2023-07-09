@@ -11,8 +11,8 @@ module.exports = {
     // LH2O: [5000, 12000],
     
 
-    XUH2O: [6000, 17000], // attack
-    XLH2O: [6000, 17000],  // repair & build
+    XUH2O: [6000, 12000], // attack
+    XLH2O: [6000, 12000],  // repair & build
 
     XKHO2: [6000, 17000], // ranged_attack
     XLHO2: [6000, 17000],  // heal

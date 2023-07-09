@@ -15,10 +15,20 @@ module.exports = {
         }
 
         // move to its target room if not in
-        if (creep.moveToRoomAdv(creep.memory.targetRoom)) {
-            if (creep.hits < creep.hitsMax) creep.heal(creep);
+        if (creep.memory.targetRoom && creep.room.name !== creep.memory.targetRoom) {
             atkOnTheWay(creep);
-            return;
+
+            if(creep.hits < creep.hitsMax) {
+                if(creep.isAtEdge()) creep.leaveEdge();
+                creep.heal(creep);
+                //return;
+            }
+            else {
+                creep.travelTo(new RoomPosition(25, 25, creep.memory.targetRoom), {preferHighway: true});
+                if (creep.hits < creep.hitsMax) creep.heal(creep);
+                return;
+            }
+
         }
 
         // flee flag logic
@@ -56,6 +66,19 @@ module.exports = {
         if (hostile) {
             creep.heal(creep);
             //if (creep.memory.target === null) creep.memory.target = hostile.id;
+
+            const moveParts = creep.body.reduce((count, part) => {
+                if (part.type === MOVE) return count + 1;
+                else return count;
+            }, 0);
+
+            // check flee
+            if (creep.getActiveBodyparts(MOVE) < moveParts) {
+                //creep.fleeFromAdv(hostile, 6);
+                damagedFlee(creep);
+                atkOnTheWay(creep);
+                return;
+            }
 
             // struct
             if (hostile.structureType) {
@@ -106,9 +129,9 @@ module.exports = {
             }
             else if (roomInfo[creep.room.name]) creep.toResPos();
             else {
-                creep.travelTo(new RoomPosition(25, 25, creep.room.name), { 
-                    allowSK: true, 
-                    range: 20,
+                creep.travelTo(new RoomPosition(25, 25, creep.room.name), {
+                    allowSK: true,
+                    range: 22,
                 });
             }
         }
@@ -173,17 +196,45 @@ function attackInDistance(creep, hostile, range) {
     if (creep.pos.getRangeTo(hostile) > range) creep.moveTo(hostile);
     else if (creep.pos.getRangeTo(hostile) < range) creep.fleeFromAdv(hostile, 5);
 
-    creep.rangedAttack(hostile);
+    let result = creep.rangedAttack(hostile);
     if (creep.pos.isNearTo(hostile)) creep.rangedMassAttack();
+    if(result = ERR_NOT_IN_RANGE) atkOnTheWay(creep);
 }
 
 function atkOnTheWay(creep) {
-    let hostiles = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3);
-    if (hostiles.length) {
-        let target = creep.pos.findClosestByRange(hostiles);
-        if (target.pos.isNearTo(creep)) {
+    let hostile = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3)[0];
+    if (!hostile) {
+        hostile = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
+            filter: struct => (
+                struct.structureType !== STRUCTURE_KEEPER_LAIR &&
+                struct.structureType !== STRUCTURE_INVADER_CORE &&
+                struct.structureType !== STRUCTURE_CONTROLLER &&
+                struct.structureType !== STRUCTURE_TERMINAL
+            )
+        });
+    }
+
+    if (hostile) {
+        if (hostile.pos.isNearTo(creep)) {
             creep.rangedMassAttack();
         }
-        else creep.rangedAttack(target);
+        else creep.rangedAttack(hostile);
     }
+}
+
+function damagedFlee(creep) {
+    if(!creep.memory.base) {
+        let hostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        creep.fleeFromAdv(hostile, 6);
+        return;
+    }
+
+    if (creep.memory.exitDirection == null) {
+        creep.memory.exitDirection = creep.room.findExitTo(creep.memory.base);
+    }
+
+    creep.say(creep.memory.exitDirection);
+    
+    let target = creep.pos.findClosestByRange(creep.memory.exitDirection);
+    creep.travelTo(target, {ignoreCreeps: false});
 }

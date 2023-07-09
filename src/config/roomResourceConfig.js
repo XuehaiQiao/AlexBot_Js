@@ -17,15 +17,15 @@ module.exports = {
     GH: {terminal: 4000, storage: [1000, 3500, 20000]}, // attack
     UO: {terminal: 4000, storage: [1000, 4000, 20000]}, // harvest
 
-    XUH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // attack
+    XUH2O: {terminal: 4000, storage: [3000, 6000, 20000]}, // attack
     XUHO2: {terminal: 4000, storage: [5000, 10000, 20000]}, // harvest
     XKH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // carry
     XKHO2: {terminal: 4000, storage: [5000, 10000, 20000]}, // ranged_attack
-    XLH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // repair & build
+    XLH2O: {terminal: 4000, storage: [3000, 6000, 20000]}, // repair & build
     XLHO2: {terminal: 4000, storage: [5000, 10000, 20000]}, // heal
     XZH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // dismantle
     XZHO2: {terminal: 4000, storage: [5000, 10000, 20000]}, // move
-    XGH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // upgradeController
+    XGH2O: {terminal: 4000, storage: [5000, 10000, 20000]}, // upgradeController    
     XGHO2: {terminal: 4000, storage: [5000, 10000, 20000]}, // tough
     
     power: {terminal: 2000, storage: [5000, 10000, 20000]},
