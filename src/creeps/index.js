@@ -14,6 +14,9 @@ let creepLogic = {
     miner:          require('./miner'),
     mineralCarrier: require('./mineralCarrier'),
 
+    // base defenders
+    baseMelee:      require('./baseMelee'),
+
     // outpost harvest
     claimer:        require('./claimer'),
     outSourcer:     require('./outSourcer'),
@@ -24,13 +27,28 @@ let creepLogic = {
     transporter:    require('./transporter'),
     defender:       require('./defender'),
     remoteMiner:    require('./remoteMiner'),
+    // outpost harvest v2
+    kAtkDuo:        require('./kAtkDuo'),
 
     // others
     wrecker:        require('./wrecker'),
     medic:          require('./medic'),
     scout:          require('./scout'),
     rangeAtker:     require('./rangeAtker'),
-    
+
+    // attackers
+    atkMelee:       require('./atkMelee'),
+    atkMedic:       require('./atkMedic'),
+
+    // defenders
+    defMelee:       require('./defMelee'),
+
+    // season
+    roadRepairer: require('./roadRepairer'),
+
+    // power
+    powerMiner: require('./powerMiner'),
+    powerMedic: require('./powerMedic'),
 }
 
 module.exports = creepLogic;

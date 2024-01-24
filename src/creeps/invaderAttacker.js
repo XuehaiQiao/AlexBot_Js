@@ -1,4 +1,3 @@
-const { G } = require("../config/roomResourceConfig");
 const { T3_HEAL, T3_TOUGH, T3_RANGE_ATTACK } = require("../constants/boostName");
 
 module.exports = {

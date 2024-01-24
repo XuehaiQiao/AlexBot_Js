@@ -2,11 +2,11 @@ module.exports = {
     properties: {
         role: 'harvester2',
         stages: {
-            1: {maxEnergyCapacity: 300, bodyParts:[WORK, WORK, CARRY, MOVE], number: 1},
-            2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 1},
+            1: {maxEnergyCapacity: 300, bodyParts:[WORK, WORK, MOVE, MOVE], number: 3},
+            2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, WORK, WORK, MOVE, MOVE], number: 1},
             3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
-            4: {maxEnergyCapacity: 1300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE], number: 1},
-            6: {maxEnergyCapacity: 2300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], number: 1},
+            4: {maxEnergyCapacity: 1300, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 1},
+            //7: {maxEnergyCapacity: 5600, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], number: 1},
         },
     },
 
@@ -28,46 +28,73 @@ module.exports = {
 
         if(result == ERR_NOT_ENOUGH_RESOURCES) {
             let source = creep.room.find(FIND_SOURCES)[creep.memory.target];
-            if(source) creep.memory.rest = source.ticksToRegeneration;
+            if(!source.energy) creep.memory.rest = source.ticksToRegeneration;
         }
     },
 
     // checks if the room needs to spawn a creep
     spawn: function(room) {
-        var sourceCount = Math.min(2, room.find(FIND_SOURCES).length);
+        const sourceCount = room.find(FIND_SOURCES).length;
+        const stage = this.getStage(room);
 
         let creepCount;
         if(global.roomCensus[room.name][this.properties.role]) creepCount = global.roomCensus[room.name][this.properties.role]
         else creepCount = 0;
 
-        if (creepCount < sourceCount) {
+        let totalNeeds = 0;
+        const rInfo = room.memory.roomInfo;
+        if(rInfo) {
+            for(const sourceObj of rInfo.sourceInfo) {
+                totalNeeds += Math.min(this.properties.stages[stage].number, sourceObj.space);
+            }
+        }
+        else {
+            totalNeeds = sourceCount * this.properties.stages[stage].number
+        }
+
+        // console.log(totalNeeds);
+
+        if (creepCount < totalNeeds) {
             return true;
         }
     },
 
     // returns an object with the data to spawn a new creep
     spawnData: function(room) {
-        let stage = this.getStage(room);
-        let name = this.properties.role + Game.time; 
-        let body = this.properties.stages[stage].bodyParts;
+        const stage = this.getStage(room);
+        const rInfo = room.memory.roomInfo;
+
+        const name = this.properties.role + Game.time; 
+        const body = this.properties.stages[stage].bodyParts;
 
         const existingThisTypeCreeps = _.filter(Game.creeps, creep => (
             creep.memory.role == this.properties.role && 
             creep.memory.base == room.name &&
             !(creep.ticksToLive < creep.body.length * 3)
         ));
-        var existingTargets = _.map(existingThisTypeCreeps, creep => creep.memory.target)
+        
+        let targetCount = {}
+        existingThisTypeCreeps.forEach((creep) => {
+            let targetId = creep.memory.target;
+            if(targetCount[targetId]) targetCount[targetId] += 1;
+            else targetCount[targetId] = 1;
+        });
 
-        let sourceCount = room.find(FIND_SOURCES).length;
-        var sourceTarget;
-        for(var i = 0; i < sourceCount; i++) {
-            if (!existingTargets.includes(i)) {
-                sourceTarget = i;
-                break;
+        let sourceTarget;
+        let sources = room.find(FIND_SOURCES);
+        for(const index in sources) {
+            let creepNeed;
+            if(rInfo) {
+                creepNeed = Math.min(this.properties.stages[stage].number, rInfo.sourceInfo[index].space);
             }
+            else creepNeed = this.properties.stages[stage].number;
+
+            if (targetCount[index] >= creepNeed) continue;
+            sourceTarget = index;
+            break;
         }
 
-        let memory = {role: this.properties.role, status: 0, target: sourceTarget, base: room.name};
+        const memory = {role: this.properties.role, status: 0, target: sourceTarget, base: room.name};
 
         return {name, body, memory};
     },

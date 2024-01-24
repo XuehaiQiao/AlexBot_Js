@@ -5,8 +5,8 @@ module.exports = {
     /** @param {Creep} creep **/
     run: function(creep) {
         // move to its target room if not in
-        if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
-            creep.moveToRoom(creep.memory.targetRoom);
+        if (creep.memory.targetRoom && creep.room.name !== creep.memory.targetRoom) {
+            creep.travelTo(new RoomPosition(25, 25, creep.memory.targetRoom), {preferHighway: true});
             return;
         }
 
@@ -15,16 +15,24 @@ module.exports = {
             hostileStruct = Game.getObjectById(creep.memory.target);
             if(!hostileStruct) creep.memory.target = null;
         } else {
-            hostileStruct = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES);
+            hostileStruct = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
+                filter: struct => (
+                    struct.structureType != STRUCTURE_CONTROLLER &&
+                    struct.structureType != STRUCTURE_RAMPART
+                    //struct.structureType != STRUCTURE_STORAGE &&
+                    //struct.structureType != STRUCTURE_TERMINAL
+                )
+            });
         }
 
         if(!hostileStruct && creep.memory.wall) {
-            hostileStruct = creep.pos.findClosestByRange(FIND_STRUCTURES, {filter: struct => struct.structureType === STRUCTURE_WALL});
+            hostileStruct = creep.pos.findClosestByRange(FIND_STRUCTURES, {filter: struct => struct.structureType === STRUCTURE_WALL && struct.structureType === STRUCTURE_RAMPART});
         }
 
         if (hostileStruct) {
-            if(creep.dismantle(hostileStruct) == ERR_NOT_IN_RANGE) {
-                creep.moveToNoCreepInRoom(hostileStruct);
+            let result = creep.dismantle(hostileStruct);
+            if(result === ERR_NOT_IN_RANGE) {
+                creep.moveTo(hostileStruct, {visualizePathStyle: {stroke: '#ff0000'}});
             }
             return;
         }

@@ -25,7 +25,7 @@ module.exports = {
         // set status: 0. harvest  1. work 
         creep.workerSetStatus();
 
-        if(creep.memory.status == 0) {
+        if(!creep.memory.status) {
             // pick up near energy
             const nearEnergy = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1, {filter: resource => resource.resourceType == RESOURCE_ENERGY});
             if(nearEnergy.length > 0) {

@@ -1,7 +1,7 @@
 const { roomInfo } = require("../config");
 
 module.exports = function(room) {
-    if (roomInfo[room.name] == undefined || roomInfo[room.name].managerPos == undefined) {
+    if (!roomInfo[room.name] || !roomInfo[room.name].managerPos) {
         return;
     }
 
@@ -22,6 +22,17 @@ module.exports = function(room) {
         if(linkInfo.sourceLinks[i] && !sourceLinks[i]) update = true;
     }
     if(update) updateLinkInfo(room);
+
+    // check if any link is both sourceLink and controllerLink
+    if(controllerLink && sourceLinks.length) {
+        for(let i in sourceLinks) {
+            if(sourceLinks[i].id === controllerLink.id) {
+                sourceLinks.splice(i, 1);
+                break;
+            }
+        }
+    }
+
 
     // check memory's integrity
     if(sourceLinks.length && managerLink) source2manager(sourceLinks, managerLink);

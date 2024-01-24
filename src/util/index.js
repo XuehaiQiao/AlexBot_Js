@@ -1,5 +1,6 @@
 const util = {
-    event: require('./event'),
+    roomUtil: require('./roomUtil'),
+    inRoomUtil: require('./inRoomUtil'),
 }
 
 module.exports = util;

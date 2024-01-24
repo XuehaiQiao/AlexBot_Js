@@ -3,7 +3,6 @@
 module.exports = {
     properties: {
         role: 'keeperAttacker',
-        body: [...new Array(25).fill(MOVE), ...new Array(19).fill(ATTACK), ...new Array(6).fill(HEAL)], // $4270
     },
     /** @param {Creep} creep **/
     run: function(creep) {

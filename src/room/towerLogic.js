@@ -1,6 +1,9 @@
 const { wall, rampart } = require("../structures");
 
+const towerRestTime = 5;
+
 module.exports = function (room) {
+    //if(room.name === 'E16S2') return;
     const towers = room.find(FIND_MY_STRUCTURES, {filter: struct => struct.structureType == STRUCTURE_TOWER && struct.store[RESOURCE_ENERGY] >= 10});
     if(!towers.length) return;
 
@@ -14,11 +17,53 @@ module.exports = function (room) {
     // defending
     let enemies = room.find(FIND_HOSTILE_CREEPS);
     if (enemies.length) {
-        _.forEach(towers, tower => {
-            let target = tower.pos.findClosestByRange(enemies);
-            tower.attack(target);
-        })
-        return;
+        if(room.memory.towerTarget) {
+            let target = Game.getObjectById(room.memory.towerTarget);
+            if(target && target.room.name === room.name) {
+                if(target.hits === target.hitsMax) {
+                    room.memory.towerTarget = null;
+                    room.memory.towerRest = Game.time;
+                }
+                else {
+                    _.forEach(towers, tower => {
+                        tower.attack(target);
+                    });
+                    console.log('founafdfasdfsdeaf', room.name)
+                    return;
+                }
+            }
+            else {
+                room.memory.towerTarget = null;
+                room.memory.towerRest = Game.time;
+            }
+        }
+        else {
+            if(room.memory.towerRest > Game.time - towerRestTime) {
+                // pass
+            }
+            else {
+                // todo: target creep with highest attack damage
+                // find enemy
+                let target;
+                const defMelees = room.find(FIND_MY_CREEPS, {filter: c => c.memory.role === 'defMelee'});
+                const nearDefMelees = [];
+                _.forEach(defMelees, c => {
+                    nearDefMelees.push(...c.pos.findInRange(FIND_HOSTILE_CREEPS, 1))
+                });
+                if(nearDefMelees.length) {
+                    target = nearDefMelees[Math.floor(Math.random() * nearDefMelees.length)];
+                }
+                else {
+                    target = enemies[Math.floor(Math.random() * enemies.length)];
+                }
+                
+                room.memory.towerTarget = target.id;
+                _.forEach(towers, tower => {
+                    tower.attack(target);
+                })
+            }
+        }
+        console.log(room, "Found Enemies!");
     }
 
     // repair (no enemy)
@@ -32,18 +77,21 @@ module.exports = function (room) {
     }
 
     if (!room.memory.needRepairStructures) room.memory.needRepairStructures = [];
-    if (Game.time % 50 === 0 && room.memory.needRepairStructures.length === 0) {
+    if (Game.time % 10 === 0 && room.memory.needRepairStructures.length === 0) {
         let needRepairStructures = _.filter(room.find(FIND_STRUCTURES), isNeedRepair);
         room.memory.needRepairStructures = _.map(needRepairStructures, structure => structure.id);
     }
 
     let needRepairs = room.memory.needRepairStructures;
-    if(!needRepairs.length) return
-    let target = Game.getObjectById(needRepairs[needRepairs.length - 1]);
-    if(!target || !isNeedRepair(target)) needRepairs.pop();
-    
-    if(!needRepairs.length) return
-    target = Game.getObjectById(needRepairs[needRepairs.length - 1]);
-    let tower = target.pos.findClosestByRange(towers);
-    tower.repair(target);
+    while(needRepairs.length) {
+        let target = Game.getObjectById(needRepairs[needRepairs.length - 1]);
+        if(!target || !isNeedRepair(target)) {
+            needRepairs.pop();
+        }
+        else {
+            let tower = target.pos.findClosestByRange(towers);
+            tower.repair(target);
+            break;
+        }
+    }
 }

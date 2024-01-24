@@ -1,7 +1,10 @@
 const creepLogic = require('./creeps');
 const roomLogic = require('./room');
+const test = require('./test');
 const tools = require('./tools');
-const { event } = require("./util");
+
+const util = require('./util');
+// const runPowerCreep = require('./powerCreep/runPowerCreep');
 require('./prototypes');
 
 module.exports.loop = function () {
@@ -20,14 +23,14 @@ module.exports.loop = function () {
         return;
     }
 
+    test.sandbox.startOfTheTick();
+
     /**
      * ====================================
      *       MEMORY FREE, INIT
      * ====================================
      */
 
-    // reset event every tick
-    event.init();
     
     // free up memory if creep no longer exists
     for(var name in Memory.creeps) {
@@ -42,7 +45,6 @@ module.exports.loop = function () {
      *            ROOM LOGICS
      * ====================================
      */
-
     // make a list of all of our rooms
     Game.myRooms = _.filter(Game.rooms, r => r.controller && r.controller.level > 0 && r.controller.my);
 
@@ -51,6 +53,8 @@ module.exports.loop = function () {
     roomLogic.roomCensus();
     // run room logic for each room in our empire
     _.forEach(Game.myRooms, r => {
+        roomLogic.activeSafeMode(r);
+        roomLogic.roomInit(r);
         roomLogic.spawning(r);
         roomLogic.towerLogic(r);
         roomLogic.linkTransfer(r);
@@ -58,6 +62,7 @@ module.exports.loop = function () {
         roomLogic.powerOperation(r);
         roomLogic.factorayLogic(r);
         // tools.myRoomPlanner(r.name, { render: true });
+
     });
     roomLogic.resourceBalancing(Game.myRooms);
     roomLogic.marketLogic();
@@ -85,6 +90,24 @@ module.exports.loop = function () {
 
     totalCreepCpu += Game.cpu.getUsed();
 
+
+    /**
+     * =====================================
+     *        POWER CREEP LOGICS
+     * =====================================
+     */
+
+    // for(var name in Game.powerCreeps) {
+    //     // if(name !== 'p1') continue;
+    //     var pc = Game.powerCreeps[name];
+    //     runPowerCreep(pc);
+    // }
+
+
+    // if (Game.shard.name === 'shard2' && Game.cpu.bucket === 10000) {
+    //     Game.cpu.generatePixel();
+    // }
+
     /**
      * ====================================
      *               LOGS
@@ -97,5 +120,8 @@ module.exports.loop = function () {
     console.log('total room cpu: ', totalRoomCpu);
     console.log('total creep cpu: ', totalCreepCpu);
     console.log('CPU bucket: ', Game.cpu.bucket);
+
+    test.sandbox.endOfTheTick();
+
     console.log("---------- End Tick, No Errors ----------");
 }

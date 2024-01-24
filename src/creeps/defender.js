@@ -2,16 +2,21 @@ module.exports = {
     properties: {
         role: "defender",
         stages: {
-            1: {maxEnergyCapacity: 300, bodyParts:[MOVE, ATTACK, MOVE, ATTACK], number: 1},
-            2: {maxEnergyCapacity: 550, bodyParts:[MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK], number: 1},
-            3: {maxEnergyCapacity: 800, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
-            //4: {maxEnergyCapacity: 1300, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
-            //5: {maxEnergyCapacity: 1800, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
-            6: {maxEnergyCapacity: 2300, bodyParts:[MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1},
+            1: { maxEnergyCapacity: 300, bodyParts: [MOVE, ATTACK, MOVE, ATTACK], number: 1 },
+            2: { maxEnergyCapacity: 550, bodyParts: [MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK], number: 1 },
+            3: { maxEnergyCapacity: 800, bodyParts: [MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE], number: 1 },
+            4: { maxEnergyCapacity: 1300, bodyParts: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, RANGED_ATTACK, HEAL], number: 1 },
+            5: { maxEnergyCapacity: 1800, bodyParts: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, HEAL], number: 1 },
+            6: { maxEnergyCapacity: 2300, bodyParts: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, HEAL, HEAL], number: 1 },
         },
     },
     /** @param {Creep} creep **/
-    run: function(creep) {
+    run: function (creep) {
+        if (creep.memory.boost && !creep.memory.boosted && creep.memory.boostInfo) {
+            creep.getBoosts();
+            return;
+        }
+        
         // move to its target room if not in
         if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
             creep.moveToRoomAdv(creep.memory.targetRoom);
@@ -21,32 +26,43 @@ module.exports = {
         let hostile;
         if (creep.memory.target) {
             hostile = Game.getObjectById(creep.memory.target);
-        } 
-        if(!hostile) {
-            hostile = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
-        } 
-        if(!hostile) {
-            hostile = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {filter: struct => (struct.structureType != STRUCTURE_KEEPER_LAIR &&struct.structureType != STRUCTURE_CONTROLLER)});
+        }
+        if (!hostile) {
+            hostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        }
+        if (!hostile) {
+            hostile = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, { filter: struct => (struct.structureType != STRUCTURE_KEEPER_LAIR && struct.structureType != STRUCTURE_CONTROLLER) });
         }
 
         if (hostile) {
             creep.rangedAttack(hostile);
-            creep.attack(hostile);
-            creep.moveTo(hostile, {visualizePathStyle: {stroke: '#ff0000'}, maxRooms: 1});
+            if (creep.attack(hostile) !== OK) creep.heal(creep);
+            creep.moveTo(hostile, { visualizePathStyle: { stroke: '#ff0000' }, maxRooms: 1 });
             //creep.say(moveResult);
-            return;
         }
+        else if (creep.getActiveBodyparts(HEAL)) {
+            if (creep.hits < creep.hitsMax) creep.heal(creep);
+            let damaged = creep.pos.findClosestByRange(FIND_MY_CREEPS, { filter: c => c.hits < c.hitsMax });
+            if (damaged) {
+                if (creep.heal(damaged) === ERR_NOT_IN_RANGE) {
+                    creep.travelTo(damaged);
+                }
+                creep.rangedHeal(damaged);
+            }
+        }
+
+
     },
 
     // checks if the room needs to spawn a creep
-    spawn: function(room, roomName) {
-        if(Memory.outSourceRooms[roomName] && Memory.outSourceRooms[roomName].neutral === true) {
+    spawn: function (room, roomName) {
+        if (Memory.outSourceRooms[roomName] && Memory.outSourceRooms[roomName].neutral === true) {
             return false;
         }
 
         // check if need spawn
         let creepCount;
-        if(global.roomCensus[roomName] && global.roomCensus[roomName][this.properties.role]) {
+        if (global.roomCensus[roomName] && global.roomCensus[roomName][this.properties.role]) {
             creepCount = global.roomCensus[roomName][this.properties.role]
         }
         else creepCount = 0;
@@ -57,19 +73,19 @@ module.exports = {
     },
 
     // returns an object with the data to spawn a new creep
-    spawnData: function(room, targetRoomName, targetId = null) {
+    spawnData: function (room, targetRoomName, targetId = null) {
         let name = this.properties.role + Game.time;
         let body = this.properties.stages[this.getStage(room)].bodyParts;
-        let memory = {role: this.properties.role, status: 0, targetRoom: targetRoomName, target: targetId, base: room.name};
+        let memory = { role: this.properties.role, status: 0, targetRoom: targetRoomName, target: targetId, base: room.name };
 
-        return {name, body, memory};
+        return { name, body, memory };
     },
 
-    getStage: function(room) {
+    getStage: function (room) {
         var stage = 1;
         let capacity = room.energyCapacityAvailable;
-        for(var level in this.properties.stages) {
-            if(capacity >= this.properties.stages[level].maxEnergyCapacity) {
+        for (var level in this.properties.stages) {
+            if (capacity >= this.properties.stages[level].maxEnergyCapacity) {
                 stage = level;
             }
         }
