@@ -2,7 +2,7 @@ const { roomResourceConfig } = require("../config");
 
 module.exports = function(myRooms) {
     // check room resource
-    if(Game.time % 200 == 45) {
+    if(Game.time % 150 == 80) {
         // Assign tasks: check memory object, create task queue if don't have.
         console.log("assign terminal task")
         for(const i in myRooms) {
@@ -23,6 +23,7 @@ module.exports = function(myRooms) {
                     room.storage.store[resourceType] < abundantLine)
                 );
             }
+            sender.sort((r1, r2) => r2.storage.store[resourceType] - r1.storage.store[resourceType]);
             receiver.sort((r1, r2) => r1.storage.store[resourceType] - r2.storage.store[resourceType]);
     
             for(const i in sender) {

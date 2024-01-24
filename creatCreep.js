@@ -46,19 +46,19 @@ Game.rooms['E9S2'].memory.tasks.spawnTasks.push({
 });
 
 // duo large
-Game.rooms['E17N2'].memory.tasks.spawnTasks.push({
+Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
     name: 'atkM',
     body: [...new Array(10).fill(TOUGH), ...new Array(5).fill(RANGED_ATTACK), ...new Array(25).fill(ATTACK), ...new Array(10).fill(MOVE)],
     memory: {
         role: 'atkMelee',
-        targetRoom: 'E22N2',
+        targetRoom: 'E3S6',
         duoNumber: 6,
         boost: true,
         boostInfo: { XGHO2: 3, XKHO2: 5, XUH2O: 25, XZHO2: 10 }
     }
 });
 
-Game.rooms['E17N2'].memory.tasks.spawnTasks.push({
+Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
     name: 'atkMe',
     body: [...new Array(5).fill(TOUGH), ...new Array(10).fill(MOVE), ...new Array(5).fill(TOUGH), ...new Array(30).fill(HEAL)],
     memory: {
@@ -160,7 +160,7 @@ Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
 
 // power =====================
 
-Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
+Game.rooms['E17N2'].memory.tasks.spawnTasks.push({
     name: 'powerMedic',
     body: [...new Array(25).fill(MOVE), ...new Array(25).fill(HEAL)],
     memory: {
@@ -168,12 +168,12 @@ Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
     }
 });
 
-Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
+Game.rooms['E17N2'].memory.tasks.spawnTasks.push({
     name: 'powerMiner',
     body: [...new Array(20).fill(MOVE), ...new Array(20).fill(ATTACK)],
     memory: {
         role: 'powerMiner',
-        targetRoom: 'E3S0',
+        targetRoom: 'E20N1',
     }
 });
 

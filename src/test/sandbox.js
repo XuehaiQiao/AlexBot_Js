@@ -39,7 +39,7 @@ const sandbox = {
         //tools.visual(Game.rooms['E14N3']);
 
         // E18N6
-        let room = Game.rooms['E18N6'];
+        let room = Game.rooms['E21N8'];
         if(room) {
             let enemies = room.find(FIND_HOSTILE_CREEPS);
             // let myCreeps = room.find(FIND_MY_CREEPS);

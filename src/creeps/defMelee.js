@@ -48,9 +48,10 @@ module.exports = {
             filter: c => (
                 c.owner.username !== 'Invader' &&
                 c.body.length >= 30 &&
-                c.pos.findInRange(FIND_MY_STRUCTURES, struct => struct.structureType === STRUCTURE_RAMPART).length > 0
+                c.pos.findInRange(FIND_MY_STRUCTURES, 1, struct => struct.structureType === STRUCTURE_RAMPART).length > 0
             )
         });
+        console.log("eeeeeee",enemies);
         if(!enemies.length) return false;
 
         // check if need spawn
@@ -64,12 +65,14 @@ module.exports = {
             room.memory.lastDefMeleeST = Game.time;
             return true;
         }
-        else {
-            if (room.memory.lastDefMeleeST < Game.time - 250) {
-                room.memory.lastDefMeleeST = Game.time;
-                return true;
-            }
-        }
+        // else {
+        //     if (room.memory.lastDefMeleeST < Game.time - 250) {
+        //         room.memory.lastDefMeleeST = Game.time;
+        //         return true;
+        //     }
+        // }
+
+        return false;
     },
 
     // returns an object with the data to spawn a new creep

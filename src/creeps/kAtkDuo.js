@@ -41,6 +41,9 @@ module.exports = {
             // if followed by partner
             creep.pull(partner);
 
+            // attack hostile if have
+            if (this.atkPlayer(creep)) return;
+
             //move to targetRoom if not in
             if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
                 creep.moveToRoom(creep.memory.targetRoom);
@@ -124,7 +127,7 @@ module.exports = {
             else invader = creep.pos.findClosestByRange(enemies);
 
             if (creep.pos.getRangeTo(invader) > 3) {
-                creep.travelTo(invader, { allowSK: true, movingTarget: true });
+                creep.travelTo(invader);
             }
             else {
                 let result = creep.attack(invader);
@@ -132,7 +135,7 @@ module.exports = {
                 creep.rangedAttack(invader);
                 if (result !== OK) {
                     creep.heal(creep);
-                    creep.travelTo(invader, { allowSK: true, movingTarget: true });
+                    creep.travelTo(invader, {ignoreCreeps: false});
                 }
 
             }

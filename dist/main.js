@@ -318,10 +318,9 @@ function runPowerCreep(pc) {
         pc.powers[PWR_OPERATE_SPAWN].cooldown === 0 &&
         (pc.room.memory.boostRoom || pc.room.memory.powerSpawn)
     ) {
-        if (pc.store[RESOURCE_OPS] < 100) pc.memory.status = 0;
-
         const spawn = pc.room.find(FIND_MY_SPAWNS, { filter: spawn => !spawn.effects || !spawn.effects.length })[0];
-        if (spawn) {
+        if (pc.store[RESOURCE_OPS] < 100) pc.memory.status = 0;
+        else if (spawn) {
             let result = pc.usePower(PWR_OPERATE_SPAWN, spawn);
             if (result === ERR_NOT_IN_RANGE) pc.moveTo(spawn);
             return;
@@ -934,7 +933,7 @@ module.exports = {
             3: { maxEnergyCapacity: 800, bodyParts: [CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE], number: 3 },
             4: { maxEnergyCapacity: 1300, bodyParts: [...new Array(16).fill(CARRY), ...new Array(8).fill(MOVE)], number: 2 },
             5: { maxEnergyCapacity: 1800, bodyParts: [...new Array(20).fill(CARRY), ...new Array(10).fill(MOVE)], number: 2 },
-            7: { maxEnergyCapacity: 10000, bodyParts: [...new Array(32).fill(CARRY), ...new Array(16).fill(MOVE)], number: 1 },
+            7: { maxEnergyCapacity: 10000, bodyParts: [...new Array(32).fill(CARRY), ...new Array(16).fill(MOVE)], number: 2 },
         },
     },
 
@@ -1114,11 +1113,11 @@ module.exports = {
         stages: {
             1: {maxEnergyCapacity: 300, bodyParts:[WORK, CARRY, MOVE], number: 1},
             2: {maxEnergyCapacity: 550, bodyParts:[WORK, WORK, WORK, CARRY, MOVE, MOVE], number: 6},
-            3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 8},
-            4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(8).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(4).fill(MOVE)], number: 8},
+            3: {maxEnergyCapacity: 800, bodyParts:[WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE], number: 7},
+            4: {maxEnergyCapacity: 1300, bodyParts:[...new Array(8).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(4).fill(MOVE)], number: 7},
             5: {maxEnergyCapacity: 1800, bodyParts:[...new Array(10).fill(WORK), ...new Array(3).fill(CARRY), ...new Array(5).fill(MOVE)], mBodyParts: [...new Array(12).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(6).fill(MOVE)], number: 1},
-            6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(14).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(7).fill(MOVE)], mBodyParts: [...new Array(14).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(7).fill(MOVE)], number: 1},
-            7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(30).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(15).fill(MOVE)], number: 0},
+            6: {maxEnergyCapacity: 2300, bodyParts:[...new Array(14).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(7).fill(MOVE)], mBodyParts: [...new Array(19).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(5).fill(MOVE)], number: 1},
+            7: {maxEnergyCapacity: 5600, bodyParts:[...new Array(16).fill(WORK), ...new Array(16).fill(CARRY), ...new Array(16).fill(MOVE)], mBodyParts: [...new Array(38).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(10).fill(MOVE)], number: 0},
             8: {maxEnergyCapacity: 10000, bodyParts:[...new Array(15).fill(WORK), ...new Array(15).fill(CARRY), ...new Array(15).fill(MOVE)], mBodyParts: [...new Array(15).fill(WORK), ...new Array(2).fill(CARRY), ...new Array(8).fill(MOVE)], number: 1},
         },
     },
@@ -1195,7 +1194,7 @@ module.exports = {
         let num = this.properties.stages[this.getStage(room)].number;
         if(room.controller.level == 8){
             if(creepCount >= 1) return false
-            else if ((storage && storage.store[RESOURCE_ENERGY] > 450000) || room.controller.ticksToDowngrade < 50000) {
+            else if ((storage && storage.store[RESOURCE_ENERGY] > 250000) || room.controller.ticksToDowngrade < 50000) {
                 return true
             }
             else return false;
@@ -3205,7 +3204,7 @@ module.exports = {
         creep.say('cdr');
         if (!creep.memory.status) {
             if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
-                creep.moveToRoomAdv(creep.memory.targetRoom);
+                creep.travelTo(new RoomPosition(25, 25, creep.memory.targetRoom), {preferHighway: true});
                 return;
             }
             if(creep.takeEnergyFromClosest()) return;
@@ -3225,7 +3224,7 @@ module.exports = {
         }
         else {
             if (creep.memory.base && creep.memory.base != creep.room.name) {
-                creep.moveToRoom(creep.memory.base);
+                creep.travelTo(new RoomPosition(25, 25, creep.memory.base), {preferHighway: true});
                 return;
             }
             var storage = creep.room.storage;
@@ -4023,6 +4022,7 @@ module.exports = {
         }
         else {
             creep.pull(partner);
+            if (this.atkPlayer(creep)) return;
             if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
                 creep.moveToRoom(creep.memory.targetRoom);
                 return;
@@ -4102,7 +4102,7 @@ module.exports = {
             else invader = creep.pos.findClosestByRange(enemies);
 
             if (creep.pos.getRangeTo(invader) > 3) {
-                creep.travelTo(invader, { allowSK: true, movingTarget: true });
+                creep.travelTo(invader);
             }
             else {
                 let result = creep.attack(invader);
@@ -4110,7 +4110,7 @@ module.exports = {
                 creep.rangedAttack(invader);
                 if (result !== OK) {
                     creep.heal(creep);
-                    creep.travelTo(invader, { allowSK: true, movingTarget: true });
+                    creep.travelTo(invader, {ignoreCreeps: false});
                 }
 
             }
@@ -4467,15 +4467,18 @@ module.exports = {
             return;
         }
         if (creep.memory.targetRoom && creep.room.name !== creep.memory.targetRoom) {
-            atkOnTheWay(creep);
-
-            if(creep.hits < creep.hitsMax) {
-                if(creep.isAtEdge()) creep.leaveEdge();
-                creep.heal(creep);
+            const hostileParts = [ATTACK, RANGED_ATTACK, HEAL, CARRY];
+            const hostiles = creep.room.find(FIND_HOSTILE_CREEPS, {
+                filter: c => (
+                    _.find(hostileParts, partType => c.getActiveBodyparts(partType) > 0)
+                )
+            });
+    
+            if (hostiles.length) {
             }
             else {
                 creep.travelTo(new RoomPosition(25, 25, creep.memory.targetRoom), {preferHighway: true});
-                if (creep.hits < creep.hitsMax) creep.heal(creep);
+                creep.heal(creep);
                 return;
             }
 
@@ -4622,7 +4625,7 @@ module.exports = {
 };
 
 function attackInDistance(creep, hostile, range) {
-    if (creep.pos.getRangeTo(hostile) > range) creep.moveTo(hostile);
+    if (creep.pos.getRangeTo(hostile) > range) creep.moveTo(hostile, {maxRooms: 1});
     else if (creep.pos.getRangeTo(hostile) < range) creep.fleeFromAdv(hostile, 5);
 
     let result = creep.rangedAttack(hostile);
@@ -5130,9 +5133,10 @@ module.exports = {
             filter: c => (
                 c.owner.username !== 'Invader' &&
                 c.body.length >= 30 &&
-                c.pos.findInRange(FIND_MY_STRUCTURES, struct => struct.structureType === STRUCTURE_RAMPART).length > 0
+                c.pos.findInRange(FIND_MY_STRUCTURES, 1, struct => struct.structureType === STRUCTURE_RAMPART).length > 0
             )
         });
+        console.log("eeeeeee",enemies);
         if(!enemies.length) return false;
         let creepCount;
         if (global.roomCensus[room.name] && global.roomCensus[room.name][this.properties.role]) {
@@ -5144,12 +5148,8 @@ module.exports = {
             room.memory.lastDefMeleeST = Game.time;
             return true;
         }
-        else {
-            if (room.memory.lastDefMeleeST < Game.time - 250) {
-                room.memory.lastDefMeleeST = Game.time;
-                return true;
-            }
-        }
+
+        return false;
     },
     spawnData: function (room) {
         let name = this.properties.role + Game.time % 10000;
@@ -5456,7 +5456,7 @@ module.exports = {
         let targetRoom = Game.rooms[targetRoomName];
         if (targetRoom) {
             let reactor = targetRoom.find(FIND_REACTORS)[0];
-            if (reactor && reactor.store[RESOURCE_THORIUM] >= 900) return false;
+            if (reactor && reactor.store[RESOURCE_THORIUM] >= 950) return false;
         }
 
         if (carryAmount <= 300 && thisTypeCreeps.length < 6) {
@@ -5740,23 +5740,13 @@ const creepLogic = __require(1,42);
 const { roomBoost } = __require(6,42);
 
 module.exports = function (room) {
-    if (room.name === 'E16S2' && Game.time % 1500 === 500) {
-        Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
-            name: 'rangeAtker',
-            body: [...new Array(5).fill(RANGED_ATTACK), ...new Array(25).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(10).fill(HEAL)],
-            memory: {
-                role: 'rangeAtker',
-                targetRoom: 'E18S1',
-            }
-        });
-
-    }
     let idleSpawn = _.find(room.find(FIND_MY_SPAWNS), spawn => spawn.spawning == null);
     if (!idleSpawn) return;
     if (createCoreCreep(room, idleSpawn)) return;
     if (createTaskCreep(room, idleSpawn)) return;
     if (roomDefenceCreeps(room, idleSpawn)) return;
     if (createReactorCreep(room, idleSpawn, 'E14N3', 'E15N5')) return;
+    if (createReactorCreep(room, idleSpawn, 'E6S2', 'E5S5')) return;
     if (roomBoost.spawn(room, idleSpawn, spawnCreep)) return;
     for (const remoteRoomName of room.memory.outSourceRooms) {
         const roomMemory = Memory.outSourceRooms[remoteRoomName];
@@ -5820,24 +5810,6 @@ function createReactorCreep(room, spawn, baseRoomName, targetRoomName) {
     if (scoutNum < 1) {
         let result = spawnCreep(room, spawn, creepLogic['scout'].spawnData(room, targetRoomName));
         if (result === OK) return true;
-    }
-
-    let defenderNum = 0;
-    if (global.roomCensus[targetRoomName] && global.roomCensus[targetRoomName]['rangeAtker']) defenderNum = global.roomCensus[targetRoomName]['rangeAtker'];
-    if (defenderNum < 1) {
-        let result = spawnCreep(room, spawn, {
-            name: 'rA' + Game.time % 5000,
-            body: [...new Array(5).fill(RANGED_ATTACK), ...new Array(25).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(10).fill(HEAL)],
-            memory: { role: 'rangeAtker', targetRoom: targetRoomName, base: room.name}
-        });
-        if (result === OK) return true;
-    }
-    if (Game.time % 1300 === 500) {
-        room.memory.tasks.spawnTasks.push({
-            name: 'rangeAtker',
-            body: [...new Array(10).fill(RANGED_ATTACK), ...new Array(6).fill(HEAL), ...new Array(16).fill(MOVE)],
-            memory: { role: 'rangeAtker', targetRoom: targetRoomName, }
-        });
     }
 
     if (Game.time % 1300 === 1100) {
@@ -5938,20 +5910,20 @@ function remoteDefenceCreeps(room, spawn, roomName, roomMemory) {
 
     const hostileCreeps = remoteRoom.find(FIND_HOSTILE_CREEPS, {
         filter: c =>
-            c.owner.username === 'Source Keeper' &&
+            c.owner.username === 'Invader' &&
             _.find(hostileParts, partType => c.getActiveBodyparts(partType) > 0)
     });
 
-    if(enemies.length) {
+    if(enemies.length && room.controller.level >= 7) {
         console.log(roomName, 'found enemy!');
         if (creepLogic['rangeAtker'].spawn(room, roomName)) {
             let creepSpawnData = {
                 name: 'rangeAtker' + Game.time % 10000,
-                body: [...new Array(5).fill(RANGED_ATTACK), ...new Array(25).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(10).fill(HEAL)],
+                body: [...new Array(5).fill(RANGED_ATTACK), ...new Array(12).fill(MOVE), ...new Array(10).fill(RANGED_ATTACK), ...new Array(13).fill(MOVE), ...new Array(10).fill(HEAL)],
                 memory: {
                     role: 'rangeAtker',
-                    base: room.name,
                     targetRoom: roomName,
+                    base: room.name,
                 }
             }
             spawnCreep(room, spawn, creepSpawnData);
@@ -5974,6 +5946,18 @@ function remoteDefenceCreeps(room, spawn, roomName, roomMemory) {
 }
 
 function remoteSourcingCreeps(room, spawn, roomName, roomMemory) {
+    const remoteRoom = Game.rooms[roomName];
+    if(remoteRoom) {
+        const hostileParts = [ATTACK, RANGED_ATTACK, WORK, HEAL, CLAIM, CARRY]
+
+        const enemies = remoteRoom.find(FIND_HOSTILE_CREEPS, {
+            filter: c =>
+                c.owner.username !== 'Source Keeper' &&
+                c.owner.username !== 'Invader' &&
+                _.find(hostileParts, partType => c.getActiveBodyparts(partType) > 0)
+        });
+        if(enemies.length) return false;
+    }
 
     if (!roomMemory.neutral) {
         let outSourceTypes = ['claimer', 'remoteHarvester', 'remoteHauler'];
@@ -6371,7 +6355,7 @@ __modules[47] = function(module, exports) {
 const { roomResourceConfig } = __require(63,47);
 
 module.exports = function(myRooms) {
-    if(Game.time % 200 == 45) {
+    if(Game.time % 150 == 80) {
         console.log("assign terminal task")
         for(const i in myRooms) {
             if(!myRooms[i].memory.tasks) myRooms[i].memory.tasks = {};
@@ -6391,6 +6375,7 @@ module.exports = function(myRooms) {
                     room.storage.store[resourceType] < abundantLine)
                 );
             }
+            sender.sort((r1, r2) => r2.storage.store[resourceType] - r1.storage.store[resourceType]);
             receiver.sort((r1, r2) => r1.storage.store[resourceType] - r2.storage.store[resourceType]);
     
             for(const i in sender) {
@@ -6436,7 +6421,7 @@ module.exports = function (room) {
 
 function usePower(room) {
     let storage = room.storage;
-    if (!storage || storage.store[RESOURCE_ENERGY] < 420000) return;
+    if (!storage || storage.store[RESOURCE_ENERGY] < 550000) return;
 
     let pSpawn = room.find(FIND_MY_STRUCTURES, {
         filter: struct => (
@@ -6764,25 +6749,26 @@ module.exports = function (room) {
     if (enemies.length) {
         if(room.memory.towerTarget) {
             let target = Game.getObjectById(room.memory.towerTarget);
-            if(target) {
+            if(target && target.room.name === room.name) {
                 if(target.hits === target.hitsMax) {
                     room.memory.towerTarget = null;
-                    room.memory.towerRest = towerRestTime;
+                    room.memory.towerRest = Game.time;
                 }
                 else {
                     _.forEach(towers, tower => {
                         tower.attack(target);
                     });
+                    console.log('founafdfasdfsdeaf', room.name)
+                    return;
                 }
             }
             else {
                 room.memory.towerTarget = null;
-                room.memory.towerRest = towerRestTime;
+                room.memory.towerRest = Game.time;
             }
         }
         else {
-            if(room.memory.towerRest > 0) {
-                room.memory.towerRest--;
+            if(room.memory.towerRest > Game.time - towerRestTime) {
             }
             else {
                 let target;
@@ -6973,7 +6959,7 @@ const sandbox = {
     },
 
     endOfTheTick: function () {
-        let room = Game.rooms['E18N6'];
+        let room = Game.rooms['E21N8'];
         if(room) {
             let enemies = room.find(FIND_HOSTILE_CREEPS);
             if(enemies.length) {
@@ -9737,9 +9723,9 @@ const creepLogic = __require(1,62);
 
 module.exports = {
     creepCounts: {
-        energyTransporter: 13,
-        thoriumTransporter: 30,
-        upgrader2: 5,
+        energyTransporter: 10, // Math.ceil(dis / 6)
+        thoriumTransporter: 30, // Math.ceil(dis / 2.7)
+        upgrader2: 3,
         builder2: 2,
     },
 
@@ -9785,16 +9771,12 @@ module.exports = {
         }
 
         const thorium = boostRoom.find(FIND_MINERALS, { filter: mine => mine.mineralType === RESOURCE_THORIUM })[0];
-        if (!thorium) {
-            delete room.memory.boostRoom;
-            return false;
-        }
         let builderCount;
         if (global.roomCensus[boostRoomName] && global.roomCensus[boostRoomName]['builder2']) builderCount = global.roomCensus[boostRoomName]['builder2'];
         else builderCount = 0;
         if (builderCount < this.creepCounts.builder2 && boostRoom.find(FIND_MY_CONSTRUCTION_SITES).length > 0) {
             let creepSpawnData = {
-                name: 'builder2' + Game.time % 10000,
+                name: 'builder' + Game.time % 10000,
                 body: [...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)],
                 memory: { role: 'builder2', base: room.name, targetRoom: boostRoomName }
             }
@@ -9826,7 +9808,14 @@ module.exports = {
 
         const controller = boostRoom.controller;
         if (controller.level < 6) {
-            if (creepLogic.roadRepairer.spawn(room, boostRoomName)) {
+            let adjacentRoomNames = Game.map.describeExits(room.name)
+            let ifRepairer = true;
+            for(let exit in adjacentRoomNames) {
+                let rN = adjacentRoomNames[exit];
+                if(rN === boostRoomName) ifRepairer = false;
+            }
+
+            if (ifRepairer && creepLogic.roadRepairer.spawn(room, boostRoomName)) {
                 let creepSpawnData = creepLogic.roadRepairer.spawnData(room, boostRoomName);
                 let result = spawnCreep(room, spawn, creepSpawnData);
                 if (result === OK) return true;
@@ -9836,17 +9825,19 @@ module.exports = {
             if (global.roomCensus[boostRoomName] && global.roomCensus[boostRoomName]['upgrader2']) upgraderCount = global.roomCensus[boostRoomName]['upgrader2'];
             else upgraderCount = 0;
             if (upgraderCount < this.creepCounts.upgrader2) {
-                let boostInfo = { GH: 30 };
+                let boostInfo = { GH: 23 };
                 let totalGH2O = baseTerminal.store['GH2O'] + baseStorage.store['GH2O'];
-                if (totalGH2O > 900) boostInfo = { GH2O: 30 };
+                if (totalGH2O > 900) boostInfo = { GH2O: 23 };
 
                 let creepSpawnData = {
                     name: 'upgrader2' + Game.time % 10000,
-                    body: [...new Array(30).fill(WORK), ...new Array(5).fill(CARRY), ...new Array(15).fill(MOVE)],
+                    body: [...new Array(23).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(23).fill(MOVE)],
                     memory: {
                         role: 'upgrader2',
                         targetRoom: boostRoomName,
                         base: room.name,
+                        boost: true,
+                        boostInfo: boostInfo,
                     }
                 }
 
@@ -9860,7 +9851,7 @@ module.exports = {
             if (transCount < this.creepCounts.energyTransporter && room.storage && room.storage.store[RESOURCE_ENERGY] > 100000) {
                 let creepSpawnData = {
                     name: 'transporter' + Game.time % 10000,
-                    body: [...new Array(32).fill(CARRY), ...new Array(16).fill(MOVE)],
+                    body: [...new Array(25).fill(CARRY), ...new Array(25).fill(MOVE)],
                     memory: { role: 'transporter', targetRoom: boostRoomName, base: room.name, workType: 4 }
                 }
                 let result = spawnCreep(room, spawn, creepSpawnData);
@@ -22841,7 +22832,7 @@ return module.exports;
 __modules[71] = function(module, exports) {
 // resourceType: {terminal: amount, storage: [ShortageLine, AbundantLine, ExceededLine]}
 module.exports = {
-    energy: {terminal: 50000, storage: [200000, 400000, 500000]},
+    energy: {terminal: 100000, storage: [200000, 400000, 500000]},
 
     O: {terminal: 4000, storage: [10000, 20000, 30000]},
     H: {terminal: 4000, storage: [10000, 20000, 30000]},
@@ -22962,6 +22953,11 @@ module.exports = {
         restPos: new RoomPosition(19, 24, "E7N1"),
         managerPos: new RoomPosition(21, 28, "E7N1"),
         storagePos: new RoomPosition(21, 28, "E7N1"),
+    },
+    E2S1: {
+        restPos: new RoomPosition(16, 25, "E2S1"),
+        managerPos: new RoomPosition(12, 32, "E2S1"),
+        storagePos: new RoomPosition(12, 32, "E2S1"),
     },
 }
 return module.exports;

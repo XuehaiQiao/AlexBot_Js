@@ -153,7 +153,7 @@ module.exports = {
         let targetRoom = Game.rooms[targetRoomName];
         if (targetRoom) {
             let reactor = targetRoom.find(FIND_REACTORS)[0];
-            if (reactor && reactor.store[RESOURCE_THORIUM] >= 900) return false;
+            if (reactor && reactor.store[RESOURCE_THORIUM] >= 950) return false;
         }
 
         if (carryAmount <= 300 && thisTypeCreeps.length < 6) {

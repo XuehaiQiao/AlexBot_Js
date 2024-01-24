@@ -2,9 +2,9 @@ const creepLogic = require("../creeps");
 
 module.exports = {
     creepCounts: {
-        energyTransporter: 13,
-        thoriumTransporter: 30,
-        upgrader2: 5,
+        energyTransporter: 10, // Math.ceil(dis / 6)
+        thoriumTransporter: 30, // Math.ceil(dis / 2.7)
+        upgrader2: 3,
         builder2: 2,
     },
 
@@ -54,18 +54,18 @@ module.exports = {
         }
 
         const thorium = boostRoom.find(FIND_MINERALS, { filter: mine => mine.mineralType === RESOURCE_THORIUM })[0];
-        if (!thorium) {
-            delete room.memory.boostRoom;
-            return false;
-        }
+        // if (!thorium) {
+        //     delete room.memory.boostRoom;
+        //     return false;
+        // }
 
-        // builder2
+        // builder
         let builderCount;
         if (global.roomCensus[boostRoomName] && global.roomCensus[boostRoomName]['builder2']) builderCount = global.roomCensus[boostRoomName]['builder2'];
         else builderCount = 0;
         if (builderCount < this.creepCounts.builder2 && boostRoom.find(FIND_MY_CONSTRUCTION_SITES).length > 0) {
             let creepSpawnData = {
-                name: 'builder2' + Game.time % 10000,
+                name: 'builder' + Game.time % 10000,
                 body: [...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)],
                 memory: { role: 'builder2', base: room.name, targetRoom: boostRoomName }
             }
@@ -102,7 +102,14 @@ module.exports = {
         const controller = boostRoom.controller;
         if (controller.level < 6) {
             // roadRepairer
-            if (creepLogic.roadRepairer.spawn(room, boostRoomName)) {
+            let adjacentRoomNames = Game.map.describeExits(room.name)
+            let ifRepairer = true;
+            for(let exit in adjacentRoomNames) {
+                let rN = adjacentRoomNames[exit];
+                if(rN === boostRoomName) ifRepairer = false;
+            }
+
+            if (ifRepairer && creepLogic.roadRepairer.spawn(room, boostRoomName)) {
                 let creepSpawnData = creepLogic.roadRepairer.spawnData(room, boostRoomName);
                 let result = spawnCreep(room, spawn, creepSpawnData);
                 if (result === OK) return true;
@@ -114,19 +121,19 @@ module.exports = {
             if (global.roomCensus[boostRoomName] && global.roomCensus[boostRoomName]['upgrader2']) upgraderCount = global.roomCensus[boostRoomName]['upgrader2'];
             else upgraderCount = 0;
             if (upgraderCount < this.creepCounts.upgrader2) {
-                let boostInfo = { GH: 30 };
+                let boostInfo = { GH: 23 };
                 let totalGH2O = baseTerminal.store['GH2O'] + baseStorage.store['GH2O'];
-                if (totalGH2O > 900) boostInfo = { GH2O: 30 };
+                if (totalGH2O > 900) boostInfo = { GH2O: 23 };
 
                 let creepSpawnData = {
                     name: 'upgrader2' + Game.time % 10000,
-                    body: [...new Array(30).fill(WORK), ...new Array(5).fill(CARRY), ...new Array(15).fill(MOVE)],
+                    body: [...new Array(23).fill(WORK), ...new Array(4).fill(CARRY), ...new Array(23).fill(MOVE)],
                     memory: {
                         role: 'upgrader2',
                         targetRoom: boostRoomName,
                         base: room.name,
-                        // boost: true,
-                        // boostInfo: boostInfo,
+                        boost: true,
+                        boostInfo: boostInfo,
                     }
                 }
 
@@ -142,7 +149,7 @@ module.exports = {
             if (transCount < this.creepCounts.energyTransporter && room.storage && room.storage.store[RESOURCE_ENERGY] > 100000) {
                 let creepSpawnData = {
                     name: 'transporter' + Game.time % 10000,
-                    body: [...new Array(32).fill(CARRY), ...new Array(16).fill(MOVE)],
+                    body: [...new Array(25).fill(CARRY), ...new Array(25).fill(MOVE)],
                     memory: { role: 'transporter', targetRoom: boostRoomName, base: room.name, workType: 4 }
                 }
                 let result = spawnCreep(room, spawn, creepSpawnData);

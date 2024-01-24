@@ -19,25 +19,27 @@ module.exports = function (room) {
     if (enemies.length) {
         if(room.memory.towerTarget) {
             let target = Game.getObjectById(room.memory.towerTarget);
-            if(target) {
+            if(target && target.room.name === room.name) {
                 if(target.hits === target.hitsMax) {
                     room.memory.towerTarget = null;
-                    room.memory.towerRest = towerRestTime;
+                    room.memory.towerRest = Game.time;
                 }
                 else {
                     _.forEach(towers, tower => {
                         tower.attack(target);
                     });
+                    console.log('founafdfasdfsdeaf', room.name)
+                    return;
                 }
             }
             else {
                 room.memory.towerTarget = null;
-                room.memory.towerRest = towerRestTime;
+                room.memory.towerRest = Game.time;
             }
         }
         else {
-            if(room.memory.towerRest > 0) {
-                room.memory.towerRest--;
+            if(room.memory.towerRest > Game.time - towerRestTime) {
+                // pass
             }
             else {
                 // todo: target creep with highest attack damage

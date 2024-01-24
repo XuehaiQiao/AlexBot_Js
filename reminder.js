@@ -5,10 +5,10 @@ const { UH2O } = require("./src/config/labProductConfig");
 // claimer spawn
 Game.spawns['Spawn1_W18S15'].spawnCreep([...new Array(6).fill(CLAIM), ...new Array(6).fill(MOVE)], 'Claimer' + Game.time, { memory: { role: 'claimer', status: 1, targetRoom: 'E14N3', claim: true } });
 
-Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
+Game.rooms['E11S2'].memory.tasks.spawnTasks.push({
     name: 'claim',
-    body: [...new Array(1).fill(CLAIM), ...new Array(1).fill(MOVE)],
-    memory: { role: 'claimer', status: 1, targetRoom: 'E7N1', claim: true }
+    body: [...new Array(1).fill(CLAIM), ...new Array(5).fill(MOVE)],
+    memory: { role: 'claimer', status: 1, targetRoom: 'E15S5', reactor: true }
 });
 // harvester2
 Game.spawns['Spawn1_W18S15'].spawnCreep([WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], 'harvester2' + Game.time, { memory: { role: 'harvester2', target: 0, targetRoom: 'W17S14' } });
@@ -18,7 +18,7 @@ Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
     memory: { role: 'harvester2', status: 0, targetRoom: 'E18S5' }
 });
 //builder2
-Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
+Game.rooms['E9S2'].memory.tasks.spawnTasks.push({
     name: 'builder',
     body: [...new Array(10).fill(WORK), ...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)],
     memory: { role: 'builder', status: 0, targetRoom: 'E7N1' }
@@ -42,7 +42,7 @@ Game.spawns['Spawn2_W21S19'].spawnCreep([...new Array(25).fill(CARRY), ...new Ar
 Game.rooms['E6S2'].memory.tasks.spawnTasks.push({ 
     name: 't', 
     body: [...new Array(25).fill(CARRY), ...new Array(25).fill(MOVE)], 
-    memory: { role: 'transporter', base: 'E6S2', targetRoom: 'E7N1' } 
+    memory: { role: 'transporter', targetRoom: 'E7N1' } 
 });
 // defender
 Game.rooms['E11S2'].memory.tasks.spawnTasks.push({
@@ -67,16 +67,16 @@ Game.rooms['E6S2'].memory.tasks.spawnTasks.push({ name: 'scout', body: [MOVE], m
 Game.spawns['Spawn3_W16S17'].spawnCreep([...new Array(25).fill(MOVE), ...new Array(19).fill(RANGED_ATTACK), ...new Array(6).fill(HEAL)], 'keeperAttacker' + Game.time, { memory: { role: 'keeperAttacker', base: 'W16S17', targetRoom: 'W16S16' } });
 
 // rangeAtker boosted/unboosted
-Game.rooms['E11S2'].memory.tasks.spawnTasks.push({
+Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
     name: 'rangeAtker',
-    body: [...new Array(1).fill(TOUGH), ...new Array(18).fill(MOVE), ...new Array(15).fill(RANGED_ATTACK), ...new Array(2).fill(HEAL)],
+    body: [...new Array(1).fill(TOUGH), ...new Array(18).fill(MOVE), ...new Array(5).fill(RANGED_ATTACK), ...new Array(2).fill(HEAL)],
     memory: {
         role: 'rangeAtker',
-        base: 'E11S2',
-        targetRoom: 'E9N0',
+        base: 'E16S2',
+        targetRoom: 'E18S1',
         boost: true,
         boosted: false,
-        boostInfo: { XLHO2: 2, XGHO2: 1, XKHO2: 15 }
+        boostInfo: { XLHO2: 2, XGHO2: 1, XKHO2: 5 }
     }
 });
 
@@ -128,6 +128,19 @@ Game.rooms['E16S2'].memory.tasks.spawnTasks.push({
         targetRoom: 'E18N2',
     }
 });
+
+// refiller
+Game.rooms['E6S2'].memory.tasks.spawnTasks.push({
+    name: 'reactorFiller',
+    body: [...new Array(10).fill(CARRY), ...new Array(10).fill(MOVE)],
+    memory: {
+        role: 'reactorFiller',
+        targetRoom: 'E5S5',
+        base: 'E6S2',
+        status: 0,
+    }
+});
+
 
 // if no tasks
 if (roomInfo[creep.room.name]) {
@@ -183,7 +196,7 @@ Game.rooms.W19S17.memory.tasks.labTasks.push({ resourceType: 'OH', amount: 3000 
 
 // orders
 Game.rooms['E6S2'].terminal.send(RESOURCE_ENERGY, 30000, 'E2N6', 'From a remote friend');
-Game.rooms['E17N2'].terminal.send('GH', 4000, 'E6S2', 'support');
+Game.rooms['E17N2'].terminal.send('XLHO2', 4000, 'E9S2', 'support');
 
 Game.market.deal('645bfc8403ae10376b827734', 4000, "W21S19");
 // purifier
@@ -316,7 +329,8 @@ Scouting
 // auto new room operation
 
 PathFinder.search(Game.rooms.E17N2.storage.pos, {pos: Game.rooms.E16N2.find.pos, range: 3}).path.length;
-PathFinder.search(Game.rooms.E16S2.storage.pos, {pos: Game.rooms.E18S5.controller.pos, range: 3}).path.length;
+PathFinder.search(Game.rooms.E21N8.storage.pos, {pos: Game.rooms.E21N9.controller.pos, range: 3}).path.length;
+PathFinder.search(Game.rooms.E11S2.storage.pos, {pos: Game.getObjectById('646f560c9bdd4e0008301e40').pos, range: 1}).path.length;
 // start tick 717500
 
 PathFinder.search(new RoomPosition(22, 26, 'E17N2'), {pos: new RoomPosition(31, 22, 'E28S3'), range: 1}, {maxOps: 10000}).path.length;

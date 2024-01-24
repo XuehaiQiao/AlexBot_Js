@@ -16,16 +16,19 @@ module.exports = {
 
         // move to its target room if not in
         if (creep.memory.targetRoom && creep.room.name !== creep.memory.targetRoom) {
-            atkOnTheWay(creep);
-
-            if(creep.hits < creep.hitsMax) {
-                if(creep.isAtEdge()) creep.leaveEdge();
-                creep.heal(creep);
-                //return;
+            const hostileParts = [ATTACK, RANGED_ATTACK, HEAL, CARRY];
+            const hostiles = creep.room.find(FIND_HOSTILE_CREEPS, {
+                filter: c => (
+                    _.find(hostileParts, partType => c.getActiveBodyparts(partType) > 0)
+                )
+            });
+    
+            if (hostiles.length) {
+                // pass
             }
             else {
                 creep.travelTo(new RoomPosition(25, 25, creep.memory.targetRoom), {preferHighway: true});
-                if (creep.hits < creep.hitsMax) creep.heal(creep);
+                creep.heal(creep);
                 return;
             }
 
@@ -193,7 +196,7 @@ module.exports = {
 };
 
 function attackInDistance(creep, hostile, range) {
-    if (creep.pos.getRangeTo(hostile) > range) creep.moveTo(hostile);
+    if (creep.pos.getRangeTo(hostile) > range) creep.moveTo(hostile, {maxRooms: 1});
     else if (creep.pos.getRangeTo(hostile) < range) creep.fleeFromAdv(hostile, 5);
 
     let result = creep.rangedAttack(hostile);

@@ -50,7 +50,7 @@ module.exports = {
         if (!creep.memory.status) {
             // move to its target room if not in
             if (creep.memory.targetRoom && creep.memory.targetRoom != creep.room.name) {
-                creep.moveToRoomAdv(creep.memory.targetRoom);
+                creep.travelTo(new RoomPosition(25, 25, creep.memory.targetRoom), {preferHighway: true});
                 return;
             }
 
@@ -76,7 +76,7 @@ module.exports = {
         else {
             // move to its base room if not in
             if (creep.memory.base && creep.memory.base != creep.room.name) {
-                creep.moveToRoom(creep.memory.base);
+                creep.travelTo(new RoomPosition(25, 25, creep.memory.base), {preferHighway: true});
                 return;
             }
 

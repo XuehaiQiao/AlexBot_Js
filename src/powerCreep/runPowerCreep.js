@@ -69,10 +69,9 @@ function runPowerCreep(pc) {
         pc.powers[PWR_OPERATE_SPAWN].cooldown === 0 &&
         (pc.room.memory.boostRoom || pc.room.memory.powerSpawn)
     ) {
-        if (pc.store[RESOURCE_OPS] < 100) pc.memory.status = 0;
-
         const spawn = pc.room.find(FIND_MY_SPAWNS, { filter: spawn => !spawn.effects || !spawn.effects.length })[0];
-        if (spawn) {
+        if (pc.store[RESOURCE_OPS] < 100) pc.memory.status = 0;
+        else if (spawn) {
             let result = pc.usePower(PWR_OPERATE_SPAWN, spawn);
             if (result === ERR_NOT_IN_RANGE) pc.moveTo(spawn);
             return;

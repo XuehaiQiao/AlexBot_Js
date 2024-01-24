@@ -1,7 +1,7 @@
 // resourceType: {terminal: amount, storage: [ShortageLine, AbundantLine, ExceededLine]}
 // if resource below shrtageLine, it requires to other rooms, if its below abundantLine, 
 module.exports = {
-    energy: {terminal: 50000, storage: [200000, 400000, 500000]},
+    energy: {terminal: 100000, storage: [200000, 400000, 500000]},
 
     O: {terminal: 4000, storage: [10000, 20000, 30000]},
     H: {terminal: 4000, storage: [10000, 20000, 30000]},
